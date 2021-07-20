@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Load Calibration</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <script src="static/load_calibration.js"></script>
+        <h1>Load Calibration</h1>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button> <br><br>
+        
+        <h2 id="component"> Component: </h2>
+
+        <form id="myForm">
+            <label> Calibration Point #1 </label>
+                <label for="x_point1"> X: </label>
+                <input id="x_point1" name="command"></input> 
+                <label for="y_point1"> Y: </label>
+                <input id="y_point1" name="command"></input>
+                <label for="z_point1"> Z: </label>
+                <input id="z_point1" name="command"></input><br>
+
+            <label for="point2"> Calibration Point #2 </label>
+                <label for="x_point2"> X: </label>
+                <input id="x_point2" name="command"></input> 
+                <label for="y_point2"> Y: </label>
+                <input id="y_point2" name="command"></input>
+                <label for="z_point2"> Z: </label>
+                <input id="z_point2" name="command"></input><br>
+
+            <label for="point3"> Calibration Point #3 </label>
+                <label for="x_point3"> X: </label>
+                <input id="x_point3" name="command"></input> 
+                <label for="y_point3"> Y: </label>
+                <input id="y_point3" name="command"></input>
+                <label for="z_point3"> Z: </label>
+                <input id="z_point3" name="command"></input><br>
+
+            <button type="submit">Load Calibration Points</button> <br>
+        </form>
+
+        <h3 id="feedback"></h3><br>
+
+        <button type="button" disabled="disabled" id="test">Test Calibration</button>
+
+        <button type="button" disabled="disabled" id="good_calibration" onclick="location.href='/labware'">Good Calibration - Save Component</button>
+
+        <button type="button" disabled="disabled" id="bad_calibration" onclick="location.href='/calibration'">Bad Calibration - Retry</button>
+
+    </body>
+
+</html>

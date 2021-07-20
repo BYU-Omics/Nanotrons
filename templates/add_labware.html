@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>Add Labware</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <link rel= "stylesheet" type= "text/css" href= '/static/styles/add_labware.css'>
+        <script src="/static/add_labware.js"></script>
+    </head>
+
+    <body>
+        <h1>Add Labware</h1>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <button onclick="window.location.href='http://127.0.0.1:5000/labware';">LABWARE</button>
+    
+        <form id="myForm">
+            
+            <input type="radio" id="Container1" name="command" value="c">
+            <label for="Container1">Chip</label>
+
+            <input type="radio" id="Container2" name="command" value="p">
+            <label for="Container2">Reagent Plate</label> <br>
+
+            <label for="models">Model</label>
+            <select id="models" name="models">
+                <option value="default" selected>- Select Chip or Reagent Plate -</option>
+            </select>
+
+            <button type="button" disabled="disabled" id="upload_model" onclick="location.href='/upload_new_model'">Upload New Model</button>
+
+            <div id="submit_button">
+                <button type="submit" disabled="disabled" id="calibrate" name="action" value="calibrate_model" onclick="location.href='/calibrate_component'"> Calibrate </button>
+                <button type="submit" disabled="disabled" id="load_calibration" name="action" value="calibrate_model" onclick="location.href='/load_calibration'"> Load Calibration </button>
+            </div> <br>
+
+            <h3 id="feedback"></h3><br>
+        </form>
+
+    </body>
+
+</html>

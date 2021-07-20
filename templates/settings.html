@@ -1,0 +1,149 @@
+<html>
+    <head>
+        <title>Settings</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>        
+        <link rel= "stylesheet" type= "text/css" href= "/static/styles/settings.css">
+    </head>
+
+    <body>
+
+        <h1>System Settings and Preferences</h1>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button><br><br>
+
+        <button type="button" class="collapsible"><b>Syringe Settings</b></button>
+        <div class="content"><br>
+            <div id="syringe_settings_spacing">
+                <div id="syringe_model"></div>
+                <div id="syringe_default_speed"></div>
+            </div>
+        </div>
+        
+        <button type="button" class="collapsible"><b>Script Settings</b></button>
+        <div class="content"><br>
+            <div id="script_settings_spacing">
+            </div>
+        </div>
+
+        <button type="button" class="collapsible"><b>Actuator Settings</b></button>
+        <div class="content"><br>
+            <div id="actuator_settings_spacing">
+            </div>
+        </div>
+
+        <button type="button" class="collapsible" onclick="activateDefaultTab('3D_collapsible')"><b>3D Mobility Settings</b></button>
+        <div class="content">
+            <div id="motor_settings_spacing"><br>
+
+                <div class="tab2">
+                    <button class="tablinks2" onclick="open3DSetting(event, 'X_Axis_Settings')" id="defaultOpen2">X Axis</button>
+                    <button class="tablinks2" onclick="open3DSetting(event, 'Y_Axis_Settings')">Y Axis</button>
+                    <button class="tablinks2" onclick="open3DSetting(event, 'Z_Axis_Settings')">Z Axis</button>
+                    <button class="tablinks2" onclick="open3DSetting(event, 'Axis_Assignment')">Motor Axes Assignment</button>
+                </div>
+
+                <div id="X_Axis_Settings" class="tabcontent2">
+                    <label><b>X Axis Settings</b></label><br>
+                    <div id="x_axis_step_size"></div>
+                    <div id="x_axis_step_speed"></div>
+                    <div id="x_axis_gearbox"></div>
+                    <div id="x_axis_orientation"></div>
+                </div>
+                
+                <div id="Y_Axis_Settings" class="tabcontent2">
+                    <label><b>Y Axis Settings</b></label><br>
+                    <div id="y_axis_step_size"></div>
+                    <div id="y_axis_step_speed"></div>
+                    <div id="y_axis_gearbox"></div>
+                    <div id="y_axis_orientation"></div>
+                </div>
+
+                <div id="Z_Axis_Settings" class="tabcontent2">
+                    <label><b>Z Axis Settings</b></label><br>
+                    <div id="z_axis_step_size"></div>
+                    <div id="z_axis_step_speed"></div>
+                    <div id="z_axis_gearbox"></div>
+                    <div id="z_axis_orientation"></div>
+                </div>
+
+                <div id="Axis_Assignment" class="tabcontent2">
+                    <label><b>Motor Axes Assignment</b></label><br>
+                    <button type="button" id="?">X-Axis motor</button><br>
+                    <button type="button" id="?">Y-Axis motor</button><br>
+                    <button type="button" id="?">Z-Axis motor</button><br>
+                    <button type="button" id="?">Syringe Axis motor</button><br>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="collapsible"><b>Feedback Settings</b></button>
+        <div class="content"><br>
+            <div id="system_feedback_settings_spacing">
+                <div id="coordinate_refresh_rate"></div>
+            </div>
+        </div>
+
+        <button type="button" class="collapsible" onclick="activateDefaultTab('xbox_collapsible')"><b>XBOX Controller Settings</b></button>
+        <div class="content" id="two_in_line">
+            <div id="xbox_left"><br><img src="{{ url_for('static', filename='xbox_controller.png') }}" id="xbox_img"></div>  
+            <div id="xbox_right"><br>
+
+                <div class="tab1">
+                    <button class="tablinks1" onclick="openControlInput(event, 'BUTTONS')" id="defaultOpen1">BUTTONS</button>
+                    <button class="tablinks1" onclick="openControlInput(event, 'TRIGGERS')">TRIGGERS</button>
+                    <button class="tablinks1" onclick="openControlInput(event, 'DIRECTIONALS')">DIRECTIONAL PAD</button>
+                    <button class="tablinks1" onclick="openControlInput(event, 'LEFT_STICK')">LEFT STICK</button>
+                    <button class="tablinks1" onclick="openControlInput(event, 'RIGHT_STICK')">RIGHT STICK</button>
+                </div>
+
+                <div id="BUTTONS" class="tabcontent1">
+                    <label><b>BUTTONS</b></label><br>
+                    <button type="button" id="?">"A"</button><br>
+                    <button type="button" id="?">"B"</button><br>
+                    <button type="button" id="?">"X"</button><br>
+                    <button type="button" id="?">"Y"</button><br>
+                    <button type="button" id="?">"START"</button><br>
+                    <button type="button" id="?">"BACK"</button><br>
+                    <button type="button" id="?">"LB" (left bumper)</button><br>
+                    <button type="button" id="?">"RB" (right bumper)</button><br>
+                </div>
+
+                <div id="TRIGGERS" class="tabcontent1">
+                    <label><b>TRIGGERS</b></label><br>
+                    <button type="button" id="?">LEFT</button><br>
+                    <button type="button" id="?">RIGHT</button><br>
+                </div>
+
+                <div id="DIRECTIONALS" class="tabcontent1">
+                    <label><b>DIRECTIONAL PAD</b></label><br>
+                    <button type="button" id="?">UP</button><br>
+                    <button type="button" id="?">DOWN</button><br>
+                    <button type="button" id="?">LEFT</button><br>
+                    <button type="button" id="?">RIGHT</button><br>
+                </div>
+
+                <div id="LEFT_STICK" class="tabcontent1">
+                    <label><b>LEFT STICK</b></label><br>
+                    <button type="button" id="?">UP</button><br>
+                    <button type="button" id="?">DOWN</button><br>
+                    <button type="button" id="?">LEFT</button><br>
+                    <button type="button" id="?">RIGHT</button><br>
+                </div>
+
+                <div id="RIGHT_STICK" class="tabcontent1">
+                    <label><b>RIGHT STICK</b></label><br>
+                    <button type="button" id="?">UP</button><br>
+                    <button type="button" id="?">DOWN</button><br>
+                    <button type="button" id="?">LEFT</button><br>
+                    <button type="button" id="?">RIGHT</button><br>
+                </div>    
+
+            <br></div>          
+        <br><br></div>
+
+        <script src="static/settings.js"></script>
+    </body>
+
+</html>

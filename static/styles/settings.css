@@ -1,0 +1,154 @@
+/* --------------------------------- STYLES FOR THE COLLAPSIBLE BARS --------------------------------- */
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+    background-color: #555;
+}
+
+.collapsible:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: left;
+    margin-left: 5px;
+    margin-right: 15px;
+}
+
+.active:after {
+    content: "\2212";
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+    padding: 0 15px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #f1f1f1;
+}
+
+/* --------------------------------- STYLES FOR THE XBOX CONTROLLER IMAGE AND THE TAB BAR DIVS --------------------------------- */
+
+#xbox_img {
+    width: 530px;
+}
+
+#two_in_line {
+    display: flex;
+    justify-content: left;
+}
+
+#xbox_left {
+    text-align: center;
+    width: 560px;
+    height: 300px;
+}
+
+#xbox_right {
+    text-align: left;
+}
+
+/* --------------------------------- STYLES FOR THE FIRST TAB BAR --------------------------------- */
+
+.tab1 {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab1 button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab1 button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab1 button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent1 {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+/* --------------------------------- STYLES FOR THE SECOND TAB BAR --------------------------------- */
+
+.tab2 {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab2 button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab2 button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab2 button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent2 {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+/* --------------------------------- STYLES FOR THE HEIGHT OF EACH COLLAPSABLE --------------------------------- */
+#motor_settings_spacing {
+    height: 215px;
+    text-align: left;
+}
+
+#syringe_settings_spacing {
+    height: 60px;
+}
+
+#system_feedback_settings_spacing {
+    height: 40px;
+}
+
+/* --------------------------------- STYLES FOR THE WIDTH OF EACH DIV RELATED TO VARIABLES DISPLAY --------------------------------- */

@@ -1,0 +1,10 @@
+/.vscode
+/__pycache__
+/Threading
+/venv
+/Classes/__pycache__
+/Classes/.vscode
+/Flask_app/__pycache__
+/Flask_app/.vscode
+=======
+/Classes/logs

@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="This is the page that allows the user to control the OT2 manually along with the thermocycler">
+        
+        <title>Manual Control</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        
+        <link rel="stylesheet" href="/static/styles/style2.css">
+    </head>
+
+    <body>
+        <h1>Manual Control</h1>
+        <br>
+        <button id="back_home" onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <hr/>
+        <p>Please make sure that the <b>OT2</b> and <b>Thermocycler</b> are properly homed before controlling them</p>
+        
+        <button onclick="screen_info()">Screen Info</button>
+        <button onclick="open_lid()">Open Lid</button>
+        <button onclick="close_lid()">Close Lid</button>
+        <button onclick="deactivate_lid()">Deactivate Lid</button>
+        <button onclick="deactivate_block()">Deactivate Block</button>
+        <button onclick="deactivate_all()">Deactivate All</button>
+        <button onclick="home_all_motors()">Home all motors</button>
+        <hr/>
+        <button onclick="home_Z()">Home Left Pippete</button>
+        <button onclick="home_A()">Home Right Pipette</button>
+        <hr/>
+        <button onclick="home_B()">Home Left Syringe</button>
+        <button onclick="home_C()">Home Right Syringe</button>
+        
+       
+        <hr/>
+        <label for="btemp">Set Block Temperature to(4-99):</label>
+        <input type="number" id="btemp" name="btemp" min="4" max="99">
+        <label for="htime">Hold Time[min]:</label>
+        <input type="number" id="htime" name="htime" min="0.1" max="99">
+        <button onclick="set_temperature()">Set Temperature </button>
+        <hr/>
+        <label for="ltemp">Set Lid Temperature to(37-110):</label>
+        <input type="number" id="ltemp" name="ltemp" min="37" max="110">
+        <button onclick="set_lid_temperature()">Set Lid Temperature </button>
+        <hr/>
+        <button class="btn-2" onclick="get_lid_temp()">Press to obtain the Lid temperature</button>
+        <span id="lidT"> </span>
+        <hr/>
+        <button class="btn-2" onclick="get_block_temp()">Press to obtain the Block temperature</button>
+        <span id="blockT"> </span>
+        <hr/>
+        
+        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
+        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
+        
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('10')">10</button>
+        <button class="btn-1" onclick="go_to_deck_slot('11')">11</button>
+        <button class="btn-1" onclick="go_to_deck_slot('12')">12</button>
+        
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('7')"> 7 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('8')"> 8 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('9')"> 9 </button>
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('4')"> 4 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('5')"> 5 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('6')"> 6 </button>
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('1')"> 1 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('2')"> 2 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('3')"> 3 </button>
+        <br>
+        <script src="static/manual_control.js"></script>
+    </body>
+
+</html>

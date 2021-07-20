@@ -1,0 +1,18 @@
+{
+    "UP":    "joystick_step_y_motor",
+    "DOWN":  "joystick_step_y_motor",
+    "RIGHT": "joystick_step_x_motor",
+    "LEFT":  "joystick_step_x_motor",
+    "RB":    "double_step_size_XYZ",
+    "LB":    "half_step_size_XYZ",
+    "A":     "joystick_step_z_motor_down",
+    "Y":     "joystick_step_z_motor_up",
+    "X":     "change_to_L_axis",
+    "B":     "change_to_R_axis",
+    "BACK":  "stop_listening",
+    "START": "nothing",
+    "0":     "joystick_step_x_motor",
+    "1":     "joystick_step_y_motor",
+    "2":     "nothing",
+    "3":     "joystick_step_syringe_motor"
+}

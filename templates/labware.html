@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <title>Labware</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        </head>
+
+    <body>
+        <link rel= "stylesheet" type= "text/css" href= "/static/styles/labware.css">
+
+        <h1>LABWARE HOME</h1>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        
+        <input title="ADD COMPONENT" id="add_labware" type="image" class="pic" src="{{ url_for('static',filename='add_button.png') }}" onclick="window.location.href='http://127.0.0.1:5000/labware/add';" />
+
+        <input title="REMOVE COMPONENT" id="delete_labware" type="image" class="pic" src="{{ url_for('static',filename='delete_button.png') }}"/>
+
+        <input title="SAVE LABWARE" id="save_labware" type="image" class="pic" src="{{ url_for('static',filename='save_button.png') }}" onclick="window.location.href='http://127.0.0.1:5000/save_labware_setup';" />
+
+        <input title="LOAD LABWARE" id="load_labware" type="image" class="pic" src="{{ url_for('static',filename='open_button.png') }}" onclick="window.location.href='http://127.0.0.1:5000/load_labware_setup';" />
+
+        <input title="CREATE MODEL" id="create_labware" type="image" class="pic" src="{{ url_for('static',filename='create.png') }}" onclick="window.location.href='http://127.0.0.1:5000/labware/create_model';" />
+
+
+        <br><br>
+
+        <h3> Calibrated Chips </h3>
+        <ol id="calibrated_chips"></ol>
+
+        <br>
+
+        <h3> Calibrated Plates </h3>
+        <ol id="calibrated_plates"></ol>
+
+        <br>
+
+        <form id="delete_form" hidden="true">
+
+            <label for="Container1">Chip</label>
+            <input type="radio" id="Container1" name="command" value="c">
+            
+            <label for="Container2">Reagent Plate</label>
+            <input type="radio" id="Container2" name="command" value="p"> <br>
+
+            <label for="Container#"> Component Index </label>
+            <input id="Container#" name="command"><br>
+
+            <button type="submit"> Delete </button>
+        </form>
+
+        <h3 id="feedback"></h3><br>
+        
+        <script src="static/labware.js"></script>
+
+    </body>
+
+</html>
