@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Load Labware Setup</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        </head>
+
+    <body>
+        <link rel= "stylesheet" type= "text/css" href= "/static/styles/labware.css">
+
+        <h2> Load Labware Setup </h2>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <button onclick="window.location.href='http://127.0.0.1:5000/labware';">LABWARE</button>
+        
+        <br>
+        
+        <h3> Currently Stored Files </h3>
+        
+        <select id="files_stored" onclick="files_stored_onclick()">
+            <option value="default" selected>- Select a Labware Setup File -</option>
+        </select>
+
+        <button id="load_button" disabled="disabled" onclick="load_button_listener()">LOAD</button>
+        
+        <label id="user_feedback"></label>
+
+        <script src="static/load_labware_setup.js"></script>
+
+    </body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Labware Creation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <link rel= "stylesheet" type= "text/css" href= "/static/styles/labware_creation.css">
+</head>
+<body>
+    <h1>Labware Creation</h1>
+
+    <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+
+    <button onclick="window.location.href='http://127.0.0.1:5000/labware';">LABWARE</button><br>
+
+    <h3>Registered Labware Models</h3>
+    <div id="models_table_div">
+
+    </div>
+
+    <div id="user_input_div">
+        <h3>Select the type of labware component you'd like to create</h3>
+    
+        <input type="radio" id="chip" name="component_type" value="c">
+        <label for="chip">Chip</label>
+    
+        <input type="radio" id="plate" name="component_type" value="p">
+        <label for="plate">Reagent Plate</label> 
+    
+        <input type="radio" id="syringe" name="component_type" value="s">
+        <label for="syringe">Syringe</label> 
+        
+        <br><br>
+    
+        <div id="chip_properties" hidden="true">
+            <label class="field_label">* Model Name:</label><input id="chip_new_model_name"><br>
+            <label class="field_label">* Grid:</label><input size="1" id="chip_grid_rows" placeholder="#Row"> x <input size="1" id="chip_grid_columns" placeholder="#Col"><label id="chip_grid_feedback"></label><br> 
+            <label class="field_label">* Point Distance:</label><input id="chip_point_distance"  size="2"> mm<br>
+            <label class="field_label">* Well Distance:</label><input id="chip_well_distance"  size="2"> mm<br>
+            <label class="field_label">* Row Types:</label>
+            <div id="chip_row_types_div">
+    
+            </div>
+            <label>* Well Names:</label>
+            <div id="chip_nicknames_div">
+    
+            </div>
+        </div>
+    
+        <div id="plate_properties" hidden="true">
+            <label class="field_label">* Model Name:</label><input id="plate_new_model_name"><br>
+            <label class="field_label">* Grid:</label><input size="1" id="plate_grid_rows" placeholder="#Row"> x <input size="1" id="plate_grid_columns" placeholder="#Col"><label id="plate_grid_feedback"></label><br>
+            <label class="field_label">* Pot row Dist:</label><input id="plate_pot_distance_r"  size="2"> mm<br>
+            <label class="field_label">* Pot col Dist:</label><input id="plate_pot_distance_c"  size="2"> mm<br>
+            <label class="field_label">* Pot Depth:</label><input id="plate_pot_depth" size="2"> mm<br>
+            <label>* Pot Names:</label>
+            <div id="plate_nicknames_div">
+    
+            </div>
+        </div>
+    
+        <div id="syringe_properties" hidden="true">
+            <label class="field_label">* Model Name:</label><input  id="syringe_new_model_name"><br>
+            <label class="field_label">* Volume:</label><input id="syringe_volume"  size="2"> uL<br>
+            <label class="field_label">* Inner Diameter:</label><input id="syringe_inner_diameter"  size="2"> mm<br>
+        </div>
+
+    </div>
+
+    <div id="user_summary_div" hidden="true">
+    </div>
+    
+    <div id="confirmation_feedback">
+        <br>
+    </div>
+
+    <button id="confirm_parameters">Confirm Parameters</button>
+    <button id="back_to_edit" hidden="true">Back to Edit Mode</button>
+    <button id="create_model" disabled>Create Model!</button>
+
+    <br><br><br><br>
+
+
+    <script src="{{url_for('static', filename='labware_creation.js')}}"></script>
+</body>
+</html>

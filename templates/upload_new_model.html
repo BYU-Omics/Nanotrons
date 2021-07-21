@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>Upload New Model</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    </head>
+
+    <body>
+
+        <script src="static/upload_new_model.js"></script>
+        <h1>Upload New Chip/Plate Model</h1>
+
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <button onclick="window.location.href='http://127.0.0.1:5000/labware';">LABWARE</button>
+        <button onclick="window.location.href='http://127.0.0.1:5000/labware/add';">ADD LABWARE</button>
+        <br><br>
+
+        <form method="POST" action="/upload_new_model" enctype="multipart/form-data">
+            <label for="Container1">Chip</label>
+            <input type="radio" id="Container1" name="command" value="c">
+            
+            <label for="Container2">Reagent Plate</label>
+            <input type="radio" id="Container2" name="command" value="p">
+
+            <br>
+            <input type="file" name="modelFile" id="file_upload" disabled="disabled"> <button id="submit_btn" disabled="disabled">Submit</button>
+
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p><b>{{ message }}</b></p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    </body>
+
+</html>

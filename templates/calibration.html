@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="This is the page that allows the user to control the OT2 manually along with the thermocycler">
+        <title>Manual Control</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        
+        <link rel="stylesheet" href="/static/styles/style2.css">
+    </head>
+
+    <body>
+        <h1>Calibration</h1>
+        <br>
+        <button id="back_home" onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <button onclick="screen_info()">Screen Info</button>
+        <br>
+        <button onclick="down_step_size()">Increase step size</button>
+        <button onclick="up_step_size()">Decrease step size</button>
+        <button onclick="stop_manual_control_window()">Add calibration point</button>
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('10')">10</button>
+        <button class="btn-1" onclick="go_to_deck_slot('11')">11</button>
+        <button class="btn-1" onclick="go_to_deck_slot('12')">12</button>
+        
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('7')"> 7 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('8')"> 8 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('9')"> 9 </button>
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('4')"> 4 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('5')"> 5 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('6')"> 6 </button>
+        <br>
+        <button class="btn-1" onclick="go_to_deck_slot('1')"> 1 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('2')"> 2 </button>
+        <button class="btn-1" onclick="go_to_deck_slot('3')"> 3 </button>
+        <br>
+        
+        <h3 id='component'>Component: </h3>
+
+        <h3 id='coordinates'>Current Coordinates: </h3>
+
+        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
+        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
+
+        <button type="button" disabled="disabled" id="test">Test Calibration</button>
+
+        <button type="button" disabled="disabled" id="good_calibration" onclick="location.href='/labware'">Good Calibration - Save Component</button>
+
+        <button type="button" disabled="disabled" id="bad_calibration" onclick="location.href='/calibrate_component'">Bad Calibration - Retry</button>
+
+        <ol id="feedback_calibration_points"></ol>
+
+        <script src="static/calibration.js"></script>
+    </body>
+
+</html>

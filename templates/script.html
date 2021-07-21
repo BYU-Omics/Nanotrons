@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <title>Scripts</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    </head>
+
+    <body>
+        <link rel= "stylesheet" type= "text/css" href= "/static/styles/script.css">
+        <h1>Script Creation and Execution</h1>
+        <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <input type="button" id="upload_script" value="Upload Script" onclick="Javascript:uploadScript()">
+        <br>
+        <input title="RUN SCRIPT" id="run_script" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="PAUSE SCRIPT" id="pause_script" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="STOP LOAD" id="stop_load" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
+        <input title="HARD STOP" id="hard_stop" type="image" class="pic" src="{{ url_for('static',filename='hardStop.jpeg') }}" />
+        <br>
+        <br>
+        <label for="scripts">Scripts</label>
+        <select id="scripts" name="scripts" onclick="option_select_script()">
+            <option value="default" selected>- Select Script to Display -</option>
+        </select>
+        <br>
+        <button type="button" disabled="disabled" id="display_script">Display Script</button>
+        <br>
+        <br>
+        <br>
+        <label for="calibration">Labware calibration</label>
+        <select id="calibration" name="calibration" onclick="option_select_labware_calibration()">
+            <option value="default" selected>- Select Calibration to Display -</option>
+        </select>
+        <br>
+        <br>
+        <input title="RUN SCRIPT" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="PAUSE SCRIPT" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <br>
+        <label for="protocols">Protocols</label>
+        <select id="protocols" name="protocols" onclick="option_select_protocol()">
+            <option value="default" selected>- Select Protocols to Display -</option>
+        </select>
+        <br>
+        <button type="button" disabled="disabled" id="display_protocol">Display Protocol</button>
+        <br>
+        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
+        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
+
+        <br>
+        <br>
+        <br>
+        
+        <b><p style="display:inline">Name: </p></b>
+        <p id="script_name" style="display:inline"></p>
+        <br>
+        <b><p style="display:inline">Description: </p></b>
+        <p id="script_description" style="display:inline"></p>
+        <br>
+        <b><p style="display:inline">gradientTime: </p></b>
+        <p id="gradientTime" style="display:inline"></p>
+        <br>
+        <b><p style="display:inline">SPEtime: </p></b>
+        <p id="SPEtime" style="display:inline"></p>
+        <br>
+
+
+        
+        
+        <br>
+        <br>
+
+        <body onload="load()">
+            <div id="myScriptTableData">
+            <b>Current data in the system ...</b>
+            <table id="myScriptTableData"  border="1" cellpadding="2">
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><b>Command</b></td>
+                    <td><b>Parameters</b></td>
+                </tr>
+            </table>
+            &nbsp;
+            </div>
+
+            <div id="myProtocolTableData">
+            <b>Current data in the system ...</b>
+            <table id="myProtocolTableData"  border="1" cellpadding="2">
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><b>Command</b></td>
+                    <td><b>Parameters</b></td>
+                </tr>
+            </table>
+            &nbsp;
+            </div>
+
+            <div id="myform">
+                <b>Simple form with name and age ...</b>
+                <table>
+                    <tr>
+                        <td>Name:</td>
+                        <td><input type="text" id="command"></td>
+                    </tr>
+                    <tr>
+                        <td>Age:</td>
+                        <td><input type="text" id="parameters">
+                        <input type="button" id="add" value="Add" onclick="Javascript:addRow()"></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="myDynamicTable">
+            <input type="button" id="create" value="Click here" onclick="Javascript:addTable()">
+            to create a Table and add some data using JavaScript
+            </div>
+        </body>
+
+
+
+        
+        
+        
+        
+        
+        
+        <script src="/static/script.js"></script>
+
+
+
+    </body>
+
+</html>
+

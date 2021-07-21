@@ -1,0 +1,9 @@
+{
+    "name": {
+        "waste" : "p 0C2",
+        "bufferA" : "p 0C1",
+        "bufferB" : "p 0C3",
+        "air" : "p 0B3",
+        "XYZ" : "25 26 27"
+    }
+}
