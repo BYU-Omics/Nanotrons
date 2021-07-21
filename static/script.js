@@ -1,31 +1,23 @@
 var socket = io.connect('http://127.0.0.1:5000');
 
-var run_script_button = document.getElementById("run_script");
 var run_protocol_button = document.getElementById("run_protocol");
-var scriptOptions = document.getElementById("scripts"); // Dropdown list that shows the available models
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
 var calibrationOptions = document.getElementById("calibration"); // Dropdown list that shows the available models
 
-var display_script_button = document.getElementById("display_script");
 var display_protocol_button = document.getElementById("display_protocol");
 var display_calibration_button = document.getElementById("display_calibration");
 
-var pause_button_script = document.getElementById("pause_script");
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
 
 var stopLoad_button = document.getElementById("stop_load");
 var hardStop_button = document.getElementById("hard_stop");
-var script_name = document.getElementById("script_name");
 var protocol_name = document.getElementById("protocol_name");
 var script_description = document.getElementById("script_description");
 var protocol_description = document.getElementById("protocol_description");
-var MStime = document.getElementById("MStime");
-var LCtime = document.getElementById("LCtime");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
-var scripts = {}; // holds list of available script
 var protocols = {}
 var calibrations = {}
 var script_to_display = "error" // save as error until over written
@@ -36,16 +28,8 @@ var python_data = ""
 
 // asks python to send the list of scripts
 
-socket.emit("get_available_scripts");
 socket.emit("get_available_protocols")
 socket.emit("get_available_calibrations")
-
-// listens for the list of available scripts
-socket.on('scripts_available', function(received_scripts) {
-    scripts = received_scripts; // save list in scripts variable
-    console.log("scripts recieved")
-    fill_script_drop_down() // add the options to the list
-});   
 
 // listens for the list of available scripts
 socket.on('protocols_available', function(received_protocols) {
@@ -60,29 +44,6 @@ socket.on('calibrations_available', function(received_calibrations) {
     console.log("calibrations received")
     fill_calibrations_drop_down() // add the options to the list
 }); 
-
-// fills drop down list with the availble scripts
-function fill_script_drop_down(){
-    // Erase all the options inside the dropdown list (select object)
-    var length = scriptOptions.options.length;
-    // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
-    for (var i = length - 1; i >= 0; i--) {
-        scriptOptions.remove(i);
-    };
-    
-    // Add instruction option ()
-    var script_option = document.createElement("option"); // Adding instruction option
-    script_option.text = "- Select a Script -"; // Adding instruction option
-    scriptOptions.add(script_option); // Adding instruction option
-
-    // Loop that adds the options to the options_list
-    for (var i = 0; i < scripts.length; i++){  
-        var script_option = document.createElement("option");
-        script_option.text = scripts[i];
-        scriptOptions.add(script_option);
-    }
-
-}
 
 // fills drop down list with the availble scripts
 function fill_protocol_drop_down(){
@@ -130,20 +91,6 @@ function fill_calibrations_drop_down(){
 }
 
 // this runs each time you select an option from the script list
-function option_select_script(){
-    // This either blocks or unblocks the submit button
-    var selected_script = scriptOptions.options[ scriptOptions.selectedIndex ].value;
-    script_to_display = selected_script; // set variable to the selected value
-    console.log(selected_script);
-    if ( selected_script != "- Select a Script -" ) { // if you select something from the list
-        display_script_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_script_button.disabled = true; // disable button
-    }
-}
-
-// this runs each time you select an option from the script list
 function option_select_protocol(){
     // This either blocks or unblocks the submit button
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
@@ -171,12 +118,6 @@ function option_select_labware_calibration(){
         display_calibration_button.disabled = true; // disable button
     }
 }
-// this runs when you click the display script button
-display_script_button.addEventListener("click", function() {
-    clear_script_Table() // clear out the old table data
-    console.log("clearing table")
-    socket.emit("give_me_script_json", script_to_display);
-});
 
 // this runs when you click the display script button
 display_protocol_button.addEventListener("click", function() {
@@ -192,35 +133,6 @@ socket.on('protocol_python_data', function(python_string) {
     console.log("protocols received")
     make_and_display_protocol_table()
 });  
-
-// listens for the json data
-socket.on('script_json_data', function(json_string) {
-    json_data = json_string; // save list in scripts variable
-    console.log("scripts recieved")
-    make_and_display_script_table()
-});  
-
-// fills in the table with script commands
-function make_and_display_script_table(){
-    console.log(json_data)
-    var obj = JSON.parse(json_data); // parse the JSON string into JSON obj
-    console.log("Name " + obj.name);
-
-    script_name.innerHTML = obj.name;               // These 6 lines get name, description, MStime, LCtime, GradientTime, and SPEtime
-    script_description.innerHTML = obj.description; // from the json data
-    MStime.innerHTML = obj.MStime;                  // The command vector is parced and displayed in a table in the for loop below
-    LCtime.innerHTML = obj.LCtime;
-    gradientTime.innerHTML = obj.gradientTime;
-    SPEtime.innerHTML = obj.SPEtime;
-
-    for(var i = 0; i < obj.commands.length; i++) { // loop for each command
-        var command = obj.commands[i]; 
-    
-        var commmandType = command.type;
-        var parameters = command.parameters;
-        addRow(commmandType, parameters); // add row to table with the command and parameters
-    }
-}
 
 // fills in the table with script commands
 function make_and_display_protocol_table(){
@@ -242,22 +154,12 @@ function make_and_display_protocol_table(){
     }
 }
 
-// the play button in HTML. Calls the run batch function
-run_script_button.addEventListener("click", function() {
-    socket.emit("run_script");
-});
-
 run_protocol_button.addEventListener("click", function() {
     socket.emit("run_protocol", protocol_to_display);
 });
 
 // the pause button in HTML. Calls the pause batch function
-pause_button_script.addEventListener("click", function() {
-    socket.emit("pause_batch");
-});
-
-// the pause button in HTML. Calls the pause batch function
-pause_button_script.addEventListener("click", function() {
+pause_button_protocol.addEventListener("click", function() {
     socket.emit("pause_protocol");
 });
 
@@ -278,9 +180,7 @@ hardStop_button.addEventListener("click", function() {
 // allows you to upload a new script that you can display
 function uploadScript() {
     var socket = io.connect('http://127.0.0.1:5000');
-
     console.log("upload script")
-
 }
 
 // adds a row to the table with the given parameters

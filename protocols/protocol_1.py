@@ -1,5 +1,3 @@
-print("In protocol_1.py")
-
 try:
     # Works when we're at the top lovel and we call main.py
     from coordinator import Coordinator
@@ -31,7 +29,7 @@ corning = myApp.myLabware.plate_list[2].get_location_by_nickname
 
 myApp.ot_control.move({'B': -125})
 
-# STARTTING PROTOCOL
+# --------------STARTTING PROTOCOL--------------
 
 # Aspirate 50 nL from custom A2 #Air gap
 myApp.goto_and_aspirate(100, custom('A2'))
@@ -43,11 +41,11 @@ myApp.goto_and_aspirate(600, custom_small('A1'))
 myApp.goto_and_dispense(50, custom('A1'))
 
 # Dispense 100 nL into Corning wells A18, B18, C18, D18 and E18
-myApp.goto_and_dispense(100, corning('F14'))
-myApp.goto_and_dispense(100, corning('G14'))
-myApp.goto_and_dispense(100, corning('H14'))
-myApp.goto_and_dispense(100, corning('I14'))
-myApp.goto_and_dispense(100, corning('J14'))
+myApp.goto_and_dispense(100, corning('A6'))
+myApp.goto_and_dispense(100, corning('B6'))
+myApp.goto_and_dispense(100, corning('C6'))
+myApp.goto_and_dispense(100, corning('D6'))
+myApp.goto_and_dispense(100, corning('E6'))
 
 # Dispense 100 nL into custom A1 #Waste
 myApp.goto_and_dispense(100, custom('A1'))
@@ -62,11 +60,11 @@ myApp.goto_and_aspirate(350, custom_small('B1'))
 myApp.goto_and_dispense(50, custom('A1'))
 
 # Dispense 50 nL into Corning wells A19, B19, C19, D19 and E19
-myApp.goto_and_dispense(50, corning('F15'))
-myApp.goto_and_dispense(50, corning('G15'))
-myApp.goto_and_dispense(50, corning('H15'))
-myApp.goto_and_dispense(50, corning('I15'))
-myApp.goto_and_dispense(50, corning('J15'))
+myApp.goto_and_dispense(50, corning('A7'))
+myApp.goto_and_dispense(50, corning('B7'))
+myApp.goto_and_dispense(50, corning('C7'))
+myApp.goto_and_dispense(50, corning('D7'))
+myApp.goto_and_dispense(50, corning('E7'))
 
 # Dispense 100 nL into custom A1 #Waste
 myApp.goto_and_dispense(100, custom('A1'))
@@ -81,11 +79,11 @@ myApp.goto_and_aspirate(200, custom_small('C1'))
 myApp.goto_and_dispense(50, custom('A1'))
 
 # Dispense 20 nL into Corning wells A20, B20, C20, D20 and E20
-myApp.goto_and_dispense(20, corning('F16'))
-myApp.goto_and_dispense(20, corning('G16'))
-myApp.goto_and_dispense(20, corning('H16'))
-myApp.goto_and_dispense(20, corning('I16'))
-myApp.goto_and_dispense(20, corning('J16'))
+myApp.goto_and_dispense(20, corning('A8'))
+myApp.goto_and_dispense(20, corning('B8'))
+myApp.goto_and_dispense(20, corning('C8'))
+myApp.goto_and_dispense(20, corning('D8'))
+myApp.goto_and_dispense(20, corning('E8'))
 
 # Dispense 100 nL into custom A1 #Waste
 myApp.goto_and_dispense(100, custom('A1'))
@@ -100,11 +98,18 @@ myApp.goto_and_aspirate(150, custom_small('D1'))
 myApp.goto_and_dispense(50, custom('A1'))
 
 # Dispense 10 nL into Corning wells A21, B21, C21, D21 and E21
-myApp.goto_and_dispense(10, corning('F17'))
-myApp.goto_and_dispense(10, corning('G17'))
-myApp.goto_and_dispense(10, corning('H17'))
-myApp.goto_and_dispense(10, corning('I17'))
-myApp.goto_and_dispense(10, corning('J17'))
+myApp.goto_and_dispense(10, corning('A9'))
+myApp.goto_and_dispense(10, corning('B9'))
+myApp.goto_and_dispense(10, corning('C9'))
+myApp.goto_and_dispense(10, corning('D9'))
+myApp.goto_and_dispense(10, corning('E9'))
 
 # Dispense 100 nL into custom A1 #Waste
 myApp.goto_and_dispense(50, custom('A1'))
+
+
+#--------------REQUIRED FOR THE END OF PROTOCOL--------------
+
+myApp.go_to_deck_slot('12')
+
+myApp.disconnect_all()
