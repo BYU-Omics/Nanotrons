@@ -627,6 +627,14 @@ def get_available_calibrations():
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
 
+@socketio.on("stop_protocol")
+def stop_protocol():
+    executer.stop_execution()
+
+@socketio.on("reconnect_coordinator")
+def reconnect_coordinator():
+    coordinator.connect_all()
+
 
 #------------------EXTRA STUFF THAT WE DON'T NEED FOR NOW--------------------
 

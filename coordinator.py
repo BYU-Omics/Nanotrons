@@ -71,7 +71,7 @@ LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 DEFAULT_PROFILE = "default_profile.json"
-FROM_NANOLITERS = 0.00
+FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
 LABWARE_COMPONENT_CHIP = 'c'
@@ -349,6 +349,7 @@ class Coordinator:
 
     # This will go to the position of the destination and dispense an amount in nL
     def goto_and_dispense(self, amount, to):
+        print(f"Go to {to} and dispense ")
         self.go_to_position(to)
         self.dispense(amount, ASPIRATE_SPEED)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
@@ -686,8 +687,9 @@ class Coordinator:
         self.ot_control.disconnect()
 
     def connect_all(self):
+        self.disconnect_all()
+        self.tc_control._connection = self.tc_control._connect_to_port()
         self.ot_control.connect(self.ot_port)
-        self.tc_control.connect(self.tc_port)
 
 def test():
     myApp = Coordinator(joystick_profile=DEFAULT_PROFILE)

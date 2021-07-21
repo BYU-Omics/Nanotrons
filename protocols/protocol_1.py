@@ -22,9 +22,10 @@ myApp = Coordinator()
 myApp.load_labware_setup(filename)
 
 # chip = myApp.myLabware.chip_list[0].get_location_by_nickname
-corning = myApp.myLabware.plate_list[0].get_location_by_nickname
-custom = myApp.myLabware.plate_list[1].get_location_by_nickname
-custom_small = myApp.myLabware.plate_list[2].get_location_by_nickname
+
+custom = myApp.myLabware.plate_list[0].get_location_by_nickname
+custom_small = myApp.myLabware.plate_list[1].get_location_by_nickname
+corning = myApp.myLabware.plate_list[2].get_location_by_nickname
 
 # ADJUSTING SYRINGE
 

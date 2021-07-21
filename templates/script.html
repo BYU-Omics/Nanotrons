@@ -33,8 +33,9 @@
         </select>
         <br>
         <br>
-        <input title="RUN SCRIPT" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="PAUSE SCRIPT" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="PAUSE PROTOCOL" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
         <br>
         <label for="protocols">Protocols</label>
         <select id="protocols" name="protocols" onclick="option_select_protocol()">

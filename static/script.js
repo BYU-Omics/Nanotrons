@@ -12,6 +12,7 @@ var display_calibration_button = document.getElementById("display_calibration");
 
 var pause_button_script = document.getElementById("pause_script");
 var pause_button_protocol = document.getElementById("pause_protocol");
+var stop_button_protocol = document.getElementById("stop_protocol")
 
 var stopLoad_button = document.getElementById("stop_load");
 var hardStop_button = document.getElementById("hard_stop");
@@ -258,6 +259,10 @@ pause_button_script.addEventListener("click", function() {
 // the pause button in HTML. Calls the pause batch function
 pause_button_script.addEventListener("click", function() {
     socket.emit("pause_protocol");
+});
+
+stop_button_protocol.addEventListener("click", function() {
+    socket.emit("stop_protocol")
 });
 
 // the stop load button in HTML. Calls the stop_load function
