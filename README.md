@@ -5,7 +5,7 @@ OT2 project
 
 Nanotrons allows [Opentrons OT2 pippeting robot](https://opentrons.com/ot-2/) OT2 pippeting robot, [Thermocycler](https://opentrons.com/modules/thermocycler-module), and [Tempdeck](https://opentrons.com/modules/temperature-module/) modules users to handle small amounts of volumes with a modified pipette and API for the OT2
 
-This repository contains the source code for the Nanotrons API and OT GUI.
+This repository contains the source code for the Nanotrons API and OT GUI. You can find the Opentrons repository [here](https://github.com/Opentrons/opentrons). 
 
 ## Installation
 
