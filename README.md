@@ -81,7 +81,7 @@ Our lab would be happy to add features to the GUI. If there are questions about 
 
 ![IMG-6309](https://user-images.githubusercontent.com/78994282/126675468-3a6d0d3f-97c7-47e8-86d9-1e6ccb74bccf.jpg)
 
-![IMG-6310](https://user-images.githubusercontent.com/78994282/126675473-2b64fc7e-2d0a-4605-86bd-85fbc7d58750.jpg)
+![IMG-6311](https://user-images.githubusercontent.com/78994282/126675753-04d3f52f-b761-465c-a594-ae208aaa2a38.jpg)
 
 
 
