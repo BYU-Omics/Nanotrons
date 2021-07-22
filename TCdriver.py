@@ -14,6 +14,8 @@ from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import utils, serial_communication
 from opentrons.drivers.serial_communication import SerialNoResponse
+from serial.tools import list_ports
+import os
 
 if TYPE_CHECKING:
     # avoid an issue where Queue doesn't support generics at runtime
@@ -83,6 +85,10 @@ POLLING_FREQUENCY_MS = 1000
 HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
 
+WINDOWS_TC_PORT = 'COM5'
+LINUX_TC_PORT = '/dev/ttyACM0'
+LINUX_OS = 'posix'
+WINDOWS_OS = 'nt'
 
 class ThermocyclerError(Exception):
     pass
@@ -351,8 +357,9 @@ class TCPoller(threading.Thread):
 
 
 class Thermocycler:
-    def __init__(self, interrupt_callback, port):
-        self._port = port
+    def __init__(self, interrupt_callback):
+        self._port = WINDOWS_TC_PORT
+        self.find_port()
         self._connection = self._connect_to_port()
         self._update_thread = None
         self._current_temp = None
@@ -682,10 +689,21 @@ class Thermocycler:
         trigger_connection.close()
         self.disconnect()
 
+    def find_port(self):
+        ports = list_ports.comports()
+        operating_system = os.name
+        for p in ports:
+            if operating_system == WINDOWS_OS and p.device == WINDOWS_TC_PORT:
+                self._port = p.device
+            elif operating_system == LINUX_OS and p.device == LINUX_TC_PORT:
+                self._port = p.device
+        print(f"Thermocycler connected to: {p}")
+
+
 async def testing():
     tc_portname = '/dev/ttyACM0'
     tc_portname_windows = 'COM5' 
-    TC = Thermocycler(interrupt_callback=interrupt_callback, port=tc_portname_windows)
+    TC = Thermocycler(interrupt_callback=interrupt_callback)
     # await TC.close()
     await TC.set_temperature(4, 30)
     # await TC.deactivate_all()

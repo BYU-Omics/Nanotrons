@@ -108,8 +108,8 @@ class Coordinator:
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
         # if REAL_RUN:
-        self.ot_control = OT2_nanopots_driver(port=self.ot_port)
-        self.tc_control = Thermocycler(interrupt_callback=interrupt_callback, port=self.tc_port)
+        self.ot_control = OT2_nanopots_driver()
+        self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
         self.myController = XboxJoystick(operating_system)
         self.myProfile = Profile(self.joystick_profile)

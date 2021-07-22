@@ -17,7 +17,8 @@ volume
 """
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 as SM
 from opentrons.config.robot_configs import (DEFAULT_GANTRY_STEPS_PER_MM, DEFAULT_PIPETTE_CONFIGS, build_config)
-RASPBERRY_OS = "r"
+from serial.tools import list_ports
+import os
 
 X_MAX= 418
 X_MIN= 25
@@ -67,17 +68,22 @@ XYZ = 'X Y Z'
 LEFT = 'Left' #X
 RIGHT = 'Right' #B
 
+WINDOWS_OT_PORT = 'COM4'
+LINUX_OT_PORT = '/dev/ttyACM0'
+LINUX_OS = 'posix'
+WINDOWS_OS = 'nt'
+
 list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 10, 30, 63, 100]
 
 class OT2_nanopots_driver(SM):
-    def __init__(self, port):
+    def __init__(self):#, port):
         super().__init__(config=build_config({}))
 
         # Atributes that control the size and speed of the X Y and Z axis. 
         #   When changed, all of them move at the same rate
         self.xyz_step_size = STEP_SIZE
         self.xyz_step_speed = STEP_SPEED
-        self._port = port
+        self._port = WINDOWS_OT_PORT
         # Attributes that control the size and speed of the plunger. 
         self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
         self.s_step_speed = SLOW_SPEED #Step speed for the syringe
@@ -88,11 +94,11 @@ class OT2_nanopots_driver(SM):
         self.i = MIDDLE_STEP
         self.tc_flag = True
         self.tc_lid_flag = 'Open'
-
+        self.find_port()
         self.connect(self._port)
 
 # Functions that help movements
-
+        
     def check_for_valid_move(self, pos, axis, size) -> bool:
         # print(pos)
         """
@@ -501,15 +507,19 @@ class OT2_nanopots_driver(SM):
         print("")
         print("............................................")
 
+    def find_port(self):
+        ports = list_ports.comports()
+        operating_system = os.name
+        for p in ports:
+            if operating_system == WINDOWS_OS and p.device == WINDOWS_OT_PORT:
+                self._port = p.device
+            elif operating_system == LINUX_OS and p == LINUX_OT_PORT:
+                self._port = p.device
+        print(f"OT2 connected to: {p}")
 
 def test():
     robot_portname_windows = 'COM4'
     robot = OT2_nanopots_driver()
-    robot.connect(port=robot_portname_windows)
-    robot.home('B')
-    # while True:
-    #     print(robot._position) 
-
 
 if __name__ == '__main__':
     test()
