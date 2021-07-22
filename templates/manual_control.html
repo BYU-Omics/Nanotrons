@@ -25,6 +25,8 @@
         <button onclick="deactivate_all()">Deactivate All</button>
         <button onclick="home_all_motors()">Home all motors</button>
         <hr/>
+        <button onclick="deactivate_tempdeck()">Deactivate Tempdeck</button>
+        <hr/>
         <button onclick="home_Z()">Home Left Pippete</button>
         <button onclick="home_A()">Home Right Pipette</button>
         <hr/>
@@ -49,6 +51,24 @@
         <button class="btn-2" onclick="get_block_temp()">Press to obtain the Block temperature</button>
         <span id="blockT"> </span>
         <hr/>
+
+        <hr/>
+        <label for="tdtemp">Set TempDeck Temperature to():</label>
+        <input type="number" id="tdtemp" name="tdtemp" min="4" max="99">
+        <label for="thtime">Hold Time[min]:</label>
+        <input type="number" id="thtime" name="thtime" min="0.1" max="99">
+        <button onclick="set_tempdeck_temp()">Set TempDeck Temperature </button>
+        <hr/>
+        <button class="btn-2" onclick="get_tempdeck_temp()">Press to obtain the TempDeck temperature</button>
+        <span id="tdT"> </span>
+        <hr/>
+        <hr/>
+        <button class="btn-2" onclick="check_tempdeck_status()">Press to obtain the TempDeck status</button>
+        <span id="tdS"> </span>
+        <hr/>
+
+       
+
         
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>

@@ -94,8 +94,7 @@ class OT2_nanopots_driver(SM):
         self.i = MIDDLE_STEP
         self.tc_flag = True
         self.tc_lid_flag = 'Open'
-        self.find_port()
-        self.connect(self._port)
+        self.connect_driver()
 
 # Functions that help movements
         
@@ -513,9 +512,14 @@ class OT2_nanopots_driver(SM):
         for p in ports:
             if operating_system == WINDOWS_OS and p.device == WINDOWS_OT_PORT:
                 self._port = p.device
+                print(f"OT2 connected to: {p}")
             elif operating_system == LINUX_OS and p == LINUX_OT_PORT:
                 self._port = p.device
-        print(f"OT2 connected to: {p}")
+                print(f"OT2 connected to: {p}")
+            
+    def connect_driver(self):
+        self.find_port()
+        self.connect(self._port)
 
 def test():
     robot_portname_windows = 'COM4'

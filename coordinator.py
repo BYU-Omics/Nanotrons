@@ -34,13 +34,10 @@ COORDINATOR CLASS
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
 """
 
-from asyncio.tasks import sleep
 from OTdriver import OT2_nanopots_driver, SLOW_SPEED
 from TDdriver import TempDeck
-from TCdriver import Thermocycler, testing
+from TCdriver import Thermocycler
 from joystick import XboxJoystick
-from typing import Any, Dict
-import subprocess
 from joystick_profile import *
 from labware_class import *
 from models_manager import ModelsManager
@@ -54,18 +51,13 @@ import time
 import logging
 import os
 import sys
-from collections import deque
+from collections import deque 
+import constants
 
 DISTANCE = 10 #mm
-# REAL_RUN = RUNNING_APP_FOR_REAL
-WINDOWS_SERIAL_PORT_OT2 = "COM4"  # This is the com port generally used by the motors on Windows, but it could be a different number
-LINUX_SERIAL_PORT_OT2 = "/dev/ttyUSB0"  # This is the com port used by the motors on Linux-based operating systems (including Raspberry OS)
-WINDOWS_SERIAL_PORT_TC = "COM5"
-LINUX_SERIAL_PORT_TC = "/dev/ttyACM0"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 UNIT_CONVERSION  = 4.23 #3.8896 4.16
-CALIBRATION_POINTS = 3
 INBETWEEN_LIFT_DISTANCE = -10 # Default distance the syringe will be lifted/lowered when going from one nanopots well\reagent pot to another
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -74,12 +66,6 @@ DEFAULT_PROFILE = "default_profile.json"
 FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
-LABWARE_COMPONENT_CHIP = 'c'
-LABWARE_COMPONENT_PLATE = 'p'
-COMPONENT_MODEL_CHIP = 'MICROPOTS_3'
-COMPONENT_MODEL_CORNING = 'CORNING_384'
-COMPONENT_MODEL_CUSTOM = 'CUSTOM'
-COMPONENT_MODEL_CUSTOM_SM = 'CUSTOM_SMALL'
 POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT = 150
 TIME_TO_SETTLE = 0.5 #SECONDS
 
@@ -97,33 +83,21 @@ class Coordinator:
         os_recognized = os.name
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
-            self.ot_port = WINDOWS_SERIAL_PORT_OT2
-            self.tc_port = WINDOWS_SERIAL_PORT_TC
             operating_system = "w"
         elif os_recognized == LINUX_OS:
             logging.info("Operating system: Linux")
-            self.ot_port = LINUX_SERIAL_PORT_OT2
-            self.tc_port = LINUX_SERIAL_PORT_TC
             operating_system = "r"
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        # if REAL_RUN:
         self.ot_control = OT2_nanopots_driver()
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
         self.myController = XboxJoystick(operating_system)
         self.myProfile = Profile(self.joystick_profile)
-        # self.myReader = HighLevelScriptReader(self)
-        
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
-        self.flag = False
-        self.log = deque()
-        self.job = deque()
-        self.run_flag = False
-        self.calibration_flag = False
         
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
@@ -337,7 +311,6 @@ class Coordinator:
 
     # drop of amount in nL and speed in nL/min
     def dispense(self, amount, speed): 
-        self.flag = True
         logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
         self.drop_off_liquid(int(amount))
     
@@ -654,6 +627,50 @@ class Coordinator:
             min_count = min_count + 0.5
         logging.info("Holding time done. Proceeding to complete next step.")
 
+
+    """
+    TEMPDECK COORDINATION SECTION
+    """
+
+    def set_tempdeck_temp(self, celcius, holding_time_in_minutes):
+        hold_time_in_secs = holding_time_in_minutes * 60
+        self.td_control.start_set_temperature(celcius)
+        current_temp = self.get_tempdeck_temp()
+        logging.info("Checking temperature of the TempDeck")
+        logging.info(f"Current_temp = {current_temp} [C] ---- Target Temperature = {celcius} [C]")
+
+        # While the target temperature has not been reached within a 1 of allowance check every five seconds and then continue to hold for specified time
+        while (float(current_temp) < (float(celcius) - 1)) or (float(current_temp) > (float(celcius) + 1)):
+            current_temp = self.get_tempdeck_temp()
+            time.sleep(5)
+            logging.info(f"Current_temp = {current_temp} [C]")
+            print(self.check_tempdeck_status())
+        logging.info("Target temperature {current_temp} [C] reached")
+
+        logging.info(f"Holding for {holding_time_in_minutes} minutes.")
+        min_count = 0 # init for tcounting the minutes to hold
+
+        # here we start the holding time. We check every half a minute and exit the loop when the time holding is equal than the time to hold
+        while float(min_count) < float(holding_time_in_minutes):
+            time.sleep(30)
+            min_count = min_count + 0.5
+        logging.info("Holding time done. Proceeding to complete next step.")
+
+    def deactivate_tempdeck(self):
+        self.td_control.deactivate()
+
+    def get_tempdeck_temp(self):
+        self.td_control.update_temperature()
+        time.sleep(0.01)
+        return self.td_control.temperature
+
+    def check_tempdeck_status(self):
+        return self.td_control.status
+
+    """
+    PROTOCOL COORDINATION SECTION
+    """
+
     # stops batch entirely, stops loading and the rest of the LC and MS calls
     def hard_stop(self): 
         self.myReader.hard_stop()
@@ -689,10 +706,10 @@ class Coordinator:
     def connect_all(self):
         self.disconnect_all()
         self.tc_control._connection = self.tc_control._connect_to_port()
-        self.ot_control.connect(self.ot_port)
+        self.ot_control.connect_driver()
 
 def test():
-    myApp = Coordinator(joystick_profile=DEFAULT_PROFILE)
+    myApp = Coordinator()
     
     # myApp.go_to_deck_slot('6')
     # myApp.close_lid()
@@ -701,12 +718,6 @@ def test():
     # myApp.home_all_motors()
     # myApp.manual_control()
     # myApp.go_to_position([200, Y_MIN, 40 ])
-
-    # print("Moving slots")
-    
-    protocol = "protocol_1.py"
-    myApp.execute_protocol(protocol)
-
 
 if __name__ == "__main__":
     test()

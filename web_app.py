@@ -329,6 +329,30 @@ def hold_time():
     print("hold_time")
     coordinator.tc_control.hold_time()
 
+#----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
+
+@socketio.on("set_tempdeck_temp")
+def set_tempdeck_temp(elements):
+    print("set_tempdeck_temp")
+    coordinator.set_tempdeck_temp(celcius=elements[TEMP], holding_time_in_minutes=elements[HOLD_TIME])
+
+@socketio.on("deactivate_tempdeck")
+def deactivate_tempdeck():
+    print("deactivate_tempdeck")
+    coordinator.deactivate_tempdeck()
+
+@socketio.on("get_tempdeck_temp")
+def get_tempdeck_temp():
+    print("get_tempdeck_temp")
+    temp = coordinator.get_tempdeck_temp()
+    socketio.emit("get_tempdeck_temp", temp)
+
+@socketio.on("check_tempdeck_status")
+def check_tempdeck_status():
+    print("check_tempdeck_status")
+    coordinator.check_tempdeck_status()
+    status = coordinator.check_tempdeck_status()
+    socketio.emit("check_tempdeck_status", status)
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
