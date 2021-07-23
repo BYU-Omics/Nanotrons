@@ -5,7 +5,7 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
-RUNNING_APP_FOR_REAL = True
+RUNNING_APP_FOR_REAL = False
 import cv2
 import os
 import time
@@ -15,8 +15,8 @@ from werkzeug.utils import secure_filename
 from video_stream import VideoStream
 from flag import Flag
 import logging
-# if RUNNING_APP_FOR_REAL:
-from coordinator import *
+if RUNNING_APP_FOR_REAL:
+    from coordinator import *
 from python_execute import Py_Execute
 
 ALLOWED_EXTENSIONS = ['json']
@@ -26,9 +26,11 @@ LABWARE_SYRINGE = "s"
 CAMERA_PORT = 0
 PIPPETE_CAMERA_PORT = 1
 RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
-RELATIVE_PATH_TO_PROTOCOLS_L = 'protocols/'
+RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
-RELATIVE_PATH_TO_LABWARE_L = 'saved_labware/'
+RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
+RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
+RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 TEMP = 0
@@ -55,8 +57,8 @@ logging.getLogger("engineio").setLevel(logging.ERROR)
 
 # -----------------------------------
 
-# if RUNNING_APP_FOR_REAL:
-coordinator = Coordinator()
+if RUNNING_APP_FOR_REAL:
+    coordinator = Coordinator()
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
@@ -65,10 +67,10 @@ my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
-# if RUNNING_APP_FOR_REAL:
-app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
-app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
-app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
+if RUNNING_APP_FOR_REAL:
+    app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
+    app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
+    app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
 app.secret_key = "hola"
 
@@ -200,7 +202,7 @@ def video_2_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def text_coordinates():
-    x, y, z = coordinator.get_current_coordinates() # This should be replaced by the actual method in the App class that returns the coordinates of the syringe
+    x, y, z = coordinator.get_current_coordinates() 
     return f"({x}, {y}, {z})"
 
 def start_sending_coordinates():
@@ -329,8 +331,6 @@ def hold_time():
     print("hold_time")
     coordinator.tc_control.hold_time()
 
-<<<<<<< HEAD
-=======
 #----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
 
 @socketio.on("set_tempdeck_temp")
@@ -355,7 +355,7 @@ def check_tempdeck_status():
     coordinator.check_tempdeck_status()
     status = coordinator.check_tempdeck_status()
     socketio.emit("check_tempdeck_status", status)
->>>>>>> newrepo
+
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
@@ -493,6 +493,7 @@ def get_syringe_models():
     socketio.emit('dynamic_selects_options', dynamic_selects_options)
 
 #----------------------------------------------- INSTANTANEOUS COMMANDS EVENTS SECTION
+
 @socketio.on("instant_command")
 def execute_instant_command(command_description):
     # Here goes the App.whatever that sends an instantaneous command to the OT_CONTROL object -> "INSTANTANEOUS COMMANDS" section of Application class
@@ -585,10 +586,9 @@ def connect_all():
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
     # if RUNNING_APP_FOR_REAL:
-    coordinator.tc_disconnect()
-    coordinator.ot_control.disconnect()
-    executer.set_file_name(protocol_name)
-    executer.execute_python_protocol()
+    coordinator.disconnect_all() # First we disconnect all the modules
+    executer.set_file_name(protocol_name) # Then we add the calibration to use
+    executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 
 @socketio.on("give_me_protocol_python")
 def give_me_protocol_python(protocolName):
@@ -616,28 +616,6 @@ def pause_protocol():
     print("pause_protocol")
     coordinator.pause_protocol()
 
-
-#------------------WORKING WITH A SCRIPT.JSON SECTION--------------------
-@socketio.on("run_script")
-def run_script():
-    # print("I am running script")
-    coordinator.run_batch()
-
-@socketio.on("give_me_script_json")
-def give_me_script_json(scriptName):
-    # read file
-    path_to_script = "../scripts/" + scriptName # moves to script folder
-    with open(path_to_script, 'r') as myfile:
-        data = myfile.read()
-
-    socketio.emit("script_json_data", data) # send data back to js in a json string
-
-@socketio.on("get_available_scripts")
-def get_available_scripts():
-    path_to_scripts_folder = "../scripts" # path to folder
-    list = os.listdir(path_to_scripts_folder) # make a list of scripts in folder
-    socketio.emit("scripts_available", list) # send the list back to js
-
 #------------------WORKING WITH A CALIBRATION.JSON SECTION--------------------
 
 @socketio.on("get_available_calibrations")
@@ -645,6 +623,7 @@ def get_available_calibrations():
     if os.name == WINDOWS_OS:
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_W  # moves to script folder
     elif os.name == LINUX_OS:
+        print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
     print(list)
@@ -654,8 +633,6 @@ def get_available_calibrations():
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
 
-<<<<<<< HEAD
-=======
 @socketio.on("stop_protocol")
 def stop_protocol():
     executer.stop_execution()
@@ -664,7 +641,19 @@ def stop_protocol():
 def reconnect_coordinator():
     coordinator.connect_all()
 
->>>>>>> newrepo
+@socketio.on("get_available_syringes")
+def get_available_syringes():
+    if os.name == WINDOWS_OS:
+        path_to_calibration = RELATIVE_PATH_TO_SYRINGES_W  # moves to script folder
+    elif os.name == LINUX_OS:
+        path_to_calibration = RELATIVE_PATH_TO_SYRINGES_L  # moves to script folder
+    list = os.listdir(path_to_calibration) # make a list of scripts in folder
+    print(list)
+    socketio.emit("syringes_available", list) # send the list back to js
+
+@socketio.on("set_labware_syringes")
+def set_labware_syringes(syringes_file_name):
+    executer.set_syringes_file_name(syringes_file_name)
 
 #------------------EXTRA STUFF THAT WE DON'T NEED FOR NOW--------------------
 
@@ -686,6 +675,26 @@ def stop_load():
 def pause_batch():
     print("pause_batch")
     #coordinator.pause_batch()
+
+@socketio.on("run_script")
+def run_script():
+    # print("I am running script")
+    coordinator.run_batch()
+
+@socketio.on("give_me_script_json")
+def give_me_script_json(scriptName):
+    # read file
+    path_to_script = "../scripts/" + scriptName # moves to script folder
+    with open(path_to_script, 'r') as myfile:
+        data = myfile.read()
+
+    socketio.emit("script_json_data", data) # send data back to js in a json string
+
+@socketio.on("get_available_scripts")
+def get_available_scripts():
+    path_to_scripts_folder = "../scripts" # path to folder
+    list = os.listdir(path_to_scripts_folder) # make a list of scripts in folder
+    socketio.emit("scripts_available", list) # send the list back to js
 
 if __name__ == "__main__":
     socketio.run(app)

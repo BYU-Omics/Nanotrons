@@ -6,12 +6,8 @@ import signal
 # from coordinator import *
 
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
-<<<<<<< HEAD
-RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
-=======
 RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\' # ./ means look within the current directory
->>>>>>> newrepo
-RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
+RELATIVE_PATH_TO_PROTOCOLS_L = 'protocols/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
@@ -20,6 +16,7 @@ class Py_Execute:
     def __init__(self):
         self.filename: str = 'protocol.py'
         self.calibration_file_name: str = 'calibration.json'
+        self.syringe_model: str = 'HAMILTON_175'
         self.p = None
 
     def set_calibration_file_name(self, name):
@@ -29,27 +26,27 @@ class Py_Execute:
     def set_file_name(self, name):
         self.filename = name
 
+    def set_syringe_file_name(self, name):
+        self.syringe_model = name
+
     def execute_python_protocol(self):
         path = sys.path
-        print(path[0])
         if os.name == LINUX_OS:
-            cmd = 'python' + ' ' + path[0] + RELATIVE_PATH_TO_PROTOCOLS_L + self.filename + ' ' + self.calibration_file_name
+            relative_path = RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
-            cmd = 'python' + ' ' + RELATIVE_PATH_TO_PROTOCOLS_W + self.filename + ' ' + self.calibration_file_name
-        print(cmd)
+            relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
+        first_arg = path[0] + relative_path + self.filename 
+        second_arg = self.calibration_file_name
+        third_arg = self.syringe_model
+        cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         print(err)
         print(out)
 
-<<<<<<< HEAD
-    # def pause_execution(self):
-    #     os.kill(self.p.pid, signal.SIGSTOP)
-=======
     def stop_execution(self):
         print("Terminate protocol")
         self.p.terminate()
->>>>>>> newrepo
 
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)

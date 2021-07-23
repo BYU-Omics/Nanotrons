@@ -12,9 +12,15 @@
         <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
         <br>
         <br>
+        <label for="syringe">Labware calibration</label>
+        <select id="syringe" name="syringe" onclick="option_select_syringe()">
+            <option value="default" selected>- Select Syringes to Display -</option>
+        </select>
+        <br>
+        <br>
         <label for="calibration">Labware calibration</label>
         <select id="calibration" name="calibration" onclick="option_select_labware_calibration()">
-            <option value="default" selected>- Select Calibration to Display -</option>
+            <option value="default" selected>- Select Calibrations to Display -</option>
         </select>
         <br>
         <br>

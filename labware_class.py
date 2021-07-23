@@ -214,8 +214,6 @@ class Labware_class:
 
         # Create labware out of the dictionary
         self.dictionary_to_labware(labware_dictionary)
-<<<<<<< HEAD
-=======
 
         chip_number = 0
         plate_number = 0
@@ -225,7 +223,6 @@ class Labware_class:
                 chip_number += 1
             elif key == 'plate':
                 plate_number += 1
->>>>>>> newrepo
         
     def available_saved_labware_files(self):
         return os.listdir(self.get_path_to_saved_labware_folder())
