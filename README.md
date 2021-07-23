@@ -52,22 +52,7 @@ The GUI(Graphical User Interface) can be opened from a [python file](./web_app.p
 
 # Protocol example 
 
-File: protocol.py
-```python
-
-# ADJUSTING SYRINGE
-SYRINGE_STARTING_POSITON = -125
-
-myApp.ot_control.move({'B': SYRINGE_STARTING_POSITON}) # 'B' axis at about half way through the actuator
-
-# STARTING PROTOCOL
-
-# Aspirate 50 nL from custom A2 #Air gap
-myApp.goto_and_aspirate(100, custom('A2'))
-
-# Aspirate 600 nL from small well A1 #1.2 mM NaFL
-myApp.goto_and_aspirate(600, custom_small('A1'))
-```
+File: [protocol_1.py](https://github.com/BYU-Omics/Nanotrons/blob/master/protocols/protocol_1.py)
 
 # Contribution
 
