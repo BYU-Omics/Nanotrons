@@ -17,6 +17,9 @@ class Api:
     def __init__(self):
         self.coordinator = Coordinator()
 
+    def adjust_syringe(self, position):
+        self.coordinator.adjust_syringe(position)
+
     def load_labware_setup(self, file_name):
         self.coordinator.load_labware_setup(file_name)
 

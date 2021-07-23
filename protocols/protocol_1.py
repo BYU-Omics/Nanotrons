@@ -1,3 +1,11 @@
+"""
+    Template for writing protocols. 
+
+    Instructions: 
+        'aspirate_from' assumes nanoliters
+        'dispense_to' 
+"""
+
 try:
     from api import *
 except ImportError:
@@ -17,9 +25,9 @@ custom = plates[0].get_location_by_nickname
 custom_small = plates[1].get_location_by_nickname
 corning = plates[2].get_location_by_nickname
 
-# ADJUSTING SYRINGE
+# ----------ADJUSTING SYRINGE
 
-myProtocol.ot_control.move({'B': -125})
+myProtocol.adjust_syringe(-125)
 
 # --------------STARTTING PROTOCOL--------------
 

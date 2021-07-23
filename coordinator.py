@@ -579,6 +579,9 @@ class Coordinator:
         self.dispense(amount, ASPIRATE_SPEED)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
     
+    def adjust_syringe(self, position):
+        self.ot_control.move({'B': position})
+
     """
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
