@@ -161,14 +161,18 @@ class Coordinator:
         self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
 
     def home_all_motors(self):
-        """ This method homes all the motors on the OT2 except fot the Syrenges
+        """ This method homes all the motors on the OT2 except for the Syringes
         """
-        self.ot_control.home("X Y Z A")
+        self.ot_control.home("X Y Z A") # Not B and C
 
     def up_step_size(self):
+        """ This method goes through a list of predefined steps 
+        """
         self.ot_control.double_step_size_XYZ("") # "" is the dummy argument
     
     def down_step_size(self):
+        """ This method goes through a list of predefined steps  """
+       
         self.ot_control.half_step_size_XYZ("") # "" is the dummy argument
     
     """
@@ -228,11 +232,49 @@ class Coordinator:
     def movexyz(self, x, y, z):
         coordinates = { 'X': x, 'Y': y, 'Z': z }
         self.go_to_position(coordinates)
-    '''
-    PROTOCOL METHODS SECTION
-        This section defines methods that get called to facilitate reading a script of instructions 
-        *** NEEDS UPDATED DOCUMENTATION FROM JACOB***
-    '''
+
+    def move(self, location, nicknames):
+        if location == "mySample":
+            logging.info(f"Moving to '{location}' at '{nicknames.mySample}'")
+            locationString = nicknames.mySample
+        else:
+            logging.info(f"Moving to '{location}' at '{nicknames.get_nickname_location(location)}'")
+            locationString = nicknames.get_nickname_location(location)
+
+        # parse the string. Ex. p 1c4 --> type = 'p', number = 1, position = 'c4'
+        type = locationString[0]
+        number = locationString[2]
+        position = locationString[3:]
+        # call function to move motors (move_to_pot() or move_to_well())
+        if type == 'p':
+            self.go_to_pot(int(number), position)
+        elif type == 'c':
+            self.go_to_well(int(number), position)
+        else:
+            logging.info("ERROR: cannot move to any location other than POT or WELL")
+    
+    def pick_up_liquid(self, volume, speed = SLOW_SPEED): 
+        """ Sends a command to the syringe motor to displace a distance that is equivalent to aspirating a given volume of liquid
+
+        Args:
+            volume ([float]): volume of liquid to be aspirated. UNIT: NANOLITERS
+            speed ([float]): speed at which the given volume of liquid will be aspirated. UNIT: MILIMITERS/SECOND
+        """     
+        step_displacement = self.volume_to_displacement_converter(volume) 
+        self.ot_control.set_step_size_syringe_motor(step_displacement)
+        self.ot_control.plunger_L_Up(size=self.ot_control.s_step_size)
+
+    def drop_off_liquid(self, volume, speed =SLOW_SPEED):
+        """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
+
+        Args:
+            volume ([float]): volume of liquid to be dispensed,. UNIT: NANOLITERS
+            speed ([float]): speed at which the given volume of liquid will be dispensed. UNIT: MILIMITERS/SECOND
+        """
+        step_displacement = self.volume_to_displacement_converter(volume)
+        self.ot_control.set_step_size_syringe_motor(step_displacement)
+        self.ot_control.plunger_L_Down(size=self.ot_control.s_step_size)
+    
     def volume_to_displacement_converter(self, volume):
         """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
 
@@ -259,73 +301,18 @@ class Coordinator:
         self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
 
-    def pick_up_liquid(self, volume, speed = SLOW_SPEED): 
-        """ Sends a command to the syringe motor to displace a distance that is equivalent to aspirating a given volume of liquid
-
-        Args:
-            volume ([float]): volume of liquid to be aspirated. UNIT: NANOLITERS
-            speed ([float]): speed at which the given volume of liquid will be aspirated. UNIT: MILIMITERS/SECOND
-        """     
-        step_displacement = self.volume_to_displacement_converter(volume) 
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Up(size=self.ot_control.s_step_size)
-
-    def drop_off_liquid(self, volume, speed =SLOW_SPEED):
-        """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
-
-        Args:
-            volume ([float]): volume of liquid to be dispensed,. UNIT: NANOLITERS
-            speed ([float]): speed at which the given volume of liquid will be dispensed. UNIT: MILIMITERS/SECOND
-        """
-        step_displacement = self.volume_to_displacement_converter(volume)
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Down(size=self.ot_control.s_step_size)
-
-    def move(self, location, nicknames):
-        if location == "mySample":
-            logging.info(f"Moving to '{location}' at '{nicknames.mySample}'")
-            locationString = nicknames.mySample
-        else:
-            logging.info(f"Moving to '{location}' at '{nicknames.get_nickname_location(location)}'")
-            locationString = nicknames.get_nickname_location(location)
-
-        # parse the string. Ex. p 1c4 --> type = 'p', number = 1, position = 'c4'
-        type = locationString[0]
-        number = locationString[2]
-        position = locationString[3:]
-        # call function to move motors (move_to_pot() or move_to_well())
-        if type == 'p':
-            self.go_to_pot(int(number), position)
-        elif type == 'c':
-            self.go_to_well(int(number), position)
-        else:
-            logging.info("ERROR: cannot move to any location other than POT or WELL")
-     
     def set_syringe_speed(self, nLminSpeed):
         mmspeed = self.volume_to_displacement_converter(nLminSpeed)/60
         
-    # pick up amount in nL and speed in nL/min
     def aspirate(self, volume, speed): 
+        """ Pick up amount in nL and speed in nL/min  """
         logging.info(f"Aspirating {volume} nL at speed {speed} nL/s")
         self.pick_up_liquid(int(volume))
 
-    # drop of amount in nL and speed in nL/min
     def dispense(self, amount, speed): 
+        """ Drop of amount in nL and speed in nL/min  """
         logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
         self.drop_off_liquid(int(amount))
-    
-    # This will go to the position of the source and aspirate an amount in nL
-    def goto_and_aspirate(self, amount, source):
-        self.go_to_position(source)
-        self.aspirate(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
-
-    # This will go to the position of the destination and dispense an amount in nL
-    def goto_and_dispense(self, amount, to):
-        print(f"Go to {to} and dispense ")
-        self.go_to_position(to)
-        self.dispense(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
 
     """
     LABWARE METHODS SECTION
@@ -423,6 +410,10 @@ class Coordinator:
             input_file_name ([str]): name of desired input file
         """
         self.myLabware.load_labware_from_file(input_file_name)
+        chip_list = self.myLabware.chip_list
+        plate_list = self.myLabware.plate_list
+        return chip_list, plate_list
+    
 
     def get_available_labware_setup_files(self):
         """ Obtain the list of available files with previously calibrated and exported labware components
@@ -489,6 +480,7 @@ class Coordinator:
     """
     SETTINGS SECTION
     """
+    
     def get_current_settings(self):
         """ Retrieve the current state of all the relevant settings of the system and store them in a dictionary
 
@@ -545,6 +537,7 @@ class Coordinator:
         This section is meant to define methods that retrieve information from the 
         components of the system
     """
+    
     def get_current_coordinates(self):
         """ Gets the position of each of the stages associated with 3 dimensional motion: X, Y, and Z axes
 
@@ -569,10 +562,27 @@ class Coordinator:
         """
         self.coordinates_refresh_rate = new_rate
 
+    '''
+    PROTOCOL METHODS SECTION FOR OT2
+        This section defines methods that get called to facilitate reading a script of instructions 
+    '''
+    def aspirate_from(self, amount, source):
+        """This will go to the position of the source and aspirate an amount in nL"""
+        self.go_to_position(source)
+        self.aspirate(amount, ASPIRATE_SPEED)
+        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
+    def dispense_to(self, amount, to):
+        """This will go to the position of the destination and dispense an amount in nL"""
+        print(f"Go to {to} and dispense ")
+        self.go_to_position(to)
+        self.dispense(amount, ASPIRATE_SPEED)
+        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
+    
     """
-    THERMOCYCLER COORDINATION SECTION
+    PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
+    
     def tc_connect(self):
         asyncio.run(self.tc_control.connect(port= self.tc_port))
 
@@ -629,7 +639,7 @@ class Coordinator:
 
 
     """
-    TEMPDECK COORDINATION SECTION
+    PROTOCOL METHODS SECTION FOR TEMPDECK 
     """
 
     def set_tempdeck_temp(self, celcius, holding_time_in_minutes):
@@ -668,27 +678,12 @@ class Coordinator:
         return self.td_control.status
 
     """
-    PROTOCOL COORDINATION SECTION
+    RUN PROTOCOL COORDINATION SECTION
     """
 
-    # stops batch entirely, stops loading and the rest of the LC and MS calls
-    def hard_stop(self): 
-        self.myReader.hard_stop()
-
-    # stops batch after loading current sample. Loaded samples still go to the MS
-    def stop_load(self): 
-        self.myReader.stop_load()
-
-    # this pauses the batch so you can add scripts to the queue (stops you from runnning the finishup routine and starting over. saves maybe 3 hours)
-    def pause_batch(self):
-        self.myReader.pause_batch()
-
     def pause_protocol(self):
-        self.myReader.pause_batch()
-
-    # makes a script reader and runs the batch through the reader
-    def run_batch(self): 
-        self.myReader.run()
+        """This method pauses the protocol process"""
+        pass
 
     def verify_container_existence(self, container_description):
         """Verify that a given well or pot exists in a given chip or plate, respectively, by providing a coded description
@@ -699,14 +694,18 @@ class Coordinator:
         """
         return self.myLabware.check_well_pot_existence(container_description)
 
-    def disconnect_all(self):
-        self.tc_disconnect()
-        self.ot_control.disconnect()
-
     def connect_all(self):
+        """This method connects the modules connected to the computer"""
         self.disconnect_all()
         self.tc_control._connection = self.tc_control._connect_to_port()
         self.ot_control.connect_driver()
+        self.td_control.connect(self.ot_control._port)
+
+    def disconnect_all(self):
+        """This method disconnects the modules connected to the computer"""
+        self.tc_disconnect()
+        self.ot_control.disconnect()
+        self.ot_control.disconnect()
 
 def test():
     myApp = Coordinator()
