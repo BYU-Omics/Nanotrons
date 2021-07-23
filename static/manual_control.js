@@ -105,6 +105,24 @@ function go_to_deck_slot(slot) {
     socket.emit("go_to_deck_slot", slot);
 }
 
+function set_tempdeck_temp() {
+    let tdtemp = document.getElementById("tdtemp");
+    let thtime = document.getElementById("thtime");
+    socket.emit("set_tempdeck_temp", [tdtemp.value, thtime.value]);
+}
+
+
+function deactivate_block() {
+    socket.emit("deactivate_block");
+}
+
+function deactivate_tempdeck() {
+    socket.emit("deactivate_tempdeck")
+}
+
+function check_tempdeck_status() {
+    socket.emit("check_tempdeck_status")
+}
 
 let btemp = 0;
 socket.on("get_block_temp", function(temp) {
@@ -112,6 +130,22 @@ socket.on("get_block_temp", function(temp) {
     btemp = temp;  
     var temp = document.getElementById("blockT")
     temp.innerHTML = btemp;
+});
+
+let tdtemp = 0;
+socket.on("get_tempdeck_temp", function(temp) {
+    console.log(temp)
+    tdtemp = temp;  
+    var temp = document.getElementById("tdT")
+    temp.innerHTML = tdtemp;
+});
+
+let tdstatus = 0;
+socket.on("check_tempdeck_status", function(status) {
+    console.log(status)
+    tdstatus = status;  
+    var status = document.getElementById("tdS")
+    status.innerHTML = tdstatus;
 });
 
 let ltemp = 0;

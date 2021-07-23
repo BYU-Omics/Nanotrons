@@ -3,12 +3,22 @@ import logging
 import asyncio
 from threading import Event, Thread, Lock
 from time import sleep
+<<<<<<< HEAD
 from typing import Any, Optional, Mapping, Dict, Tuple
+=======
+from typing import Any, Optional, Mapping, Dict, Tuple, Union
+>>>>>>> newrepo
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
+<<<<<<< HEAD
+=======
+from serial.tools import list_ports
+import os
+
+>>>>>>> newrepo
 '''
 - Driver is responsible for providing an interface for the temp-deck
 - Driver is the only system component that knows about the temp-deck's GCODES
@@ -38,6 +48,15 @@ GCODES = {
 
 TEMP_DECK_BAUDRATE = 115200
 
+<<<<<<< HEAD
+=======
+WINDOWS_TD_PORT = 'COM6'
+LINUX_TD_PORT = '/dev/ttyACM0'
+LINUX_OS = 'posix'
+WINDOWS_OS = 'nt'
+
+
+>>>>>>> newrepo
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
@@ -52,6 +71,7 @@ temp_locks: Dict[str, Tuple[Lock, 'TempDeck']] = {}
 class TempDeckError(Exception):
     pass
 
+<<<<<<< HEAD
 
 class SimulatingDriver:
     def __init__(self, sim_model: str = None):
@@ -110,6 +130,8 @@ class SimulatingDriver:
                 'version': 'dummyVersionTD'}
 
 
+=======
+>>>>>>> newrepo
 class TempDeck:
     def __init__(self):
         self.run_flag = Event()
@@ -119,17 +141,25 @@ class TempDeck:
         self._temperature = {'current': 25, 'target': None}
         self._update_thread = None
         self._port = None
+<<<<<<< HEAD
         self._lock = None
+=======
+        self.find_port()
+        self.connect(self._port)
+>>>>>>> newrepo
 
     def connect(self, port=None) -> Optional[str]:
         try:
             self.disconnect(port)
             self._connect_to_port(port)
+<<<<<<< HEAD
             if temp_locks.get(port):
                 self._lock = temp_locks[port][0]
             else:
                 self._lock = Lock()
                 temp_locks[port] = (self._lock, self)
+=======
+>>>>>>> newrepo
             self._wait_for_ack()  # verify the device is there
             self._port = port
 
@@ -227,10 +257,17 @@ class TempDeck:
 
     def _get_status(self) -> str:
         # Separate function for testability
+<<<<<<< HEAD
         current = self._temperature['current']
         target = self._temperature.get('target')
         delta = 0.7
         if target:
+=======
+        current = float(self._temperature['current'])
+        target = float(self._temperature.get('target'))
+        delta = 0.7
+        if target != 'none':
+>>>>>>> newrepo
             diff = target - current  # type: ignore
             if abs(diff) < delta:   # To avoid status fluctuation near target
                 return 'holding at target'
@@ -309,6 +346,7 @@ class TempDeck:
         """
 
         """
+<<<<<<< HEAD
         assert self._lock, 'not connected'
         with self._lock:
             command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
@@ -322,6 +360,19 @@ class TempDeck:
                 raise TempDeckError(ret_code)
 
             return ret_code.strip()
+=======
+        command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
+        ret_code = self._recursive_write_and_return(
+            command_line, timeout, DEFAULT_COMMAND_RETRIES)
+
+        # Smoothieware returns error state if a switch was hit while moving
+        if (ERROR_KEYWORD in ret_code.lower()) or \
+                (ALARM_KEYWORD in ret_code.lower()):
+            log.error(f'Received error message from Temp-Deck: {ret_code}')
+            raise TempDeckError(ret_code)
+
+        return ret_code.strip()
+>>>>>>> newrepo
 
     def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
         if not tag:
@@ -349,9 +400,18 @@ class TempDeck:
             res = self._send_command(
                 GCODES['GET_TEMP'],
                 tag=f'tempdeck {id(self)} rut')
+<<<<<<< HEAD
             res = utils.parse_temperature_response(
                 res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
             self._temperature.update(res)
+=======
+            data = utils.parse_key_values(res)
+            res = utils.parse_temperature_response(
+                res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+            # print(data['C'])
+            self._temperature.update({'current': data['C'], 'target':  data['T']})
+            print(f"Temp updated to: {self._temperature}")
+>>>>>>> newrepo
             return None
         except utils.ParseError as e:
             retries -= 1
@@ -374,3 +434,37 @@ class TempDeck:
             raise last_e
         else:
             raise TempDeckError('Unknown error in temperature module')
+<<<<<<< HEAD
+=======
+
+    def find_port(self):
+        ports = list_ports.comports()
+        operating_system = os.name
+        for p in ports:
+            if operating_system == WINDOWS_OS and p.device == WINDOWS_TD_PORT:
+                self._port = p.device
+                print(f"Tempdeck connected to: {p}")
+            elif operating_system == LINUX_OS and p.device == LINUX_TD_PORT:
+                self._port = p.device
+                print(f"Tempdeck connected to: {p}")
+
+def test():
+    TD = TempDeck()
+    # await TD.set_temperature(4)
+    TD.deactivate()
+    # TD.pause()
+    # TD.resume()
+    # TD.update_temperature()
+    TD.start_set_temperature(10)
+    # TD.legacy_set_temperature(4)
+    print("updating temp")
+    TD.update_temperature()
+    sleep(0.01)
+    print(TD.temperature)
+    print(TD.status)
+    # print(TD.get_device_info()) # RETURNS: {'model': 'temp_deck_v3.0', 'version': 'v2.0.1', 'serial': 'TDV03P20181008A06'}
+
+
+if __name__ == "__main__":
+    test()
+>>>>>>> newrepo

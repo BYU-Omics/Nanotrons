@@ -1,0 +1,3 @@
+[submodule "OT2/OT2/opentrons"]
+	path = OT2/OT2/opentrons
+	url = https://github.com/Opentrons/opentrons.git

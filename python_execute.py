@@ -6,7 +6,11 @@ import signal
 # from coordinator import *
 
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
+<<<<<<< HEAD
 RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
+=======
+RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\' # ./ means look within the current directory
+>>>>>>> newrepo
 RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
@@ -38,8 +42,14 @@ class Py_Execute:
         print(err)
         print(out)
 
+<<<<<<< HEAD
     # def pause_execution(self):
     #     os.kill(self.p.pid, signal.SIGSTOP)
+=======
+    def stop_execution(self):
+        print("Terminate protocol")
+        self.p.terminate()
+>>>>>>> newrepo
 
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)

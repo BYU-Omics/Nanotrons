@@ -1,30 +1,23 @@
 var socket = io.connect('http://127.0.0.1:5000');
 
-var run_script_button = document.getElementById("run_script");
 var run_protocol_button = document.getElementById("run_protocol");
-var scriptOptions = document.getElementById("scripts"); // Dropdown list that shows the available models
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
 var calibrationOptions = document.getElementById("calibration"); // Dropdown list that shows the available models
 
-var display_script_button = document.getElementById("display_script");
 var display_protocol_button = document.getElementById("display_protocol");
 var display_calibration_button = document.getElementById("display_calibration");
 
-var pause_button_script = document.getElementById("pause_script");
 var pause_button_protocol = document.getElementById("pause_protocol");
+var stop_button_protocol = document.getElementById("stop_protocol")
 
 var stopLoad_button = document.getElementById("stop_load");
 var hardStop_button = document.getElementById("hard_stop");
-var script_name = document.getElementById("script_name");
 var protocol_name = document.getElementById("protocol_name");
 var script_description = document.getElementById("script_description");
 var protocol_description = document.getElementById("protocol_description");
-var MStime = document.getElementById("MStime");
-var LCtime = document.getElementById("LCtime");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
-var scripts = {}; // holds list of available script
 var protocols = {}
 var calibrations = {}
 var script_to_display = "error" // save as error until over written
@@ -35,11 +28,15 @@ var python_data = ""
 
 // asks python to send the list of scripts
 
+<<<<<<< HEAD
 socket.emit("get_available_scripts");
+=======
+>>>>>>> newrepo
 socket.emit("get_available_protocols")
 socket.emit("get_available_calibrations")
 
 // listens for the list of available scripts
+<<<<<<< HEAD
 socket.on('scripts_available', function(received_scripts) {
     scripts = received_scripts; // save list in scripts variable
     console.log("scripts recieved")
@@ -47,6 +44,8 @@ socket.on('scripts_available', function(received_scripts) {
 });   
 
 // listens for the list of available scripts
+=======
+>>>>>>> newrepo
 socket.on('protocols_available', function(received_protocols) {
     protocols = received_protocols; // save list in scripts variable
     console.log("protocol received")
@@ -61,6 +60,7 @@ socket.on('calibrations_available', function(received_calibrations) {
 }); 
 
 // fills drop down list with the availble scripts
+<<<<<<< HEAD
 function fill_script_drop_down(){
     // Erase all the options inside the dropdown list (select object)
     var length = scriptOptions.options.length;
@@ -84,6 +84,8 @@ function fill_script_drop_down(){
 }
 
 // fills drop down list with the availble scripts
+=======
+>>>>>>> newrepo
 function fill_protocol_drop_down(){
     // Erase all the options inside the dropdown list (select object)
     var length = protocolOptions.options.length;
@@ -129,6 +131,7 @@ function fill_calibrations_drop_down(){
 }
 
 // this runs each time you select an option from the script list
+<<<<<<< HEAD
 function option_select_script(){
     // This either blocks or unblocks the submit button
     var selected_script = scriptOptions.options[ scriptOptions.selectedIndex ].value;
@@ -143,6 +146,8 @@ function option_select_script(){
 }
 
 // this runs each time you select an option from the script list
+=======
+>>>>>>> newrepo
 function option_select_protocol(){
     // This either blocks or unblocks the submit button
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
@@ -170,12 +175,15 @@ function option_select_labware_calibration(){
         display_calibration_button.disabled = true; // disable button
     }
 }
+<<<<<<< HEAD
 // this runs when you click the display script button
 display_script_button.addEventListener("click", function() {
     clear_script_Table() // clear out the old table data
     console.log("clearing table")
     socket.emit("give_me_script_json", script_to_display);
 });
+=======
+>>>>>>> newrepo
 
 // this runs when you click the display script button
 display_protocol_button.addEventListener("click", function() {
@@ -192,6 +200,7 @@ socket.on('protocol_python_data', function(python_string) {
     make_and_display_protocol_table()
 });  
 
+<<<<<<< HEAD
 // listens for the json data
 socket.on('script_json_data', function(json_string) {
     json_data = json_string; // save list in scripts variable
@@ -221,6 +230,8 @@ function make_and_display_script_table(){
     }
 }
 
+=======
+>>>>>>> newrepo
 // fills in the table with script commands
 function make_and_display_protocol_table(){
     console.log(python_data)
@@ -241,16 +252,20 @@ function make_and_display_protocol_table(){
     }
 }
 
+<<<<<<< HEAD
 // the play button in HTML. Calls the run batch function
 run_script_button.addEventListener("click", function() {
     socket.emit("run_script");
 });
 
+=======
+>>>>>>> newrepo
 run_protocol_button.addEventListener("click", function() {
     socket.emit("run_protocol", protocol_to_display);
 });
 
 // the pause button in HTML. Calls the pause batch function
+<<<<<<< HEAD
 pause_button_script.addEventListener("click", function() {
     socket.emit("pause_batch");
 });
@@ -258,6 +273,14 @@ pause_button_script.addEventListener("click", function() {
 // the pause button in HTML. Calls the pause batch function
 pause_button_script.addEventListener("click", function() {
     socket.emit("pause_protocol");
+=======
+pause_button_protocol.addEventListener("click", function() {
+    socket.emit("pause_protocol");
+});
+
+stop_button_protocol.addEventListener("click", function() {
+    socket.emit("stop_protocol")
+>>>>>>> newrepo
 });
 
 // the stop load button in HTML. Calls the stop_load function
@@ -273,9 +296,13 @@ hardStop_button.addEventListener("click", function() {
 // allows you to upload a new script that you can display
 function uploadScript() {
     var socket = io.connect('http://127.0.0.1:5000');
+<<<<<<< HEAD
 
     console.log("upload script")
 
+=======
+    console.log("upload script")
+>>>>>>> newrepo
 }
 
 // adds a row to the table with the given parameters

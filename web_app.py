@@ -329,6 +329,33 @@ def hold_time():
     print("hold_time")
     coordinator.tc_control.hold_time()
 
+<<<<<<< HEAD
+=======
+#----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
+
+@socketio.on("set_tempdeck_temp")
+def set_tempdeck_temp(elements):
+    print("set_tempdeck_temp")
+    coordinator.set_tempdeck_temp(celcius=elements[TEMP], holding_time_in_minutes=elements[HOLD_TIME])
+
+@socketio.on("deactivate_tempdeck")
+def deactivate_tempdeck():
+    print("deactivate_tempdeck")
+    coordinator.deactivate_tempdeck()
+
+@socketio.on("get_tempdeck_temp")
+def get_tempdeck_temp():
+    print("get_tempdeck_temp")
+    temp = coordinator.get_tempdeck_temp()
+    socketio.emit("get_tempdeck_temp", temp)
+
+@socketio.on("check_tempdeck_status")
+def check_tempdeck_status():
+    print("check_tempdeck_status")
+    coordinator.check_tempdeck_status()
+    status = coordinator.check_tempdeck_status()
+    socketio.emit("check_tempdeck_status", status)
+>>>>>>> newrepo
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
@@ -627,6 +654,17 @@ def get_available_calibrations():
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
 
+<<<<<<< HEAD
+=======
+@socketio.on("stop_protocol")
+def stop_protocol():
+    executer.stop_execution()
+
+@socketio.on("reconnect_coordinator")
+def reconnect_coordinator():
+    coordinator.connect_all()
+
+>>>>>>> newrepo
 
 #------------------EXTRA STUFF THAT WE DON'T NEED FOR NOW--------------------
 

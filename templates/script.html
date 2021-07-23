@@ -10,21 +10,6 @@
         <link rel= "stylesheet" type= "text/css" href= "/static/styles/script.css">
         <h1>Script Creation and Execution</h1>
         <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
-        <input type="button" id="upload_script" value="Upload Script" onclick="Javascript:uploadScript()">
-        <br>
-        <input title="RUN SCRIPT" id="run_script" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="PAUSE SCRIPT" id="pause_script" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
-        <input title="STOP LOAD" id="stop_load" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
-        <input title="HARD STOP" id="hard_stop" type="image" class="pic" src="{{ url_for('static',filename='hardStop.jpeg') }}" />
-        <br>
-        <br>
-        <label for="scripts">Scripts</label>
-        <select id="scripts" name="scripts" onclick="option_select_script()">
-            <option value="default" selected>- Select Script to Display -</option>
-        </select>
-        <br>
-        <button type="button" disabled="disabled" id="display_script">Display Script</button>
-        <br>
         <br>
         <br>
         <label for="calibration">Labware calibration</label>
@@ -33,8 +18,9 @@
         </select>
         <br>
         <br>
-        <input title="RUN SCRIPT" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="PAUSE SCRIPT" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="PAUSE PROTOCOL" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
         <br>
         <label for="protocols">Protocols</label>
         <select id="protocols" name="protocols" onclick="option_select_protocol()">
@@ -62,10 +48,6 @@
         <b><p style="display:inline">SPEtime: </p></b>
         <p id="SPEtime" style="display:inline"></p>
         <br>
-
-
-        
-        
         <br>
         <br>
 

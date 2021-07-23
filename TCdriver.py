@@ -14,6 +14,11 @@ from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import utils, serial_communication
 from opentrons.drivers.serial_communication import SerialNoResponse
+<<<<<<< HEAD
+=======
+from serial.tools import list_ports
+import os
+>>>>>>> newrepo
 
 if TYPE_CHECKING:
     # avoid an issue where Queue doesn't support generics at runtime
@@ -83,10 +88,18 @@ POLLING_FREQUENCY_MS = 1000
 HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
 
+<<<<<<< HEAD
+=======
+WINDOWS_TC_PORT = 'COM5'
+LINUX_TC_PORT = '/dev/ttyACM0'
+LINUX_OS = 'posix'
+WINDOWS_OS = 'nt'
+>>>>>>> newrepo
 
 class ThermocyclerError(Exception):
     pass
 
+<<<<<<< HEAD
 
 class SimulatingDriver:
     def __init__(self, sim_model: str = None):
@@ -353,6 +366,11 @@ class TCPoller(threading.Thread):
 class Thermocycler:
     def __init__(self, interrupt_callback, port):
         self._port = port
+=======
+class Thermocycler:
+    def __init__(self, interrupt_callback):
+        self._port = WINDOWS_TC_PORT
+>>>>>>> newrepo
         self._connection = self._connect_to_port()
         self._update_thread = None
         self._current_temp = None
@@ -389,12 +407,17 @@ class Thermocycler:
         return self._connection.is_open
 
     def _connect_to_port(self):
+<<<<<<< HEAD
+=======
+        self.find_port()
+>>>>>>> newrepo
         try:
             return serial_communication.connect(port=self._port,
                                                 baudrate=TC_BAUDRATE)
         except SerialException:
             raise SerialException(
                 "Thermocycler device not found on {}".format(self._port))
+<<<<<<< HEAD
         # try:
         #     self._connection = serial_communication.connect(
         #         port=self._port,
@@ -409,6 +432,8 @@ class Thermocycler:
         #     error_msg += 'the UART port is disabled on this device (OS)'
         #     raise SerialException(error_msg)
 
+=======
+>>>>>>> newrepo
 
     def _wait_for_ack(self):
         """
@@ -682,10 +707,31 @@ class Thermocycler:
         trigger_connection.close()
         self.disconnect()
 
+<<<<<<< HEAD
 async def testing():
     tc_portname = '/dev/ttyACM0'
     tc_portname_windows = 'COM5' 
     TC = Thermocycler(interrupt_callback=interrupt_callback, port=tc_portname_windows)
+=======
+    def find_port(self):
+        ports = list_ports.comports()
+        operating_system = os.name
+        for p in ports:
+            if operating_system == WINDOWS_OS and p.device == WINDOWS_TC_PORT:
+                self._port = p.device
+                print(f"Thermocycler connected to: {p}")
+            elif operating_system == LINUX_OS and p.device == LINUX_TC_PORT:
+                self._port = p.device
+                print(f"Thermocycler connected to: {p}")
+            
+        
+
+
+async def testing():
+    tc_portname = '/dev/ttyACM0'
+    tc_portname_windows = 'COM5' 
+    TC = Thermocycler(interrupt_callback=interrupt_callback)
+>>>>>>> newrepo
     # await TC.close()
     await TC.set_temperature(4, 30)
     # await TC.deactivate_all()
