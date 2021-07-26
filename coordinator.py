@@ -43,6 +43,7 @@ from labware_class import *
 from models_manager import ModelsManager
 from calibration import *
 from deck import *
+from keyboard import Keyboard
 import asyncio
 # from high_level_script_reader import HighLevelScriptReader	
 import threading
@@ -51,11 +52,13 @@ import time
 import logging
 import os
 import sys
+import platform
 from collections import deque 
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_OS = 'Darwin'
 UNIT_CONVERSION  = 4.23 #3.8896 4.16
 INBETWEEN_LIFT_DISTANCE = -10 # Default distance the syringe will be lifted/lowered when going from one nanopots well\reagent pot to another
 LABWARE_CHIP = "c"
@@ -80,18 +83,24 @@ class Coordinator:
         """
         operating_system = ""
         os_recognized = os.name
+        self.ot_control = OT2_nanotrons_driver()
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
             operating_system = "w"
+            self.myController = XboxJoystick(operating_system)
         elif os_recognized == LINUX_OS:
             logging.info("Operating system: Linux")
             operating_system = "r"
+            if platform.system() == MACBOOK_OS:
+                self.myController = Keyboard(self.ot_control)
+            else:
+                self.myController = XboxJoystick(operating_system)
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        self.ot_control = OT2_nanotrons_driver()
+        
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        self.myController = XboxJoystick(operating_system)
+        
         self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
@@ -148,11 +157,14 @@ class Coordinator:
     def manual_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
-        t1 = threading.Thread(target=self.myController.listen)
-        t1.start()
-        while(t1.is_alive()):
-            self.monitor_joystick()
-            time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+        if platform.system() == MACBOOK_OS:
+            self.myController.listen()
+        else: 
+            t1 = threading.Thread(target=self.myController.listen)
+            t1.start()
+            while(t1.is_alive()):
+                self.monitor_joystick()
+                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
 
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
@@ -469,7 +481,6 @@ class Coordinator:
         
         settings_dict["xyz_axis_step_size"] = self.ot_control.get_step_size_xyz_motor()
         settings_dict["xyz_axis_step_speed"] = self.ot_control.get_step_speed_xyz_motor()
-        settings_dict["x_axis_orientation"] = self.myController.get_axis_direction(self.get_linked_joystick_axis_index("x"))
         return settings_dict
 
     def update_setting(self, property_name, value):
@@ -684,7 +695,8 @@ class Coordinator:
         self.ot_control.disconnect()
 
 def test():
-    myApp = Coordinator()
+    #myApp = Coordinator()
+    print(platform.system())
     
     # myApp.go_to_deck_slot('6')
     # myApp.close_lid()

@@ -63,7 +63,7 @@ class Profile:
     # This returns the function associated to the provided string name. It searches on all the classes specified inside of the method
     def find_method(self, function_name):
         # print("Function name: {}".format(function_name))
-        method = getattr(OT2_nanopots_driver, function_name, "NOT_FOUND")
+        method = getattr(OT2_nanotrons_driver, function_name, "NOT_FOUND")
         # if method == "NOT_FOUND":
         #     method = getattr(Scripter, function_name, "NOT_FOUND")
         if method == "NOT_FOUND":

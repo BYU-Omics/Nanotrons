@@ -45,6 +45,7 @@ WINDOWS_TD_PORT = 'COM6'
 LINUX_TD_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_TD_PORT = '/dev/cu.usbmodem142301'
 
 
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
@@ -327,12 +328,21 @@ class TempDeck:
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
+            # print(p)
             if operating_system == WINDOWS_OS and p.device == WINDOWS_TD_PORT:
                 self._port = p.device
                 print(f"Tempdeck connected to: {p}")
-            elif operating_system == LINUX_OS and p.device == LINUX_TD_PORT:
-                self._port = p.device
-                print(f"Tempdeck connected to: {p}")
+            elif operating_system == LINUX_OS:
+                if p == LINUX_TD_PORT or p.device == MACBOOK_TD_PORT:
+                    self._port = p.device
+                    # print(self._port)
+                    print(f"Tempdeck connected to: {p}")
+                else: 
+                    # print(f"Port not found: {p.device}")
+                    pass
+            else:
+                print(f"No operating system recognized: {operating_system}")
+                
 
 def test():
     TD = TempDeck()

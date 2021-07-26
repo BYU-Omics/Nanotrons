@@ -5,7 +5,7 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
-RUNNING_APP_FOR_REAL = False
+RUNNING_APP_FOR_REAL = True
 import cv2
 import os
 import time
@@ -18,13 +18,16 @@ import logging
 if RUNNING_APP_FOR_REAL:
     from coordinator import *
 from python_execute import Py_Execute
+import platform
 
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 CAMERA_PORT = 0
+CAMERA_PORT_MACBOOK = 1
 PIPPETE_CAMERA_PORT = 1
+PIPPETE_CAMERA_PORT_MACBOOK = 2
 RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
 RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
@@ -33,6 +36,7 @@ RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
 RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_OS = 'Darwin'
 TEMP = 0
 HOLD_TIME = 1
 X, Y, Z = 0, 1 ,2
@@ -62,8 +66,12 @@ if RUNNING_APP_FOR_REAL:
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
-myCamera = VideoStream(CAMERA_PORT)
-my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
+if platform.system() == MACBOOK_OS:
+    myCamera = VideoStream(CAMERA_PORT_MACBOOK)
+    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
+else: 
+    myCamera = VideoStream(CAMERA_PORT)
+    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []

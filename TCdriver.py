@@ -89,6 +89,7 @@ WINDOWS_TC_PORT = 'COM5'
 LINUX_TC_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_TC_PORT = '/dev/cu.usbmodem142101'
 
 class ThermocyclerError(Exception):
     pass
@@ -416,12 +417,21 @@ class Thermocycler:
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
+            # print(p)
             if operating_system == WINDOWS_OS and p.device == WINDOWS_TC_PORT:
                 self._port = p.device
                 print(f"Thermocycler connected to: {p}")
-            elif operating_system == LINUX_OS and p.device == LINUX_TC_PORT:
-                self._port = p.device
-                print(f"Thermocycler connected to: {p}")
+            elif operating_system == LINUX_OS:
+                if p == LINUX_TC_PORT or p.device == MACBOOK_TC_PORT:
+                    self._port = p.device
+                    # print(self._port)
+                    print(f"Thermocycler connected to: {p}")
+                else: 
+                    # print(f"Port not found: {p.device}")
+                    pass
+            else:
+                print(f"No operating system recognized: {operating_system}")
+                
 
 async def testing():
     tc_portname = '/dev/ttyACM0'

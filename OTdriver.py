@@ -70,6 +70,7 @@ RIGHT = 'Right' #B
 
 WINDOWS_OT_PORT = 'COM4'
 LINUX_OT_PORT = '/dev/ttyACM0'
+MACBOOK_OT_PORT = "/dev/cu.usbserial-A50285BI"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
@@ -83,7 +84,7 @@ class OT2_nanotrons_driver(SM):
         #   When changed, all of them move at the same rate
         self.xyz_step_size = STEP_SIZE
         self.xyz_step_speed = STEP_SPEED
-        self._port = WINDOWS_OT_PORT
+        self._port = None
         # Attributes that control the size and speed of the plunger. 
         self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
         self.s_step_speed = SLOW_SPEED #Step speed for the syringe
@@ -515,12 +516,20 @@ class OT2_nanotrons_driver(SM):
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
+            # print(p)
             if operating_system == WINDOWS_OS and p.device == WINDOWS_OT_PORT:
                 self._port = p.device
                 print(f"OT2 connected to: {p}")
-            elif operating_system == LINUX_OS and p == LINUX_OT_PORT:
-                self._port = p.device
-                print(f"OT2 connected to: {p}")
+            elif operating_system == LINUX_OS:
+                if p == LINUX_OT_PORT or p.device == MACBOOK_OT_PORT:
+                    self._port = p.device
+                    # print(self._port)
+                    print(f"OT2 connected to: {p}")
+                else: 
+                    # print(f"Port not found: {p.device}")
+                    pass
+            else:
+                print(f"No operating system recognized: {operating_system}")
             
     def connect_driver(self):
         """
@@ -531,6 +540,7 @@ class OT2_nanotrons_driver(SM):
 
 def test():
     robot = OT2_nanotrons_driver()
+    robot.find_port()
 
 if __name__ == '__main__':
     test()
