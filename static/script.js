@@ -188,6 +188,7 @@ socket.on('protocol_python_data', function(python_string) {
 // fills in the table with script commands
 function make_and_display_protocol_table(){
     console.log(python_data)
+    var obj1 = PY.parse(python_data)
     var obj = JSON.parse(python_data); // parse the JSON string into JSON obj
     console.log("Name " + obj.name);
 

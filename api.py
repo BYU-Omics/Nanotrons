@@ -21,7 +21,7 @@ class Api:
         self.coordinator.adjust_syringe(position)
 
     def load_labware_setup(self, file_name):
-        self.coordinator.load_labware_setup(file_name)
+        return self.coordinator.load_labware_setup(file_name)
 
     def aspirate_from(self, amount, source):
         self.coordinator.aspirate_from(amount, source)

@@ -397,7 +397,8 @@ class Coordinator:
         self.myLabware.load_labware_from_file(input_file_name)
         chip_list = self.myLabware.chip_list
         plate_list = self.myLabware.plate_list
-        return chip_list, plate_list
+        labware = [chip_list, plate_list]
+        return labware
     
 
     def get_available_labware_setup_files(self):
@@ -692,7 +693,7 @@ class Coordinator:
         """This method disconnects the modules connected to the computer"""
         self.tc_disconnect()
         self.ot_control.disconnect()
-        self.ot_control.disconnect()
+        self.td_control.disconnect()
 
 def test():
     #myApp = Coordinator()

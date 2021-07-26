@@ -183,7 +183,7 @@ def gen_1(camera):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
-            print("frame is none")
+            print("Frame is none")
 
 def gen_2(camera):
     while True:
@@ -197,7 +197,7 @@ def gen_2(camera):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
-            print("frame is none")
+            print("Frame is none")
 
 @app.route('/video_1_feed')
 def video_1_feed():
@@ -382,7 +382,7 @@ def start_calibration():
     while not read_done_calibration_flag():
         # Enable manual control
         coordinator.manual_control()
-        print("Added")
+        print("Calibration point added")
         # Once manual control is over (user pressed START button), read the position of the syringe
         position = coordinator.get_current_coordinates()
         # Store the position in the calibration points list
@@ -634,7 +634,7 @@ def get_available_calibrations():
         print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    print(list)
+    print(f"Files on folder: {list}")
     socketio.emit("calibrations_available", list) # send the list back to js
 
 @socketio.on("set_labware_calibration")
@@ -656,7 +656,7 @@ def get_available_syringes():
     elif os.name == LINUX_OS:
         path_to_calibration = RELATIVE_PATH_TO_SYRINGES_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    print(list)
+    print(f"Files on folder: {list}")
     socketio.emit("syringes_available", list) # send the list back to js
 
 @socketio.on("set_labware_syringes")

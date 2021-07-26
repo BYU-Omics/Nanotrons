@@ -32,13 +32,15 @@ class Py_Execute:
     def execute_python_protocol(self):
         path = sys.path
         if os.name == LINUX_OS:
-            relative_path = RELATIVE_PATH_TO_PROTOCOLS_L
+            relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
             relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
-        first_arg = path[0] + relative_path + self.filename 
+        print(f"relative_path: {relative_path}")
+        first_arg = relative_path + self.filename 
         second_arg = self.calibration_file_name
         third_arg = self.syringe_model
         cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
+        print(f"cmd: {cmd}")
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         print(err)

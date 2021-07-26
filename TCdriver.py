@@ -429,8 +429,8 @@ class Thermocycler:
                 else: 
                     # print(f"Port not found: {p.device}")
                     pass
-            else:
-                print(f"No operating system recognized: {operating_system}")
+            # else:
+            #     print(f"No operating system recognized: {operating_system}")
                 
 
 async def testing():

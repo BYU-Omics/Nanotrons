@@ -41,7 +41,7 @@ GCODES = {
 
 TEMP_DECK_BAUDRATE = 115200
 
-WINDOWS_TD_PORT = 'COM6'
+WINDOWS_TD_PORT = 'COM7'
 LINUX_TD_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
@@ -68,7 +68,7 @@ class TempDeck:
         self.run_flag.set()
 
         self._connection = None
-        self._temperature = {'current': 25, 'target': None}
+        self._temperature = {'current': 25, 'target': 10}
         self._update_thread = None
         self._port = None
         self.find_port()
@@ -88,7 +88,7 @@ class TempDeck:
     def disconnect(self, port=None):
         if self._port and self.is_connected():
             self._connection.close()  # type: ignore
-            del temp_locks[self._port]
+            # del temp_locks[self._port]
         elif self.is_connected():
             self._connection.close()  # type: ignore
 
@@ -176,18 +176,22 @@ class TempDeck:
     def _get_status(self) -> str:
         # Separate function for testability
         current = float(self._temperature['current'])
-        target = float(self._temperature.get('target'))
-        delta = 0.7
+        target = self._temperature.get('target')
         if target != 'none':
-            diff = target - current  # type: ignore
-            if abs(diff) < delta:   # To avoid status fluctuation near target
-                return 'holding at target'
-            elif diff < 0:
-                return 'cooling'
+            target = float(target)
+            delta = 0.7
+            if target != 'none':
+                diff = target - current  # type: ignore
+                if abs(diff) < delta:   # To avoid status fluctuation near target
+                    return 'holding at target'
+                elif diff < 0:
+                    return 'cooling'
+                else:
+                    return 'heating'
             else:
-                return 'heating'
+                return 'idle'
         else:
-            return 'idle'
+            print(f"Target is: {self._temperature.get('target')}")
 
     @property
     def status(self) -> str:
@@ -340,8 +344,8 @@ class TempDeck:
                 else: 
                     # print(f"Port not found: {p.device}")
                     pass
-            else:
-                print(f"No operating system recognized: {operating_system}")
+            # else:
+            #     print(f"No operating system recognized: {operating_system}")
                 
 
 def test():
