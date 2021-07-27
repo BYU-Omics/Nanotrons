@@ -9,10 +9,13 @@ PROFILES CLASS
     The purpose of these importing/exporting functionalities is to allow for the system to support different mappings
 """
 
-from OTdriver import *
+from drivers.OTdriver import *
 from joystick import *
 import inspect
 import json
+import sys
+
+CURRENT_DIRECTORY = sys.path[0] + '\\controller_profiles\\'
 
 class Profile:
     def __init__(self, file):
@@ -97,8 +100,11 @@ class Profile:
         self.axes_mapping[axis_index] = method
 
     # This loads the provided file onto the Profile object. It DOES NOT check for erroneous input. The file is supposed to be formatted correctly
-    def load_profile(self, file_name):
-        json_path = open(file_name, "r")
+    def load_profile(self, file_name = 'default_profile.py'):
+        # print(CURRENT_DIRECTORY)
+        path_to_file = CURRENT_DIRECTORY + file_name
+        # print(path_to_file)
+        json_path = open(path_to_file, "r")
         myFile = json.load(json_path)
         for line in myFile.items():
             key, value = line

@@ -41,7 +41,7 @@ GCODES = {
 
 TEMP_DECK_BAUDRATE = 115200
 
-WINDOWS_TD_PORT = 'COM7'
+WINDOWS_TD_SER = '7&322D9725&0&1'
 LINUX_TD_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
@@ -332,8 +332,8 @@ class TempDeck:
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
-            # print(p)
-            if operating_system == WINDOWS_OS and p.device == WINDOWS_TD_PORT:
+            # print(p.serial_number)
+            if operating_system == WINDOWS_OS and p.serial_number == WINDOWS_TD_SER:
                 self._port = p.device
                 print(f"Tempdeck connected to: {p}")
             elif operating_system == LINUX_OS:
@@ -351,17 +351,17 @@ class TempDeck:
 def test():
     TD = TempDeck()
     # await TD.set_temperature(4)
-    TD.deactivate()
+    # TD.deactivate()
     # TD.pause()
     # TD.resume()
     # TD.update_temperature()
-    TD.start_set_temperature(10)
-    # TD.legacy_set_temperature(4)
-    print("updating temp")
-    TD.update_temperature()
-    sleep(0.01)
-    print(TD.temperature)
-    print(TD.status)
+    # TD.start_set_temperature(10)
+    # # TD.legacy_set_temperature(4)
+    # print("updating temp")
+    # TD.update_temperature()
+    # sleep(0.01)
+    # print(TD.temperature)
+    # print(TD.status)
     # print(TD.get_device_info()) # RETURNS: {'model': 'temp_deck_v3.0', 'version': 'v2.0.1', 'serial': 'TDV03P20181008A06'}
 
 

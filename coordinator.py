@@ -34,9 +34,9 @@ COORDINATOR CLASS
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
 """
 
-from OTdriver import OT2_nanotrons_driver, SLOW_SPEED
-from TDdriver import TempDeck
-from TCdriver import Thermocycler
+from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
+from drivers.TDdriver import TempDeck
+from drivers.TCdriver import Thermocycler
 from joystick import XboxJoystick
 from joystick_profile import *
 from labware_class import *
@@ -54,6 +54,8 @@ import os
 import sys
 import platform
 from collections import deque 
+from opentrons.hardware_control.pipette import Pipette
+from opentrons.protocols.api_support.types import APIVersion
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
@@ -97,16 +99,13 @@ class Coordinator:
                 self.myController = XboxJoystick(operating_system)
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        
         self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
-        
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
@@ -696,9 +695,12 @@ class Coordinator:
         self.td_control.disconnect()
 
 def test():
-    #myApp = Coordinator()
-    print(platform.system())
+    myApp = Coordinator()
     
+    tc_mod = myApp.prot_context.load_module('thermocycler module', '7')
+    
+    tc_mod.close_lid()
+    # print(platform.system())
     # myApp.go_to_deck_slot('6')
     # myApp.close_lid()
     # myApp.set_block_temp(4, 5)

@@ -21,6 +21,7 @@ var protocol_description = document.getElementById("protocol_description");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
+var contents = ""
 var protocols = {}
 var calibrations = {}
 var syringes = {}
@@ -58,6 +59,11 @@ socket.on('syringes_available', function(received_syringes) {
     console.log("syringes received")
     fill_syringes_drop_down() // add the options to the list
 }); 
+
+socket.on('display_contents', function(file_contents) {
+    python_file_contents = file_contents
+});
+
 
 // fills drop down list with the availble scripts
 function fill_protocol_drop_down(){
@@ -132,6 +138,7 @@ function option_select_protocol(){
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
     console.log(selected_protocol);
+    socket.emit("set_protocol_filename", protocol_to_display)
     if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
         display_protocol_button.disabled = false; // enable the button
     }
@@ -172,18 +179,24 @@ function option_select_syringe(){
 
 // this runs when you click the display script button
 display_protocol_button.addEventListener("click", function() {
-    clear_protocol_Table() // clear out the old table data
+    // clear_protocol_Table() // clear out the old table data
     console.log("clearing table")
-    socket.emit("give_me_protocol_python", protocol_to_display);
 });
 
 
 // listens for the json data
 socket.on('protocol_python_data', function(python_string) {
-    python_data = python_string; // save list in scripts variable
     console.log("protocols received")
-    make_and_display_protocol_table()
+    python_data = python_string; // save list in scripts variable
+    var content = document.getElementById("file_contents")
+    content.innerHTML = python_data
+    // make_and_display_protocol_table()
 });  
+
+function display_contents() {
+    socket.emit("display_contents")
+}
+
 
 // fills in the table with script commands
 function make_and_display_protocol_table(){
@@ -234,6 +247,8 @@ function uploadScript() {
     var socket = io.connect('http://127.0.0.1:5000');
     console.log("upload script")
 }
+
+
 
 // adds a row to the table with the given parameters
 function addRow(command, parameters) {

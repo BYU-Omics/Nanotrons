@@ -624,6 +624,17 @@ def pause_protocol():
     print("pause_protocol")
     coordinator.pause_protocol()
 
+
+@socketio.on("set_protocol_filename")
+def set_protocol_filename(protocol_name):
+    print(f"Filename set to: {protocol_name}")
+    executer.set_file_name(protocol_name) # Then we add the calibration to use
+
+@socketio.on("display_contents")
+def display_contents():
+    print("display_contents")
+    socketio.emit("protocol_python_data", executer.display_contents())
+
 #------------------WORKING WITH A CALIBRATION.JSON SECTION--------------------
 
 @socketio.on("get_available_calibrations")

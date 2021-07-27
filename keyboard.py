@@ -1,5 +1,5 @@
 import pygame
-from OTdriver import OT2_nanotrons_driver as OT2
+from drivers.OTdriver import OT2_nanotrons_driver as OT2
 
 class Keyboard:
     def __init__(self, driver = OT2):

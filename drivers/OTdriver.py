@@ -69,6 +69,7 @@ LEFT = 'Left' #X
 RIGHT = 'Right' #B
 
 WINDOWS_OT_PORT = 'COM4'
+WINDOWS_OT_SER = 'A50285BIA'
 LINUX_OT_PORT = '/dev/ttyACM0'
 MACBOOK_OT_PORT = "/dev/cu.usbserial-A50285BI"
 LINUX_OS = 'posix'
@@ -517,7 +518,7 @@ class OT2_nanotrons_driver(SM):
         operating_system = os.name
         for p in ports:
             # print(p)
-            if operating_system == WINDOWS_OS and p.device == WINDOWS_OT_PORT:
+            if operating_system == WINDOWS_OS and p.serial_number == WINDOWS_OT_SER:
                 self._port = p.device
                 print(f"OT2 connected to: {p}")
             elif operating_system == LINUX_OS:

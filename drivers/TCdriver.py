@@ -86,6 +86,7 @@ HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
 
 WINDOWS_TC_PORT = 'COM5'
+WINDOWS_TC_SER = 'B71546CF50533336372E3120FF12202C'
 LINUX_TC_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
@@ -418,7 +419,7 @@ class Thermocycler:
         operating_system = os.name
         for p in ports:
             # print(p)
-            if operating_system == WINDOWS_OS and p.device == WINDOWS_TC_PORT:
+            if operating_system == WINDOWS_OS and p.serial_number == WINDOWS_TC_SER:
                 self._port = p.device
                 print(f"Thermocycler connected to: {p}")
             elif operating_system == LINUX_OS:

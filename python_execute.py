@@ -18,6 +18,7 @@ class Py_Execute:
         self.calibration_file_name: str = 'calibration.json'
         self.syringe_model: str = 'HAMILTON_175'
         self.p = None
+        self.path_to_file = None
 
     def set_calibration_file_name(self, name):
         print(f"Calibration filename: {name}")
@@ -30,13 +31,7 @@ class Py_Execute:
         self.syringe_model = name
 
     def execute_python_protocol(self):
-        path = sys.path
-        if os.name == LINUX_OS:
-            relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
-        elif os.name == WINDOWS_OS:
-            relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
-        print(f"relative_path: {relative_path}")
-        first_arg = relative_path + self.filename 
+        first_arg = self.set_get_path()
         second_arg = self.calibration_file_name
         third_arg = self.syringe_model
         cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
@@ -46,10 +41,27 @@ class Py_Execute:
         print(err)
         print(out)
 
+    def set_get_path(self):
+        path = sys.path
+        if os.name == LINUX_OS:
+            relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
+        elif os.name == WINDOWS_OS:
+            relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
+        print(f"relative_path: {relative_path}")
+        self.path_to_file =  relative_path + self.filename 
+        return self.path_to_file
+
+
     def stop_execution(self):
         print("Terminate protocol")
         self.p.terminate()
 
+    def display_contents(self):
+        print(f"self.set_get_path(): {self.set_get_path()}")
+        with open(self.set_get_path(), 'r') as f:
+            contents = f.read()
+            print(contents)
+            return contents
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)
 
@@ -60,7 +72,8 @@ def test():
     calibration_name = "labware_for_test.json"
     executer.set_calibration_file_name(calibration_name)
     executer.set_file_name(protocol_name)
-    executer.execute_python_protocol()
+    # executer.execute_python_protocol()
+    executer.display_contents()
     # executer.pause_execution()
     # executer.continue_execution()
 
