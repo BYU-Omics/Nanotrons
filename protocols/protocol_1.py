@@ -9,7 +9,6 @@ import sys
 LABWARE = sys.argv[1]
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 
-
 try:
     from api import *
 except ImportError:
@@ -21,7 +20,6 @@ myProtocol = Api()
 
 # ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
 print(f"Labware list: {myProtocol.load_labware_setup(LABWARE)}")
-
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 

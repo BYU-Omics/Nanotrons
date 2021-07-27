@@ -1,25 +1,29 @@
-print("In protocol_2.py")
+"""
+    Template for writing protocols. 
+
+    Instructions: 
+        'aspirate_from' assumes nanoliters
+        'dispense_to' 
+"""
+import sys
+LABWARE = sys.argv[1]
+CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 
 try:
-    # Works when we're at the top lovel and we call main.py
-    from coordinator import Coordinator
+    from api import *
 except ImportError:
-    # If we're not in the top level
-    # And we're trying to call the file directly
-    import sys
-    # add the submodules to $PATH
-    # sys.path[0] is the current file's path
-    path = sys.path[0]#"c:\\Users\\RTK Lab\\Documents\\PJ\\nanopots_dev\\OT2"
-    print(path)
+    CURRENT_DIRECTORY
+    from api import *
 
-    sys.path.append(sys.path[0] + '\\..')
-    from coordinator import Coordinator
+# ----------CREATE A PROTOCOL OBJECT
+myProtocol = Api() 
 
-filename = sys.argv[1]
+# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
+print(f"Labware list: {myProtocol.load_labware_setup(LABWARE)}")
 
-myProtocol = Coordinator() 
+chips, plates = myProtocol.load_labware_setup(LABWARE)
 
-myProtocol.load_labware_setup(filename)
+# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED
 
 # chip = myProtocol.myLabware.chip_list[0].get_location_by_nickname
 corning = myProtocol.myLabware.plate_list[0].get_location_by_nickname

@@ -185,11 +185,27 @@ display_protocol_button.addEventListener("click", function() {
 
 
 // listens for the json data
-socket.on('protocol_python_data', function(python_string) {
+socket.on('protocol_python_data', function(python_lines_list) {
     console.log("protocols received")
-    python_data = python_string; // save list in scripts variable
+    python_data = python_lines_list; // save list in scripts variable
     var content = document.getElementById("file_contents")
-    content.innerHTML = python_data
+    
+    text_area_left = '<textarea id="w3review" name="w3review" rows="4" cols="50">'
+    text_area_right = '</textarea>'
+    text = "<br>" + text_area_left
+    for (let i = 36; i < python_data.length; i++) {
+        console.log(python_data[i][0])
+        if (python_data[i][0] == '#') {
+            text +=  python_data[i] ;
+        } else {
+            
+            text += python_data[i] ;
+        }
+    }
+    content.innerHTML = text + text_area_right + "<br>"
+    // console.log(text)
+    
+    
     // make_and_display_protocol_table()
 });  
 

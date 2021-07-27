@@ -59,7 +59,7 @@ class Py_Execute:
     def display_contents(self):
         print(f"self.set_get_path(): {self.set_get_path()}")
         with open(self.set_get_path(), 'r') as f:
-            contents = f.read()
+            contents = f.readlines()
             print(contents)
             return contents
     # def continue_execution(self):
