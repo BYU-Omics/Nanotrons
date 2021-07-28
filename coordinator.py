@@ -54,8 +54,7 @@ import os
 import sys
 import platform
 from collections import deque 
-from opentrons.hardware_control.pipette import Pipette
-from opentrons.protocols.api_support.types import APIVersion
+
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'

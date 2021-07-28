@@ -112,6 +112,6 @@ myProtocol.dispense_to(10, corning('E9'))
 # Dispense 100 nL into custom A1 #Waste
 myProtocol.dispense_to(50, custom('A1'))
 
-#--------------REQUIRED FOR THE END OF PROTOCOL--------------
+#--------------END OF PROTOCOL--------------
 
 myProtocol.end_of_protocol()
