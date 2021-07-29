@@ -26,11 +26,11 @@ myProtocol = Api()
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 
-# ------------END OF HEADING---------------------
-
-
+# ------------END OF HEADING-------------------------------------------------
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
+
+# Labware file loaded: Test_for_protocols.json
 
 micropots_3 = chips[0].get_location_by_nickname 
 corning_384 = plates[0].get_location_by_nickname 
@@ -39,7 +39,9 @@ corning_384_2 = plates[2].get_location_by_nickname
 custom_3 = plates[3].get_location_by_nickname 
 custom_4 = plates[4].get_location_by_nickname 
 custom_small = plates[5].get_location_by_nickname 
-custom_small
+custom_small_5 = plates[6].get_location_by_nickname 
+
+#----------START OF PROTOCOL----------------------------------------
 
 #--------------END OF PROTOCOL--------------
 
