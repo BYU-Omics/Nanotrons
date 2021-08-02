@@ -30,18 +30,22 @@ chips, plates = myProtocol.load_labware_setup(LABWARE)
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
 
-# Labware file loaded: Test_for_protocols.json
+# Labware file loaded: Alex_config.json
 
 micropots_3 = chips[0].get_location_by_nickname 
-corning_384 = plates[0].get_location_by_nickname 
-custom = plates[1].get_location_by_nickname 
-corning_384_2 = plates[2].get_location_by_nickname 
-custom_3 = plates[3].get_location_by_nickname 
-custom_4 = plates[4].get_location_by_nickname 
-custom_small = plates[5].get_location_by_nickname 
-custom_small_5 = plates[6].get_location_by_nickname 
+custom = plates[0].get_location_by_nickname 
 
 #----------START OF PROTOCOL----------------------------------------
+
+myProtocol.dispense_to(amount = 0, to = custom('A2'))
+
+myProtocol.dispense_to(amount = 0, to = custom('A1'))
+
+myProtocol.dispense_to(amount = 0, to = custom('B2'))
+
+myProtocol.dispense_to(amount = 0, to = custom('C2'))
+
+myProtocol.dispense_to(amount = 0, to = custom('D2'))
 
 #--------------END OF PROTOCOL--------------
 

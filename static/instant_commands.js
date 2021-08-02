@@ -29,7 +29,9 @@ socket.emit("get_labware_summary");
 // Get select components by id
 var chip_plate_select = document.getElementById("labware_components");
 var component_locations_select = document.getElementById("container_nickname");
+var slot_select = document.getElementById("slot_nickname");
 var go_button = document.getElementById("go_button");
+var show_component_button = document.getElementById("show_component_button");
 var previous_labware_selected = "";
 populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
 
@@ -150,8 +152,28 @@ function component_location_onclick() {
     }
 }
 
+function slots_onclick() {
+    console.log("slots_onclick called!");
+    var option_selected = slot_select.options[ slot_select.selectedIndex ].value;
+    console.log(option_selected);
+    if (option_selected != "default") {
+        console.log("it's not the default option! Enable GO! button");
+        // Toggle on GO! button visibility
+        go_button.disabled = false;
+    }
+
+    else {
+        // Toggle off GO! button visibility
+        go_button.disabled = true;
+    }
+}
+
 function home_all_motors() {
 	socket.emit("home_all_motors");
+}
+
+function show_component_button_listener(slot){
+    socket.emit("get_type_of_labware_by_slot", slot)
 }
 
 function go_button_listener() {
@@ -166,3 +188,5 @@ function go_button_listener() {
     var feedback = document.getElementById("user_feedback");
     feedback.innerHTML = `Syringe sent to ${component_location} in ${chip_plate_select.value}`;
 }
+
+

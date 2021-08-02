@@ -14,8 +14,9 @@ from joystick import *
 import inspect
 import json
 import sys
+from pathlib import Path
 
-CURRENT_DIRECTORY = sys.path[0] + '\\controller_profiles\\'
+CURRENT_DIRECTORY = str(Path().absolute()) + '\\controller_profiles\\'
 
 class Profile:
     def __init__(self, file):
@@ -101,9 +102,16 @@ class Profile:
 
     # This loads the provided file onto the Profile object. It DOES NOT check for erroneous input. The file is supposed to be formatted correctly
     def load_profile(self, file_name = 'default_profile.py'):
-        # print(CURRENT_DIRECTORY)
-        path_to_file = CURRENT_DIRECTORY + file_name
-        # print(path_to_file)
+        print(CURRENT_DIRECTORY)
+        print(f"Path to current directory: {CURRENT_DIRECTORY}")
+        path_to_file: str = CURRENT_DIRECTORY
+        if 'protocols' in path_to_file:
+            stripped = path_to_file.strip('protocols')
+            print(f"Stripping: {stripped}")
+            path_to_file = stripped + file_name
+        else:
+            path_to_file += "\\" + file_name
+        print(f"Path used to open profile: {path_to_file}")
         json_path = open(path_to_file, "r")
         myFile = json.load(json_path)
         for line in myFile.items():
@@ -167,12 +175,7 @@ class Profile:
 
 
 def testing():
-    seba = Profile("default_profile.json")
-    seba.set_profile_name("seba_profile")
-    print(seba.to_string_buttons_mapping())
-    print(seba.to_string_hats_mapping())
-    print(seba.to_string_axes_mapping())
-    seba.export_profile()
+    print("Directory Path:", Path().absolute()) # Directory of current working directory, not __file__  
 
 if __name__ == "__main__":
     testing()

@@ -483,6 +483,10 @@ def new_labware_model(model_properties):
     elif (model_properties["component_type"] == "Syringe"):
         coordinator.create_new_syringe_model(model_properties)
 
+@socketio.on("get_type_of_labware_by_slot")
+def get_type_of_labware_by_slot():
+    coordinator.get_type_of_labware_by_slot(slot)
+
 #----------------------------------------------- SETTINGS EVENTS SECTION
 @socketio.on("get_current_settings")
 def get_current_settings():

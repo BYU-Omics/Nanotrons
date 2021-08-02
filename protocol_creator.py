@@ -131,7 +131,7 @@ class ProtocolCreator:
         if cmd == 'aspirate_from':
             cmd_text += f"{cmd}(amount = {volume}, source = {location})"
         elif cmd == 'dispense_to':
-            cmd_text += f"{cmd}(amount = {volume}, source = {location})"
+            cmd_text += f"{cmd}(amount = {volume}, to = {location})"
         elif cmd == 'open_lid':
             cmd_text += f"{cmd}()"
         elif cmd == 'close_lid':
@@ -292,7 +292,7 @@ class ProtocolCreator:
 
 def tets_creation_of_file():
     creator = ProtocolCreator()
-    labware = "Test_for_protocols.json"
+    labware = "Alex_config.json"
     creator.create_protocol_file(labware)
 
 def tests_adding_lists_of_commands():
@@ -313,7 +313,7 @@ def tests_adding_a_command_to_the_end_of_file():
 
 def tests_handling_commands():
     creator = ProtocolCreator()
-    name = "protocol_0.py"
+    name = "protocol_5.py"
     location = "custom('A2')"
     new_list = creator.create_list_of_commands()
     print(f"List: {new_list}")
@@ -330,17 +330,17 @@ def tests_handling_commands():
     creator.reset_file_commands(name)
     creator.add_list_of_commands_to_protocol_file(name, new_list)
 
-    # commands = creator.get_list_of_commands_from_file(name)
-    # print(f"Getting list of commands:\n {commands}")
-    # commands = creator.erase_command(commands, 0)
-    # location = "custom('A2')"
-    # cmd = creator.create_command_txt(filename= name, cmd="dispense_to", volume=10, location=location)
-    # creator.add_command_to_end_of_list(cmd, commands)
-    # print(f"Adding a command to end of list:\n {commands}")
-    # creator.add_command_to_a_position_on_list(cmd, commands, 1)
-    # print(f"Adding a command to position {1} on list:\n {commands}")
-    # creator.add_list_of_commands_to_protocol_file(name, commands)
-    # print(f"Adding new list to file")
+    commands = creator.get_list_of_commands_from_file(name)
+    print(f"Getting list of commands:\n {commands}")
+    commands = creator.erase_command(commands, 0)
+    location = "custom('A2')"
+    cmd = creator.create_command_txt(filename= name, cmd="dispense_to", volume=10, location=location)
+    creator.add_command_to_end_of_list(cmd, commands)
+    print(f"Adding a command to end of list:\n {commands}")
+    creator.add_command_to_a_position_on_list(cmd, commands, 1)
+    print(f"Adding a command to position {1} on list:\n {commands}")
+    creator.add_list_of_commands_to_protocol_file(name, commands)
+    print(f"Adding new list to file")
     # creator.delete_existing_protocol(name)
     # creator.reset_file_commands(name)
 

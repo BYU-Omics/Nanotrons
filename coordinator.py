@@ -545,6 +545,15 @@ class Coordinator:
         """
         self.coordinates_refresh_rate = new_rate
 
+    def get_type_of_labware_by_slot(self, slot: int, plate: Plate = None, chip: Chip = None):
+        if plate != None:
+            plate_pot_properties = plate.import_plate_properties()
+            locations = plate_pot_properties["pot_locations"]
+            print(locations)
+
+        elif chip != None:
+            print(chip.well_locations)
+
     '''
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
