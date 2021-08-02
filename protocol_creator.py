@@ -33,6 +33,7 @@ class ProtocolCreator:
 
     def get_path_to_protocols(self, filename):
         path = sys.path
+        print(path[0] + RELATIVE_PATH_TO_PROTOCOLS_L)
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
@@ -254,6 +255,10 @@ class ProtocolCreator:
                     commands_list.append(line)
         return commands_list
 
+    def create_list_of_commands(self):
+        new_list_of_commands = [] 
+        return new_list_of_commands
+
     def erase_command(self, commands: list, position):
         if commands.count == 0:
             print("No commands in list of commands")
@@ -268,6 +273,7 @@ class ProtocolCreator:
     def add_command_to_end_of_list(self, cmd, commands: list):
         commands.append(cmd)
         return commands
+
 
     #------PROTOCOL DISPLAY SECTION----------
 
@@ -308,6 +314,22 @@ def tests_adding_a_command_to_the_end_of_file():
 def tests_handling_commands():
     creator = ProtocolCreator()
     name = "protocol_0.py"
+    location = "custom('A2')"
+    new_list = creator.create_list_of_commands()
+    print(f"List: {new_list}")
+    cmd = creator.create_command_txt(filename= name, cmd="dispense_to", volume=10, location=location)
+    creator.add_command_to_end_of_list(cmd, new_list)
+    print(f"List: {new_list}")
+    creator.add_command_to_end_of_list(cmd, new_list)
+    print(f"List: {new_list}")
+    creator.erase_command(new_list, 1)
+    print(f"List: {new_list}")
+    creator.reset_file_commands(name)
+    creator.add_list_of_commands_to_protocol_file(name, new_list)
+    creator.add_command_to_end_of_list(cmd, new_list)
+    creator.reset_file_commands(name)
+    creator.add_list_of_commands_to_protocol_file(name, new_list)
+
     # commands = creator.get_list_of_commands_from_file(name)
     # print(f"Getting list of commands:\n {commands}")
     # commands = creator.erase_command(commands, 0)
@@ -320,7 +342,7 @@ def tests_handling_commands():
     # creator.add_list_of_commands_to_protocol_file(name, commands)
     # print(f"Adding new list to file")
     # creator.delete_existing_protocol(name)
-    creator.reset_file_commands(name)
+    # creator.reset_file_commands(name)
 
 def test():
     # tets_creation_of_file()

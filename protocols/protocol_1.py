@@ -43,10 +43,6 @@ custom_small_5 = plates[6].get_location_by_nickname
 
 #----------START OF PROTOCOL----------------------------------------
 
-myProtocol.dispense_to(amount = 10, source = custom('A2'))
-
-myProtocol.dispense_to(amount = 10, source = custom('A2'))
-
 #--------------END OF PROTOCOL--------------
 
 myProtocol.end_of_protocol()

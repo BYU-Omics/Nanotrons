@@ -165,7 +165,7 @@ function option_select_labware_calibration(){
 // this runs each time you select an option from the script list
 function option_select_syringe(){
     // This either blocks or unblocks the submit button
-    var selected_syringe = csyringeOptions.options[ syringeOptions.selectedIndex ].value;
+    var selected_syringe = syringeOptions.options[ syringeOptions.selectedIndex ].value;
     syringe_to_display = selected_syringe; // set variable to the selected value
     console.log(selected_syringe);
     socket.emit("set_labware_syringe", selected_syringe)
