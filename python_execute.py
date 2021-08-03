@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 import signal
+import asyncio
 # from opentrons import api
 # from coordinator import *
 
@@ -54,7 +55,11 @@ class Py_Execute:
 
     def stop_execution(self):
         print("Terminate protocol")
-        self.p.terminate()
+        first_arg = self.set_get_path()
+        second_arg = self.calibration_file_name
+        third_arg = self.syringe_model
+        cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
+        subprocess.Popen(cmd, shell=True).kill()
 
     def display_contents(self):
         print(f"self.set_get_path(): {self.set_get_path()}")
@@ -68,8 +73,8 @@ class Py_Execute:
 def test():
     print(os.name)
     executer = Py_Execute()
-    protocol_name = "protocol_1.py"
-    calibration_name = "labware_for_test.json"
+    protocol_name = "protocol_5.py"
+    calibration_name = "Alex_config.json"
     executer.set_calibration_file_name(calibration_name)
     executer.set_file_name(protocol_name)
     # executer.execute_python_protocol()

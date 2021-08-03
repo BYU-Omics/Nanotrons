@@ -5,6 +5,7 @@ the user to write only neccessary commands to perform protocols.
 """
 from coordinator import *
 import sys
+import requests
 
 LABWARE = sys.argv[1]
 # If we're not in the top level
@@ -12,6 +13,8 @@ LABWARE = sys.argv[1]
 # add the submodules to $PATH
 # sys.path[0] is the current file's path
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
+
+my_data = {'name': 'True'}
 
 PLATE_DEPTH = "Plate's depth"
 
@@ -69,3 +72,8 @@ class Api:
     def set_plate_depth(self, plate: Plate, depth = PLATE_DEPTH):
         self.current_labware_depth = self.coordinator.set_plate_depth(plate, depth)
 
+    def take_picture_at(self, source = None):
+        if source != None:
+            self.coordinator.go_to_position(source)
+        # self.coordinator.set_picture_flag(True)
+        requests.post('http://localhost:5000/', json=my_data)

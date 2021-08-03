@@ -26,6 +26,8 @@ myProtocol = Api()
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 
+# myProtocol.adjust_syringe(-100)
+
 # ------------END OF HEADING-------------------------------------------------
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
@@ -37,11 +39,19 @@ custom = plates[0].get_location_by_nickname
 
 #----------START OF PROTOCOL----------------------------------------
 
-myProtocol.set_plate_depth(plates[0])
+# myProtocol.set_plate_depth(plates[0], depth = 5)
 
-myProtocol.dispense_to(amount = 10, to = custom('A2'))
+# myProtocol.aspirate_from(amount = 0, source = custom('A1'))
 
-myProtocol.dispense_to(amount = 10, to = custom('A4'))
+# myProtocol.set_plate_depth(plates[0], depth = 0)
+
+myProtocol.dispense_to(amount = 0, to = micropots_3('B5'))
+
+myProtocol.take_picture_at(micropots_3('B5'))
+
+myProtocol.dispense_to(amount = 0, to = micropots_3('B6'))
+
+myProtocol.take_picture_at(micropots_3('B6'))
 
 #--------------END OF PROTOCOL--------------
 

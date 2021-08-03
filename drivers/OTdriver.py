@@ -354,6 +354,7 @@ class OT2_nanotrons_driver(SM):
     def set_tc_lid_flag(self, status: str):
         self.tc_lid_flag = status
 
+
 # Joystick functions
 
     def joystick_step_x_motor(self, direction = 1):
@@ -467,10 +468,11 @@ class OT2_nanotrons_driver(SM):
             self.move({'Z': TC_Z_OPEN_LID}, speed= MEDIUM_SPEED)
         else:
             self.move({'Z': current_z_pos + 20}, speed= MEDIUM_SPEED)
-        if(self.check_for_valid_move(x, 'X', None)):
-            self.move({'X': x}, speed= MEDIUM_SPEED)
-            if(self.check_for_valid_move(y, 'Y', None)):
-                self.move({'Y': y}, speed= MEDIUM_SPEED)
+        if(self.check_for_valid_move(y, 'Y', None)):
+            # First move the Y axis so that it does not collapse with the thermocycler
+            self.move({'Y': y}, speed= MEDIUM_SPEED)
+            if(self.check_for_valid_move(x, 'X', None)):
+                self.move({'X': x}, speed= MEDIUM_SPEED)
                 if(self.check_for_valid_move(z, 'Z', None)):
                     self.move({'Z': z}, speed= MOVE_TO_SPEED)
 

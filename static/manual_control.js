@@ -124,6 +124,10 @@ function check_tempdeck_status() {
     socket.emit("check_tempdeck_status")
 }
 
+function take_picture() {
+    socket.emit("take_picture")
+}
+
 let btemp = 0;
 socket.on("get_block_temp", function(temp) {
     console.log(temp)

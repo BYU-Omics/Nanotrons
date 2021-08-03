@@ -106,11 +106,20 @@ class Coordinator:
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
+        self.picture_flag = False
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")
 
+
+    def set_picture_flag(self, value: bool):
+        print(f"Setting picture flag to: {value}")
+        self.picture_flag = value
+
+    def get_picture_flag(self):
+        return self.picture_flag
+        
     """
     MANUAL CONTROL SECTION
         The only method that should be called on an instance of the Application class is manual_control(). The
@@ -207,7 +216,7 @@ class Coordinator:
         """ This method goes allows the OT2 to move to a designated physical slot  """
         slot_number = float(slot)
         logging.info(f"Moving to slot {slot}")
-        x= self.deck.get_slot_center(slot)[0]
+        x = self.deck.get_slot_center(slot)[0]
         y = self.deck.get_slot_center(slot)[1]
         z = POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT
         location = [x, y, z]
@@ -618,12 +627,12 @@ class Coordinator:
         asyncio.run(self.tc_control.connect(port= self.tc_port))
 
     def open_lid(self):
-        self.go_to_deck_slot('12') # for avoiding collitions
+        self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
     def close_lid(self):
-        self.go_to_deck_slot('12') # for avoiding collitions
+        self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.close())
         self.ot_control.set_tc_lid_flag('closed')
 
@@ -712,8 +721,8 @@ class Coordinator:
     RUN PROTOCOL COORDINATION SECTION
     """
 
-    def pause_protocol(self):
-        """This method pauses the protocol process"""
+    def stop_protocol(self):
+        """This method stops the protocol process"""
         pass
 
     def verify_container_existence(self, container_description):

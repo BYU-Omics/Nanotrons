@@ -9,6 +9,7 @@ RUNNING_APP_FOR_REAL = True
 import cv2
 import os
 import time
+from flask import request
 from flask import Flask, render_template, url_for, Response, flash, request, redirect
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
@@ -34,6 +35,7 @@ RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
 RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
 RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
 RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
+RELATIVE_PATH_TO_PICTURES_W = 'pictures/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 MACBOOK_OS = 'Darwin'
@@ -136,6 +138,11 @@ def script():
 @app.route('/settings')
 def system_settings():
     return render_template("settings.html")
+
+@app.route("/", methods =["POST"])
+def PostData():
+    data = request.get_json(force=True)
+    coordinator.set_picture_flag(bool(data['name']))
     
 # This method checks to see if the filename ends with an allowed extension
 def allowed_file(filename):
@@ -186,6 +193,10 @@ def gen_1(camera):
             print("Frame is none")
 
 def gen_2(camera):
+    img_counter = 0
+    # Image directory
+    directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
+    print(directory)
     while True:
         if camera.stopped:
             break
@@ -198,6 +209,14 @@ def gen_2(camera):
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
             print("Frame is none")
+        if coordinator.get_picture_flag() == True:
+            print(coordinator.get_picture_flag())
+            frame = camera.read()
+            img_name = "opencv_frame_{}.jpg".format(img_counter)
+            cv2.imwrite(directory + img_name, frame)
+            print("{} written!".format(img_name))
+            img_counter += 1
+            coordinator.set_picture_flag(False)
 
 @app.route('/video_1_feed')
 def video_1_feed():
@@ -278,6 +297,11 @@ def up_step_size():
 def down_step_size():
     print("down_step_size")
     coordinator.down_step_size()
+
+@socketio.on("take_picture")
+def take_picture():
+    print("take_picture")
+    coordinator.set_picture_flag(True)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
@@ -484,7 +508,7 @@ def new_labware_model(model_properties):
         coordinator.create_new_syringe_model(model_properties)
 
 @socketio.on("get_type_of_labware_by_slot")
-def get_type_of_labware_by_slot():
+def get_type_of_labware_by_slot(slot):
     coordinator.get_type_of_labware_by_slot(slot)
 
 #----------------------------------------------- SETTINGS EVENTS SECTION
