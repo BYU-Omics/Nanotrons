@@ -47,11 +47,11 @@ custom = plates[0].get_location_by_nickname
 
 myProtocol.dispense_to(amount = 0, to = micropots_3('B5'))
 
-myProtocol.take_picture_at(micropots_3('B5'))
+myProtocol.take_picture()
 
 myProtocol.dispense_to(amount = 0, to = micropots_3('B6'))
 
-myProtocol.take_picture_at(micropots_3('B6'))
+myProtocol.take_picture()
 
 #--------------END OF PROTOCOL--------------
 

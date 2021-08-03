@@ -114,7 +114,7 @@ class Coordinator:
 
 
     def set_picture_flag(self, value: bool):
-        print(f"Setting picture flag to: {value}")
+        # print(f"Setting picture flag to: {value}")
         self.picture_flag = value
 
     def get_picture_flag(self):
@@ -559,7 +559,7 @@ class Coordinator:
         if plate != None:
             plate_pot_properties = plate.export_plate_properties()
             locations = plate_pot_properties["pot_locations"]
-            print(locations)
+            # print(locations)
         elif chip != None:
             print(chip.well_locations)
 
@@ -589,7 +589,7 @@ class Coordinator:
     '''
     def aspirate_from(self, amount, source, depth: int = None):
         """This will go to the position of the source and aspirate an amount in nL"""
-        print(f"Depth on aspirate from: {depth}")
+        # print(f"Depth on aspirate from: {depth}")
         if depth != None:
             self.go_to_position(source)
             self.ot_control.pipete_L_Down(depth)
@@ -603,7 +603,7 @@ class Coordinator:
 
     def dispense_to(self, amount, to, depth: int = None):
         """This will go to the position of the destination and dispense an amount in nL"""
-        print(f"Depth on dispense to: {depth}")
+        # print(f"Depth on dispense to: {depth}")
         if depth != None:
             self.go_to_position(to)
             self.ot_control.pipete_L_Down(depth)

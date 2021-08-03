@@ -72,8 +72,7 @@ class Api:
     def set_plate_depth(self, plate: Plate, depth = PLATE_DEPTH):
         self.current_labware_depth = self.coordinator.set_plate_depth(plate, depth)
 
-    def take_picture_at(self, source = None):
+    def take_picture(self, source = None):
         if source != None:
             self.coordinator.go_to_position(source)
-        # self.coordinator.set_picture_flag(True)
         requests.post('http://localhost:5000/', json=my_data)

@@ -671,10 +671,10 @@ def get_available_calibrations():
     if os.name == WINDOWS_OS:
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_W  # moves to script folder
     elif os.name == LINUX_OS:
-        print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
+        # print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    print(f"Files on folder: {list}")
+    # print(f"Files on folder: {list}")
     socketio.emit("calibrations_available", list) # send the list back to js
 
 @socketio.on("set_labware_calibration")
@@ -696,7 +696,7 @@ def get_available_syringes():
     elif os.name == LINUX_OS:
         path_to_calibration = RELATIVE_PATH_TO_SYRINGES_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    print(f"Files on folder: {list}")
+    # print(f"Files on folder: {list}")
     socketio.emit("syringes_available", list) # send the list back to js
 
 @socketio.on("set_labware_syringes")

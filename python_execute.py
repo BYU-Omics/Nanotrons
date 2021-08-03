@@ -36,7 +36,7 @@ class Py_Execute:
         second_arg = self.calibration_file_name
         third_arg = self.syringe_model
         cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
-        print(f"cmd: {cmd}")
+        # print(f"cmd: {cmd}")
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         print(err)
@@ -48,13 +48,13 @@ class Py_Execute:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
             relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
-        print(f"relative_path: {relative_path}")
+        # print(f"relative_path: {relative_path}")
         self.path_to_file =  relative_path + self.filename 
         return self.path_to_file
 
 
     def stop_execution(self):
-        print("Terminate protocol")
+        # print("Terminate protocol")
         first_arg = self.set_get_path()
         second_arg = self.calibration_file_name
         third_arg = self.syringe_model
@@ -62,7 +62,7 @@ class Py_Execute:
         subprocess.Popen(cmd, shell=True).kill()
 
     def display_contents(self):
-        print(f"self.set_get_path(): {self.set_get_path()}")
+        # print(f"self.set_get_path(): {self.set_get_path()}")
         with open(self.set_get_path(), 'r') as f:
             contents = f.readlines()
             print(contents)
