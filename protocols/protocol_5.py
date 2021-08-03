@@ -37,15 +37,11 @@ custom = plates[0].get_location_by_nickname
 
 #----------START OF PROTOCOL----------------------------------------
 
-myProtocol.dispense_to(amount = 0, to = custom('A2'))
+myProtocol.set_plate_depth(plates[0])
 
-myProtocol.dispense_to(amount = 0, to = custom('A1'))
+myProtocol.dispense_to(amount = 10, to = custom('A2'))
 
-myProtocol.dispense_to(amount = 0, to = custom('B2'))
-
-myProtocol.dispense_to(amount = 0, to = custom('C2'))
-
-myProtocol.dispense_to(amount = 0, to = custom('D2'))
+myProtocol.dispense_to(amount = 10, to = custom('A4'))
 
 #--------------END OF PROTOCOL--------------
 

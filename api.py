@@ -13,9 +13,12 @@ LABWARE = sys.argv[1]
 # sys.path[0] is the current file's path
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 
+PLATE_DEPTH = "Plate's depth"
+
 class Api:
     def __init__(self):
         self.coordinator = Coordinator()
+        self.current_labware_depth = None
 
     def adjust_syringe(self, position):
         self.coordinator.adjust_syringe(position)
@@ -24,10 +27,10 @@ class Api:
         return self.coordinator.load_labware_setup(file_name)
 
     def aspirate_from(self, amount, source):
-        self.coordinator.aspirate_from(amount, source)
+        self.coordinator.aspirate_from(amount, source, self.current_labware_depth)
 
     def dispense_to(self, amount, to):
-        self.coordinator.dispense_to(amount, to)
+        self.coordinator.dispense_to(amount, to, self.current_labware_depth)
 
     def open_lid(self):
         self.coordinator.open_lid()
@@ -63,5 +66,6 @@ class Api:
         self.coordinator.go_to_deck_slot('12')
         self.coordinator.disconnect_all()
 
-
+    def set_plate_depth(self, plate: Plate, depth = PLATE_DEPTH):
+        self.current_labware_depth = self.coordinator.set_plate_depth(plate, depth)
 

@@ -26,6 +26,8 @@ var labware_summary = {
 
 socket.emit("get_labware_summary");
 
+
+
 // Get select components by id
 var chip_plate_select = document.getElementById("labware_components");
 var component_locations_select = document.getElementById("container_nickname");
@@ -159,12 +161,12 @@ function slots_onclick() {
     if (option_selected != "default") {
         console.log("it's not the default option! Enable GO! button");
         // Toggle on GO! button visibility
-        go_button.disabled = false;
+        show_component_button.disabled = false;
     }
 
     else {
         // Toggle off GO! button visibility
-        go_button.disabled = true;
+        show_component_button.disabled = true;
     }
 }
 

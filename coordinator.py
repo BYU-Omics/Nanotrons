@@ -71,6 +71,7 @@ REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
 POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT = 150
 TIME_TO_SETTLE = 0.5 #SECONDS
+PLATE_DEPTH = "Plate's depth"
 
 def interrupt_callback(res):
     sys.stderr.write(res)
@@ -547,29 +548,64 @@ class Coordinator:
 
     def get_type_of_labware_by_slot(self, slot: int, plate: Plate = None, chip: Chip = None):
         if plate != None:
-            plate_pot_properties = plate.import_plate_properties()
+            plate_pot_properties = plate.export_plate_properties()
             locations = plate_pot_properties["pot_locations"]
             print(locations)
-
         elif chip != None:
             print(chip.well_locations)
 
+    def get_depth_of_labware(self, labware: Plate):
+        plate_pot_properties = labware.export_plate_properties()
+        depth = plate_pot_properties["pot_depths"]
+        return depth
+
+    def set_plate_depth(self, plate, depth = PLATE_DEPTH):
+        # .get_depth_of_labware return a list, so we get the first elements since all of the deoths are the same [0]
+        plate_default_depth = self.get_depth_of_labware(plate)[0]
+        if depth == PLATE_DEPTH:
+            # we set the depth here to the distance of the pot minus 1 milimiter so that it has some room. 
+            return plate_default_depth - 1
+        # if the depth value is an integer it means that the user wants to dispense or aspirate at a higher point that is smaller in distance than the plates depth, otherwise it would hit the bottom of the plate 
+        elif (type(depth) == int) and (depth < plate_default_depth): 
+            if depth < plate_default_depth:
+                return depth
+            else: 
+                print("Number input for depth greater than allowed, using default depth. ")
+                return None 
+        else: 
+            return None
     '''
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
-    def aspirate_from(self, amount, source):
+    def aspirate_from(self, amount, source, depth: int = None):
         """This will go to the position of the source and aspirate an amount in nL"""
-        self.go_to_position(source)
-        self.aspirate(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
+        print(f"Depth on aspirate from: {depth}")
+        if depth != None:
+            self.go_to_position(source)
+            self.ot_control.pipete_L_Down(depth)
+            self.aspirate(amount, ASPIRATE_SPEED)
+            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
+            self.ot_control.pipete_L_Up(depth)
+        else:
+            self.go_to_position(source)
+            self.aspirate(amount, ASPIRATE_SPEED)
+            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, amount, to):
+    def dispense_to(self, amount, to, depth: int = None):
         """This will go to the position of the destination and dispense an amount in nL"""
-        print(f"Go to {to} and dispense ")
-        self.go_to_position(to)
-        self.dispense(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
+        print(f"Depth on dispense to: {depth}")
+        if depth != None:
+            self.go_to_position(to)
+            self.ot_control.pipete_L_Down(depth)
+            self.dispense(amount, ASPIRATE_SPEED)
+            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
+            self.ot_control.pipete_L_Up(depth)
+        else:
+            self.go_to_position(to)
+            self.dispense(amount, ASPIRATE_SPEED)
+            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
+        
     
     def adjust_syringe(self, position):
         self.ot_control.move({'B': position})

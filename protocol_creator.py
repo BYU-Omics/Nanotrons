@@ -4,6 +4,7 @@
 
 """
 
+from plate import Plate
 import sys
 import os
 from pathlib import Path
@@ -20,6 +21,22 @@ START_OF_PROTOCOL_TEXT = "#----------START OF PROTOCOL--------------------------
 
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+
+# Texxt for the commands 
+ASPIRATE_CMD = 'aspirate_from'
+DISPENSE_CMD = 'dispense_to'
+OPEN_LID_CMD = 'open_lid'
+CLOSE_LID_CMD = 'close_lid'
+DEACTIVATE_LID_CMD = 'deactivate_lid'
+DEACTIVATE_BLOCK_CMD = 'deactivate_block'
+SET_BLOCK_TEMP_CMD = 'set_block_temp'
+SET_LID_TEMP_CMD = 'set_lid_temp'
+SET_TEMPDECK_TEMP_CMD = 'set_tempdeck_temp'
+DEACTIVATE_TEMPDECK_CMD = 'deactivate_tempdeck'
+DEACTIVATE_ALL_CMD = 'deactivate_all'
+SET_PLATE_DEPTH_CMD = 'set_plate_depth'
+
+PLATE_DEPTH = "Plate's depth"
 
 # Class ProtocolCreator
 
@@ -126,30 +143,32 @@ class ProtocolCreator:
         list_of_labware = chip_names_list + plate_names_list
         return content
 
-    def create_command_txt(self, filename,  cmd = "", volume = "", location = "", temp = "", holding_time = ""):
+    def create_command_txt(self, filename,  cmd = "", volume = "", location = "", temp = "", holding_time = "", plate: Plate = None, depth = None):
         cmd_text = "myProtocol."
-        if cmd == 'aspirate_from':
+        if cmd == ASPIRATE_CMD:
             cmd_text += f"{cmd}(amount = {volume}, source = {location})"
-        elif cmd == 'dispense_to':
+        elif cmd == DISPENSE_CMD:
             cmd_text += f"{cmd}(amount = {volume}, to = {location})"
-        elif cmd == 'open_lid':
+        elif cmd == OPEN_LID_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == 'close_lid':
+        elif cmd == CLOSE_LID_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == 'deactivate_lid':
+        elif cmd == DEACTIVATE_LID_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == 'deactivate_block':
+        elif cmd == DEACTIVATE_BLOCK_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == 'set_block_temp':
+        elif cmd == SET_BLOCK_TEMP_CMD:
             cmd_text += f"{cmd}(target_temp = {temp}, holding_time_in_minutes = {holding_time})"
-        elif cmd == 'set_lid_temp':
+        elif cmd == SET_LID_TEMP_CMD:
             cmd_text += f"{cmd}(temp = {temp})"
-        elif cmd == 'set_tempdeck_temp':
+        elif cmd == SET_TEMPDECK_TEMP_CMD:
             cmd_text += f"{cmd}(celcius = {temp}, holding_time_in_minutes = {holding_time})"
-        elif cmd == 'deactivate_tempdeck':
+        elif cmd == DEACTIVATE_TEMPDECK_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == 'deactivate_all':
+        elif cmd == DEACTIVATE_ALL_CMD:
             cmd_text += f"{cmd}()"
+        elif cmd == SET_PLATE_DEPTH_CMD:
+            cmd_text += f"{cmd}({plate})"
         # print(cmd_text)
         return cmd_text
 
@@ -316,31 +335,16 @@ def tests_handling_commands():
     name = "protocol_5.py"
     location = "custom('A2')"
     new_list = creator.create_list_of_commands()
-    print(f"List: {new_list}")
-    cmd = creator.create_command_txt(filename= name, cmd="dispense_to", volume=10, location=location)
+    cmd = creator.create_command_txt(filename= name, cmd=SET_PLATE_DEPTH_CMD, plate='custom', depth=PLATE_DEPTH)
     creator.add_command_to_end_of_list(cmd, new_list)
-    print(f"List: {new_list}")
+    cmd = creator.create_command_txt(filename= name, cmd=DISPENSE_CMD, volume=10, location=location)
     creator.add_command_to_end_of_list(cmd, new_list)
-    print(f"List: {new_list}")
-    creator.erase_command(new_list, 1)
-    print(f"List: {new_list}")
-    creator.reset_file_commands(name)
     creator.add_list_of_commands_to_protocol_file(name, new_list)
-    creator.add_command_to_end_of_list(cmd, new_list)
+    location = "custom('A4')"
+    cmd = creator.create_command_txt(filename= name, cmd=DISPENSE_CMD, volume=10, location=location)
     creator.reset_file_commands(name)
+    creator.add_command_to_end_of_list(cmd, new_list)
     creator.add_list_of_commands_to_protocol_file(name, new_list)
-
-    commands = creator.get_list_of_commands_from_file(name)
-    print(f"Getting list of commands:\n {commands}")
-    commands = creator.erase_command(commands, 0)
-    location = "custom('A2')"
-    cmd = creator.create_command_txt(filename= name, cmd="dispense_to", volume=10, location=location)
-    creator.add_command_to_end_of_list(cmd, commands)
-    print(f"Adding a command to end of list:\n {commands}")
-    creator.add_command_to_a_position_on_list(cmd, commands, 1)
-    print(f"Adding a command to position {1} on list:\n {commands}")
-    creator.add_list_of_commands_to_protocol_file(name, commands)
-    print(f"Adding new list to file")
     # creator.delete_existing_protocol(name)
     # creator.reset_file_commands(name)
 
