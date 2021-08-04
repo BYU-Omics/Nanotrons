@@ -35,14 +35,34 @@ chips, plates = myProtocol.load_labware_setup(LABWARE)
 micropots_3 = chips[0].get_location_by_nickname 
 corning_384 = plates[0].get_location_by_nickname 
 custom = plates[1].get_location_by_nickname 
-corning_384_2 = plates[2].get_location_by_nickname 
-custom_3 = plates[3].get_location_by_nickname 
-custom_4 = plates[4].get_location_by_nickname 
-custom_small = plates[5].get_location_by_nickname 
-custom_small_5 = plates[6].get_location_by_nickname 
+
+myProtocol.dispense_to(0, custom('A1'))
+myProtocol.adjust_syringe()
 
 #----------START OF PROTOCOL----------------------------------------
 
+myProtocol.set_block_temp(4, 0)
+
+for number in range(0, 1):
+    myProtocol.take_picture(micropots_3('B2'))
+    myProtocol.take_picture(micropots_3('B5'))
+    myProtocol.take_picture(micropots_3('B8'))
+
+    myProtocol.close_lid()
+
+    myProtocol.set_lid_temp(39)
+
+    myProtocol.set_block_temp(37, 15)
+
+    myProtocol.deactivate_lid()
+
+    myProtocol.set_block_temp(4, 0)
+
+    myProtocol.open_lid()
+
 #--------------END OF PROTOCOL--------------
+
+myProtocol.dispense_to(0, custom('A1'))
+myProtocol.adjust_syringe()
 
 myProtocol.end_of_protocol()

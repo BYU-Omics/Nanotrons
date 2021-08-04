@@ -4,11 +4,15 @@
 
 """
 
+from typing import List
 from plate import Plate
 import sys
 import os
 from pathlib import Path
 import json
+import csv
+import re
+
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
 RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\' # ./ means look within the current directory
 RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
@@ -35,8 +39,18 @@ SET_TEMPDECK_TEMP_CMD = 'set_tempdeck_temp'
 DEACTIVATE_TEMPDECK_CMD = 'deactivate_tempdeck'
 DEACTIVATE_ALL_CMD = 'deactivate_all'
 SET_PLATE_DEPTH_CMD = 'set_plate_depth'
-
+TAKE_PICTURE = 'take_picture'
 PLATE_DEPTH = "Plate's depth"
+
+CMD = 'cmd'
+VOLUME = 'volume'
+LABWARE = 'labware'
+LOCATION = 'location'
+TEMP = 'temp'
+HOLDING_TIME = 'holding_time'
+PLATE = 'plate'
+DEPTH = 'depth'
+SOURCE = 'source'
 
 # Class ProtocolCreator
 
@@ -50,7 +64,7 @@ class ProtocolCreator:
 
     def get_path_to_protocols(self, filename):
         path = sys.path
-        print(path[0] + RELATIVE_PATH_TO_PROTOCOLS_L)
+        # print(path[0] + RELATIVE_PATH_TO_PROTOCOLS_L)
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
@@ -92,10 +106,14 @@ class ProtocolCreator:
 
     #------TXT HANDLING SECTION----------
 
-    def create_name_for_new_file(self):
+    def create_name_for_new_file(self, extension: str):
         protocol = "protocol"
         number = 0
-        extension = ".py"
+        if extension == 'py':
+            extension = ".py"
+        elif extension == 'csv':
+            extension = ".csv"
+
         new_file_name = protocol + '_' + str(number) + extension
         path = self.get_path_to_protocols(new_file_name)
         while Path(path).is_file():
@@ -143,12 +161,12 @@ class ProtocolCreator:
         list_of_labware = chip_names_list + plate_names_list
         return content
 
-    def create_command_txt(self, filename,  cmd = "", volume = "", location = "", temp = "", holding_time = "", plate: Plate = None, depth = None):
+    def create_command_txt(self,  cmd = None, volume = None, labware = None, location = None, temp = None, holding_time = None, plate: Plate = None, depth = None):
         cmd_text = "myProtocol."
         if cmd == ASPIRATE_CMD:
-            cmd_text += f"{cmd}(amount = {volume}, source = {location})"
+            cmd_text += f"{cmd}(volume = {volume}, {SOURCE} = {labware}('{location}'))"
         elif cmd == DISPENSE_CMD:
-            cmd_text += f"{cmd}(amount = {volume}, to = {location})"
+            cmd_text += f"{cmd}(volume = {volume}, to = {labware}('{location}'))"
         elif cmd == OPEN_LID_CMD:
             cmd_text += f"{cmd}()"
         elif cmd == CLOSE_LID_CMD:
@@ -169,15 +187,40 @@ class ProtocolCreator:
             cmd_text += f"{cmd}()"
         elif cmd == SET_PLATE_DEPTH_CMD:
             cmd_text += f"{cmd}({plate})"
-        # print(cmd_text)
+        elif cmd == TAKE_PICTURE:
+            cmd_text += F"{cmd}()" 
         return cmd_text
 
+    def create_cmd_argumens_from_text(self, cmd_text:str):
+        cmd_dictionary: dict = {}
+        source_arg_dict: dict = {}
+        left_side_of_parenthesys = cmd_text.split("(", 1)[0]
+        right_side_of_parenthesys = cmd_text.split("(", 1)[1]
+        clean_right_side = right_side_of_parenthesys.replace("))", ")")
+        command = left_side_of_parenthesys.split(".")[1]
+        cmd_dictionary.update({CMD: f"{command}"}) 
+        # print(f"Command: {command}")
+        arguments = clean_right_side.split(", ")
+        for argument in arguments:
+            argument = argument.split(" = ")
+            if SOURCE in argument:
+                source_arg = argument[1].strip(")")
+                source_arg = source_arg.split("(")
+                labware = source_arg[0]
+                location = source_arg[1]
+                # source_arg_dict.update({f"{labware}": f"{location}"})
+                cmd_dictionary.update({f"{labware}": f"{location}"})
+                argument[1] = source_arg_dict
+            cmd_dictionary.update({f"{argument[0]}": f"{argument[1]}"}) 
+
+        print(f"Cmd dictionary: {cmd_dictionary}")
+        return cmd_dictionary
     #------PROTOCOL FILE HANDLING SECTION----------
 
     def add_cmd_to_protocol_file(self, filename, cmd):
         contents = self.get_file_contents(filename)
         line_count = 0
-        txt_to_add = "\n" + cmd + "\n"
+        txt_to_add: str = "\n" + cmd + "\n"
         while line_count < len(contents):
             # print(f"line[{line_count}]{contents[line_count]}")
             if contents[line_count] == START_OF_PROTOCOL_TEXT:
@@ -189,7 +232,7 @@ class ProtocolCreator:
                     self.index_for_old_command = line_count + 2
                     break
                 elif contents[self.index_for_old_command][:10] == 'myProtocol':
-                    print(f"Adding command: {txt_to_add}")
+                    print(f"Adding command: {cmd}")
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command += 2 
                     break
@@ -239,13 +282,13 @@ class ProtocolCreator:
     def add_list_of_commands_to_protocol_file(self, filename, list_of_cmds: list):
         for command in reversed(list_of_cmds):
             self.add_cmd_to_protocol_file(filename=filename, cmd=command) 
-        print("List of commands added to {filename}")
+        print(f"List of commands added to {filename}")
                 
     def create_protocol_file(self, labware_name, filename: str = None):
         if filename != None:
             new_name = filename
         else:
-            new_name = self.create_name_for_new_file()
+            new_name = self.create_name_for_new_file(extension='py')
         self.create_new_file(new_name)
         print(labware_name)
         heading = self.get_file_contents("protocol_heading.txt")
@@ -258,6 +301,7 @@ class ProtocolCreator:
             content += line 
         self.write_contents_to_file(new_name, content)
         print(f"File {new_name} created in directory")
+        return new_name
 
     #------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
 
@@ -285,14 +329,77 @@ class ProtocolCreator:
             commands.pop(position)
         return commands
 
-    def add_command_to_a_position_on_list(self, cmd, commands:list, position):
+    def add_command_to_a_position_on_list(self, cmd, commands: list, position):
         commands.insert(position, cmd)
         return commands
 
     def add_command_to_end_of_list(self, cmd, commands: list):
         commands.append(cmd)
         return commands
+    
+    #------PROTOCOL CSV HANDLING SECTION-----
 
+    def convert_csv_to_cmd_list(self, filename: str) -> list:
+        path_to_file = self.get_path_to_protocols(filename)
+        colums_names = []
+        cmd_list = []
+        with open(path_to_file, mode='r') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            line_count = 0
+            for row in csv_reader:
+                if line_count == 0:
+                    for key in row.keys():
+                        colums_names.append(key)
+                    line_count += 1
+                cmd = row[CMD]
+                if VOLUME in colums_names:
+                    volume = row[VOLUME]
+                else:
+                    volume = None
+                if LABWARE in colums_names:
+                    labware = row[LABWARE]
+                else:
+                    labware = None
+                if LOCATION in colums_names:
+                    location = row[LOCATION]
+                else:
+                    location = None
+                if TEMP in colums_names:
+                    temp = row[TEMP]
+                else:
+                    temp = None
+                if HOLDING_TIME in colums_names:
+                    holding_time = row[HOLDING_TIME]
+                else:
+                    holding_time = None
+                if PLATE in colums_names:
+                    plate = row[PLATE]
+                else:
+                    plate = None
+                if DEPTH in colums_names:
+                    depth = row[DEPTH]
+                else:
+                    depth = None
+                cmd_list.append(self.create_command_txt(cmd=cmd,volume=volume, labware=labware, location=location, temp=temp, holding_time=holding_time, plate=plate, depth=depth))
+                line_count += 1
+        return cmd_list
+    
+    def convert_cmd_dict_to_csv(self, cmd_dict: dict):
+        csv_filename = self.create_name_for_new_file('csv')
+        path_to_file = self.get_path_to_protocols(csv_filename)
+        first_row = [CMD, VOLUME, LABWARE, LOCATION, TEMP, HOLDING_TIME, PLATE, DEPTH]
+        with open(path_to_file, 'w', encoding='UTF8', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=first_row)
+            # writer.writerow(first_row)
+            writer.writeheader()
+            writer.writerow(cmd_dict)
+            
+            # list_of_argument_values = []
+            # for key in cmd_dict.keys():
+            #     value = cmd_dict[f"{key}"]
+            #     list_of_argument_values.append(value)
+            # print(list_of_argument_values)
+            # writer.writerow(value)
 
     #------PROTOCOL DISPLAY SECTION----------
 
@@ -348,11 +455,26 @@ def tests_handling_commands():
     # creator.delete_existing_protocol(name)
     # creator.reset_file_commands(name)
 
+def tests_csv():
+    creator = ProtocolCreator()
+    labware = "Fluorescein_test.json"
+    csv_name = "test_protocol.csv"
+    # protocol_name = creator.create_protocol_file(labware)
+    # cmd_list = creator.convert_csv_to_cmd_list(csv_name)
+    # creator.add_list_of_commands_to_protocol_file(protocol_name, cmd_list)
+    cmd = "myProtocol.aspirate_from(volume = 50, source = custom('A1'))"
+    # print(cmd)
+    cmd_dictionary = creator.create_cmd_argumens_from_text(cmd)
+    print(cmd_dictionary)
+    creator.convert_cmd_dict_to_csv(cmd_dictionary)
+
+    
 def test():
     # tets_creation_of_file()
     # tests_adding_lists_of_commands()
     # tests_adding_a_command_to_the_end_of_file()
-    tests_handling_commands()
+    # tests_handling_commands()
+    tests_csv()
 
 if __name__ == "__main__":
     test()

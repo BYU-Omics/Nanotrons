@@ -747,6 +747,10 @@ class Coordinator:
         self.ot_control.disconnect()
         self.td_control.disconnect()
 
+    def end_of_protocol(self):
+        self.go_to_deck_slot('12')
+        self.disconnect_all()
+
 def test():
     myApp = Coordinator()
     

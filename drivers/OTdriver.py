@@ -28,10 +28,10 @@ Z_MAX= 170.15
 Z_MIN= 10 
 A_MAX= 170.15
 A_MIN= 10 
-B_MAX= 18
-B_MIN= -1*154 
-C_MAX= 18
-C_MIN= -1*154 
+B_MAX= 0
+B_MIN= -1*190 # TO-DO: change thee limit according to the syringe we are sugin. note for self. 
+C_MAX= 0
+C_MIN= -1*190 
 TC_X = 211
 TC_Y = 155
 TC_Z_OPEN_LID = 170
@@ -75,7 +75,7 @@ MACBOOK_OT_PORT = "/dev/cu.usbserial-A50285BI"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
-list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 10, 30, 63, 100]
+list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 9, 13, 30, 51.5, 63, 67.5, 69.5, 103.5]
 
 class OT2_nanotrons_driver(SM):
     def __init__(self):#, port):

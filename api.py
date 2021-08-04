@@ -13,6 +13,7 @@ LABWARE = sys.argv[1]
 # add the submodules to $PATH
 # sys.path[0] is the current file's path
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
+WEB_ADDRESS = 'http://localhost:5000/'
 
 my_data = {'name': 'True'}
 
@@ -23,17 +24,18 @@ class Api:
         self.coordinator = Coordinator()
         self.current_labware_depth = None
 
-    def adjust_syringe(self, position):
-        self.coordinator.adjust_syringe(position)
+    def adjust_syringe(self):
+        self.coordinator.adjust_syringe(B_MIN)
+        self.coordinator.adjust_syringe(-131.5)
 
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
-    def aspirate_from(self, amount, source):
-        self.coordinator.aspirate_from(amount, source, self.current_labware_depth)
+    def aspirate_from(self, volume, source):
+        self.coordinator.aspirate_from(volume, source, self.current_labware_depth)
 
-    def dispense_to(self, amount, to):
-        self.coordinator.dispense_to(amount, to, self.current_labware_depth)
+    def dispense_to(self, volume, to):
+        self.coordinator.dispense_to(volume, to, self.current_labware_depth)
 
     def open_lid(self):
         self.coordinator.open_lid()
@@ -66,8 +68,7 @@ class Api:
         self.coordinator.deactivate_all()
 
     def end_of_protocol(self):
-        self.coordinator.go_to_deck_slot('12')
-        self.coordinator.disconnect_all()
+        self.coordinator.end_of_protocol()
 
     def set_plate_depth(self, plate: Plate, depth = PLATE_DEPTH):
         self.current_labware_depth = self.coordinator.set_plate_depth(plate, depth)
@@ -75,4 +76,4 @@ class Api:
     def take_picture(self, source = None):
         if source != None:
             self.coordinator.go_to_position(source)
-        requests.post('http://localhost:5000/', json=my_data)
+        requests.post(WEB_ADDRESS, json=my_data)
