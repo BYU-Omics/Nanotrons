@@ -568,7 +568,7 @@ class Coordinator:
         depth = plate_pot_properties["pot_depths"]
         return depth
 
-    def set_plate_depth(self, plate, depth = PLATE_DEPTH):
+    def set_plate_depth(self, plate, depth):
         # .get_depth_of_labware return a list, so we get the first elements since all of the deoths are the same [0]
         plate_default_depth = self.get_depth_of_labware(plate)[0]
         if depth == PLATE_DEPTH:
@@ -583,39 +583,26 @@ class Coordinator:
                 return None 
         else: 
             return None
+
+    def void_plate_depth(self, plate: Plate, void: bool = False):
+        plate.void_plate_depth(void)
+
     '''
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
-    def aspirate_from(self, amount, source, depth: int = None):
+    def aspirate_from(self, amount, source):
         """This will go to the position of the source and aspirate an amount in nL"""
-        # print(f"Depth on aspirate from: {depth}")
-        if depth != None:
-            self.go_to_position(source)
-            self.ot_control.pipete_L_Down(depth)
-            self.aspirate(amount, ASPIRATE_SPEED)
-            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
-            self.ot_control.pipete_L_Up(depth)
-        else:
-            self.go_to_position(source)
-            self.aspirate(amount, ASPIRATE_SPEED)
-            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
+        self.go_to_position(source)
+        self.aspirate(amount, ASPIRATE_SPEED)
+        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
     def dispense_to(self, amount, to, depth: int = None):
         """This will go to the position of the destination and dispense an amount in nL"""
-        # print(f"Depth on dispense to: {depth}")
-        if depth != None:
-            self.go_to_position(to)
-            self.ot_control.pipete_L_Down(depth)
-            self.dispense(amount, ASPIRATE_SPEED)
-            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
-            self.ot_control.pipete_L_Up(depth)
-        else:
-            self.go_to_position(to)
-            self.dispense(amount, ASPIRATE_SPEED)
-            time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
+        self.go_to_position(to)
+        self.dispense(amount, ASPIRATE_SPEED)
+        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
-    
     def adjust_syringe(self, position):
         self.ot_control.move({'B': position})
 

@@ -38,10 +38,12 @@ SET_LID_TEMP_CMD = 'set_lid_temp'
 SET_TEMPDECK_TEMP_CMD = 'set_tempdeck_temp'
 DEACTIVATE_TEMPDECK_CMD = 'deactivate_tempdeck'
 DEACTIVATE_ALL_CMD = 'deactivate_all'
-SET_PLATE_DEPTH_CMD = 'set_plate_depth'
 TAKE_PICTURE = 'take_picture'
+VOID_PLATE_DEPTH_CMD = 'void_plate_depth'
 PLATE_DEPTH = "Plate's depth"
-
+TEXT_FOR_VOID_DEPTH_PLATES = "# If the depth has been voided for any of the plates, this is specified here:\n\n"
+NO_PLATES_DEPTH_VOIDED_TXT = "# No plates depth have been voided for this protocol\n"
+MY_PROTOCOL_TXT = "myProtocol."
 CMD = 'cmd'
 VOLUME = 'volume'
 LABWARE = 'labware'
@@ -124,7 +126,7 @@ class ProtocolCreator:
 
     def create_protocol_labware_txt(self, labware_filename):
         path = self.get_path_to_labware(labware_filename)
-        print(path)
+        # print(path)
         content = []
         with open(path) as f:
             data = json.load(f)
@@ -154,15 +156,46 @@ class ProtocolCreator:
                 copy_plate += 1
             plate_names_list.append(plate_name)
             content.append(f"{plate_name} = plates[{plate_count}].get_location_by_nickname \n")
-            plate_count +=1 
-        text_for_start_of_protocol = "\n" + START_OF_PROTOCOL_TEXT
-        content.append(text_for_start_of_protocol)
-            
+            plate_count +=1
         list_of_labware = chip_names_list + plate_names_list
         return content
 
-    def create_command_txt(self,  cmd = None, volume = None, labware = None, location = None, temp = None, holding_time = None, plate: Plate = None, depth = None):
-        cmd_text = "myProtocol."
+    def create_protocol_voided_depth_for_labware(self, labware_filename, list_of_voided_plates: list = None):
+        path = self.get_path_to_labware(labware_filename)
+        plate_count = 0
+        # print(path)
+        plate_names_list = []
+        content = []
+        # print(f"List of voided plates: {list_of_voided_plates}")
+        content.append(TEXT_FOR_VOID_DEPTH_PLATES)
+        with open(path) as f:
+            data = json.load(f)
+            plates = data['plates']
+            #create the list of names of plates that were calibrated
+            for plate in plates:
+                plate_name = plate['model'].lower()
+                plate_names_list.append(plate_name)
+            # print(f"plates from file: {plate_names_list}")
+
+            #search for the plates that the depth will be voided. 
+            # for each plate calibrated, if this name matches a plate in the voided list
+            for plate_name in plate_names_list:
+                if plate_name in list_of_voided_plates:
+                    # print(f"Plate {plate_name} found in list of voided plates.")
+                    content.append(self.create_command_txt(cmd = VOID_PLATE_DEPTH_CMD, plate_index=plate_count, void = True) + '\n')
+                plate_count += 1
+        
+        plates_voided_txt = ""
+        for cmd in content:
+            plates_voided_txt += cmd + '\n'
+        
+        txt = TEXT_FOR_VOID_DEPTH_PLATES + plates_voided_txt
+        # print(f"txt: {txt}")
+        return content
+
+    def create_command_txt(self,  cmd = None, volume = None, labware = None, location = None, temp = None, holding_time = None, plate: Plate = None, depth = None, void: bool = None, plate_index: int = None):
+        # print("Creating command...")
+        cmd_text = MY_PROTOCOL_TXT
         if cmd == ASPIRATE_CMD:
             cmd_text += f"{cmd}(volume = {volume}, {SOURCE} = {labware}('{location}'))"
         elif cmd == DISPENSE_CMD:
@@ -185,10 +218,10 @@ class ProtocolCreator:
             cmd_text += f"{cmd}()"
         elif cmd == DEACTIVATE_ALL_CMD:
             cmd_text += f"{cmd}()"
-        elif cmd == SET_PLATE_DEPTH_CMD:
-            cmd_text += f"{cmd}({plate})"
         elif cmd == TAKE_PICTURE:
-            cmd_text += F"{cmd}()" 
+            cmd_text += f"{cmd}()" 
+        elif cmd == VOID_PLATE_DEPTH_CMD:
+            cmd_text += f"{cmd}(plate = plates[{plate_index}], void = {void})"
         return cmd_text
 
     def create_cmd_argumens_from_text(self, cmd_text:str):
@@ -227,12 +260,12 @@ class ProtocolCreator:
                 # print(f"line[{line_count}]: {contents[line_count]}")
                 # print(f"line_old command[{self.index_for_old_command}]: {contents[self.index_for_old_command]}")
                 if contents[line_count + 2] == '#--------------END OF PROTOCOL--------------\n':
-                    print(f"Adding first command: {txt_to_add}")
+                    # print(f"Adding first command: {txt_to_add}")
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command = line_count + 2
                     break
                 elif contents[self.index_for_old_command][:10] == 'myProtocol':
-                    print(f"Adding command: {cmd}")
+                    # print(f"Adding command: {cmd}")
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command += 2 
                     break
@@ -263,7 +296,7 @@ class ProtocolCreator:
         while line_count < len(contents):
             # print(f"line[{line_count}]{contents[line_count]}")
             if contents[line_count + 2] == '#--------------END OF PROTOCOL--------------\n':
-                print("Adding command")
+                # print("Adding command")
                 contents.insert(line_count + 1, txt_to_add)
                 # self.index_for_old_command = line_count + 2
                 break
@@ -284,22 +317,29 @@ class ProtocolCreator:
             self.add_cmd_to_protocol_file(filename=filename, cmd=command) 
         print(f"List of commands added to {filename}")
                 
-    def create_protocol_file(self, labware_name, filename: str = None):
+    def create_protocol_file(self, labware_name, filename: str = None, voided_plates: list = None, list_of_commands: list = None):
         if filename != None:
             new_name = filename
         else:
             new_name = self.create_name_for_new_file(extension='py')
         self.create_new_file(new_name)
-        print(labware_name)
+        # print(labware_name)
         heading = self.get_file_contents("protocol_heading.txt")
         labware = self.create_protocol_labware_txt(labware_filename=labware_name)
+        text_for_start_of_protocol = [START_OF_PROTOCOL_TEXT]
+        if voided_plates != None:
+            voided_plate_text = self.create_protocol_voided_depth_for_labware(labware_name, voided_plates)
+        else:
+            voided_plate_text = [NO_PLATES_DEPTH_VOIDED_TXT]
         end_of_protocol = self.get_file_contents("protocol_eof.txt")
         newline = ["\n"]
-        txt = heading + labware + newline + end_of_protocol
+        txt = heading + labware + newline + voided_plate_text + newline + text_for_start_of_protocol + newline + end_of_protocol
         content = ""
         for line in txt:
             content += line 
         self.write_contents_to_file(new_name, content)
+        if list_of_commands != None:
+            self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=list_of_commands)
         print(f"File {new_name} created in directory")
         return new_name
 
@@ -408,7 +448,7 @@ class ProtocolCreator:
         for command in list_of_commands:
             command_to_dict = self.create_cmd_argumens_from_text(command)
             dict_list.append(command_to_dict)
-        print(f"dict_list = {dict_list}")
+        # print(f"dict_list = {dict_list}")
         return dict_list
 
 
@@ -428,9 +468,7 @@ class ProtocolCreator:
 #------FUNCTION TESTS SECTION----------
 
 def tets_creation_of_file():
-    creator = ProtocolCreator()
-    labware = "Alex_config.json"
-    creator.create_protocol_file(labware)
+    tests_voiding_depth_of_plates()
 
 def tests_adding_lists_of_commands():
     creator = ProtocolCreator()
@@ -453,8 +491,6 @@ def tests_handling_commands():
     name = "protocol_5.py"
     location = "custom('A2')"
     new_list = creator.create_list_of_commands()
-    cmd = creator.create_command_txt(filename= name, cmd=SET_PLATE_DEPTH_CMD, plate='custom', depth=PLATE_DEPTH)
-    creator.add_command_to_end_of_list(cmd, new_list)
     cmd = creator.create_command_txt(filename= name, cmd=DISPENSE_CMD, volume=10, location=location)
     creator.add_command_to_end_of_list(cmd, new_list)
     creator.add_list_of_commands_to_protocol_file(name, new_list)
@@ -465,6 +501,21 @@ def tests_handling_commands():
     creator.add_list_of_commands_to_protocol_file(name, new_list)
     # creator.delete_existing_protocol(name)
     # creator.reset_file_commands(name)
+
+def tests_voiding_depth_of_plates():
+    creator = ProtocolCreator()
+    labware = "Fluorescein_test.json"
+    cmd = "myProtocol.aspirate_from(volume = 50, source = custom('A1'))"
+    cmd2 = "myProtocol.aspirate_from(volume = 50, source = corning_384('A2'))"
+    cmd_3 = "myProtocol.set_block_temp(4, 0)"
+    cmd_4 = "myProtocol.close_lid()"
+    cmd_5 = "myProtocol.set_lid_temp(39)"
+    cmd_6 = "myProtocol.set_block_temp(37, 15)"
+    cmd_7 = "myProtocol.deactivate_lid()"
+    plates_to_void_depth = ['custom', 'corning_384']
+    list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
+    # creator.create_protocol_file(labware_name=labware, voided_plates=plates_to_void_depth, list_of_commands=list_of_commands)
+    creator.create_protocol_file(labware_name=labware, list_of_commands=list_of_commands)
 
 def tests_csv():
     creator = ProtocolCreator()
@@ -488,9 +539,9 @@ def tests_csv():
     # creator.convert_cmd_dict_to_csv(cmd_dictionary)
     # creator.convert_cmd_dict_to_csv(cmd2_dictionary)
 
-    list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
-
-    creator.convert_cmd_list_to_csv(list_of_commands)
+    
+    # creator.create_protocol_voided_depth_for_labware(labware, plates_to_void_depth)
+    # creator.convert_cmd_list_to_csv(list_of_commands)
     
 
     
@@ -499,7 +550,8 @@ def test():
     # tests_adding_lists_of_commands()
     # tests_adding_a_command_to_the_end_of_file()
     # tests_handling_commands()
-    tests_csv()
+    tests_voiding_depth_of_plates()
+    # tests_csv()
 
 if __name__ == "__main__":
     test()

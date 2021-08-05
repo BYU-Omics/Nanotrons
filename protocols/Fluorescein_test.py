@@ -33,9 +33,9 @@ chips, plates = myProtocol.load_labware_setup(LABWARE)
 # Labware file loaded: Test_for_protocols.json
 
 micropots_3 = chips[0].get_location_by_nickname 
-corning_384 = plates[0].get_location_by_nickname 
-custom = plates[1].get_location_by_nickname 
-custom_small = plates[2].get_location_by_nickname 
+corning_384 = plates[0].pot_position_for_protocol
+custom = plates[1].pot_position_for_protocol
+custom_small = plates[2].pot_position_for_protocol
 
 myProtocol.dispense_to(0, custom('A1'))
 myProtocol.adjust_syringe()

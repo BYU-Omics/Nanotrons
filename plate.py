@@ -18,10 +18,11 @@ class Plate:
             self.pot_depths = [ 0 for _ in range(amount_of_pots) ] # This will say how deep is a pot
             self.nicknames = [ "" for _ in range(amount_of_pots) ] # Assigns a nickname to each well given their index
             self.nicknames_inv = {} # Maps the nicknames to a specific well index
-
+            self.void_depth: bool = False 
         # If a plate is being created from a dictionary of pre-recorded parameters 
         else:
             self.import_plate_properties(plate_properties)
+            self.void_depth: bool = False 
 
     # Stores the location of a specified pot
     def set_location(self, pot_index, location_tuple):
@@ -45,6 +46,11 @@ class Plate:
     def set_pot_depth(self, pot_index, pot_depth):
         self.pot_depths[pot_index] = pot_depth
 
+    def void_plate_depth(self, void: bool = False):
+        self.void_depth = void
+        print(f"Voiding depth for {self.get_model_name()}, self.void_depth = {self.void_depth}")
+
+
     # Gets the depth of the speficied pot 
     def get_pot_depth(self, pot_index):
         return self.pot_depths[pot_index]
@@ -57,6 +63,22 @@ class Plate:
     def get_location_by_nickname(self, pot_nickname):
         # print(f"get_location_by_nickname. Nickname: {pot_nickname} - > {self.pot_locations[self.nicknames_inv[pot_nickname]]}")
         return self.pot_locations[self.nicknames_inv[pot_nickname]]
+
+    def pot_position_for_protocol(self, pot_nickname):
+        location = self.pot_locations[self.nicknames_inv[pot_nickname]]
+        x = location[0]
+        y = location[1]
+        z = location[2]
+        depth = self.get_pot_depth(0)
+        location_with_depth = [x, y, z - depth]
+        print(f"Depth voided? : {self.void_plate_depth}")
+        if self.void_depth:
+            print("Depth has been voided. Returning calibration point level.")
+            return location
+        else:
+            print("Depth has not been voided. Going to the bottom of plate. ")
+            print(f"Depth is: {depth}")
+            return location_with_depth
 
     # Returns the location of a given pot specified by its index
     def get_location_by_index(self, pot_index):

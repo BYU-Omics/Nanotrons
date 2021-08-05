@@ -32,10 +32,10 @@ class Api:
         return self.coordinator.load_labware_setup(file_name)
 
     def aspirate_from(self, volume, source):
-        self.coordinator.aspirate_from(volume, source, self.current_labware_depth)
+        self.coordinator.aspirate_from(volume, source)
 
     def dispense_to(self, volume, to):
-        self.coordinator.dispense_to(volume, to, self.current_labware_depth)
+        self.coordinator.dispense_to(volume, to)
 
     def open_lid(self):
         self.coordinator.open_lid()
@@ -70,8 +70,8 @@ class Api:
     def end_of_protocol(self):
         self.coordinator.end_of_protocol()
 
-    def set_plate_depth(self, plate: Plate, depth = PLATE_DEPTH):
-        self.current_labware_depth = self.coordinator.set_plate_depth(plate, depth)
+    def void_plate_depth(self, plate: Plate, void: bool = False):
+        self.coordinator.void_plate_depth(plate, void)
 
     def take_picture(self, source = None):
         if source != None:
