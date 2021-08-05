@@ -20,6 +20,8 @@ if RUNNING_APP_FOR_REAL:
     from coordinator import *
 from python_execute import Py_Execute
 import platform
+import numpy as np
+import matplotlib.pylab as plt
 
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
@@ -192,18 +194,61 @@ def gen_1(camera):
         else:
             print("Frame is none")
 
+def draw_the_lines(img, lines):
+    img = np.copy(img)
+    x3, y3 = 270, 220
+    x4, y4 = 330, 280
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    lines_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+    for line in lines:
+        for x1, y1, x2, y2 in line:
+            # print(f"{x1},{y1}")
+            if (x1 < x3 or x1 > x4) or (y1 < y3 or y1 > y4):
+                # cv2.line(lines_image, (x1,y1), (x2, y2), (255, 255, 255), thickness=4)
+                # cv2.circle(lines_image, (x1, y1), 0, (0,0,255), thickness=7)
+                cv2.rectangle(lines_image, (x3, y3), (x4, y4), (255, 255, 255), 1)
+                cv2.putText(lines_image, "Place tip here:", (10, 250), font, 1, (255, 255, 255), 1, cv2.LINE_4)
+    img = cv2.addWeighted(img, 0.8, lines_image, 1, 0.0)
+    return img
+
 def gen_2(camera):
     img_counter = 0
     # Image directory
     directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
-    print(directory)
+    # print(directory)
+    x1, y1 = 250, 200
+    x2, y2 = 350, 300
+    x3, y3 = 280, 230
+    x4, y4 = 320, 270
+    line_thickness = 2
     while True:
         if camera.stopped:
             break
         frame = camera.read()
-        # font = cv2.FONT_HERSHEY_SIMPLEX
-        # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
-        ret, jpeg = cv2.imencode('.jpg',frame)
+        color = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        gray = cv2.cvtColor(color, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, 100, 200, apertureSize=3)
+        lines = cv2.HoughLinesP(image = edges, rho= 6, theta= np.pi/60, threshold=160, lines= np.array([]), minLineLength=120, maxLineGap=25)
+        
+        image_with_lines = draw_the_lines(frame, lines)
+
+        # for line in image_with_lines:
+        #     x5, y5, x6, y6 = line[0]
+        # # print(f"coordinates: {x5}, {y5}, {x6}, {y6}")
+        # if x5 < x1 or y5 < y1 or x5 > x2 or y5 > y2:
+        #     cv2.rectangle(image_with_lines, (x3, y3), (x4, y4), (255, 255, 255), 1)
+        #     counter += 1
+        # if counter == 15:
+        #     cv2.putText(frame, "Place tip here:", (10, 250), font, 1, (255, 255, 255), 1, cv2.LINE_4)
+        #     counter = 0
+
+        # cv2.line(frame, (x5, y5), (x6, y6), (0, 0, 128), 1)
+        
+        # # Writing and drawing rextangles adn text
+        
+        cv2.rectangle(image_with_lines, (x1, y1), (x2, y2), (255, 255, 255), line_thickness)
+        
+        ret, jpeg = cv2.imencode('.jpg', image_with_lines)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
