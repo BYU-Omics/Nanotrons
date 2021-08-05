@@ -207,13 +207,13 @@ class ProtocolCreator:
                 source_arg = argument[1].strip(")")
                 source_arg = source_arg.split("(")
                 labware = source_arg[0]
-                location = source_arg[1]
-                # source_arg_dict.update({f"{labware}": f"{location}"})
-                cmd_dictionary.update({f"{labware}": f"{location}"})
-                argument[1] = source_arg_dict
-            cmd_dictionary.update({f"{argument[0]}": f"{argument[1]}"}) 
+                location = source_arg[1].strip("'")
+                cmd_dictionary.update({f"{LABWARE}": f"{labware}"})
+                cmd_dictionary.update({f"{LOCATION}": f"{location}"})
+            else:
+                cmd_dictionary.update({f"{argument[0]}": f"{argument[1]}"}) 
 
-        print(f"Cmd dictionary: {cmd_dictionary}")
+        # print(f"Cmd dictionary: {cmd_dictionary}")
         return cmd_dictionary
     #------PROTOCOL FILE HANDLING SECTION----------
 
@@ -384,15 +384,17 @@ class ProtocolCreator:
                 line_count += 1
         return cmd_list
     
-    def convert_cmd_dict_to_csv(self, cmd_dict: dict):
+    def convert_cmd_list_to_csv(self, list_of_commands: list):
         csv_filename = self.create_name_for_new_file('csv')
         path_to_file = self.get_path_to_protocols(csv_filename)
         first_row = [CMD, VOLUME, LABWARE, LOCATION, TEMP, HOLDING_TIME, PLATE, DEPTH]
+        list_of_dict = self.convert_list_of_cmds_to_list_of_dict(list_of_commands)
         with open(path_to_file, 'w', encoding='UTF8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=first_row)
             # writer.writerow(first_row)
             writer.writeheader()
-            writer.writerow(cmd_dict)
+            for command in list_of_dict:
+                writer.writerow(command)
             
             # list_of_argument_values = []
             # for key in cmd_dict.keys():
@@ -400,6 +402,15 @@ class ProtocolCreator:
             #     list_of_argument_values.append(value)
             # print(list_of_argument_values)
             # writer.writerow(value)
+
+    def convert_list_of_cmds_to_list_of_dict(self, list_of_commands: list):
+        dict_list: list = []
+        for command in list_of_commands:
+            command_to_dict = self.create_cmd_argumens_from_text(command)
+            dict_list.append(command_to_dict)
+        print(f"dict_list = {dict_list}")
+        return dict_list
+
 
     #------PROTOCOL DISPLAY SECTION----------
 
@@ -463,10 +474,24 @@ def tests_csv():
     # cmd_list = creator.convert_csv_to_cmd_list(csv_name)
     # creator.add_list_of_commands_to_protocol_file(protocol_name, cmd_list)
     cmd = "myProtocol.aspirate_from(volume = 50, source = custom('A1'))"
-    # print(cmd)
-    cmd_dictionary = creator.create_cmd_argumens_from_text(cmd)
-    print(cmd_dictionary)
-    creator.convert_cmd_dict_to_csv(cmd_dictionary)
+    cmd2 = "myProtocol.aspirate_from(volume = 50, source = corning_384('A2'))"
+    cmd_3 = "myProtocol.set_block_temp(4, 0)"
+    cmd_4 = "myProtocol.close_lid()"
+    cmd_5 = "myProtocol.set_lid_temp(39)"
+    cmd_6 = "myProtocol.set_block_temp(37, 15)"
+    cmd_7 = "myProtocol.deactivate_lid()"
+    # # print(cmd)
+    # cmd_dictionary = creator.create_cmd_argumens_from_text(cmd)
+    # print(cmd_dictionary)
+    # cmd2_dictionary = creator.create_cmd_argumens_from_text(cmd2)
+    # print(cmd2_dictionary)
+    # creator.convert_cmd_dict_to_csv(cmd_dictionary)
+    # creator.convert_cmd_dict_to_csv(cmd2_dictionary)
+
+    list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
+
+    creator.convert_cmd_list_to_csv(list_of_commands)
+    
 
     
 def test():
