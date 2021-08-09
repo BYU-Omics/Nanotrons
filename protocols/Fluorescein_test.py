@@ -37,6 +37,9 @@ corning_384 = plates[0].pot_position_for_protocol
 custom = plates[1].pot_position_for_protocol
 custom_small = plates[2].pot_position_for_protocol
 
+myProtocol.void_plate_depth(plates[1], True)
+myProtocol.void_plate_depth(plates[2], True)
+
 myProtocol.dispense_to(0, custom('A1'))
 myProtocol.adjust_syringe()
 
@@ -48,15 +51,11 @@ myProtocol.aspirate_from(600, custom_small('A1'))
 
 myProtocol.dispense_to(50, custom('A1'))
 
-myProtocol.set_plate_depth(plates[0])
-
 myProtocol.dispense_to(100, corning_384('A18'))
 myProtocol.dispense_to(100, corning_384('B18'))
 myProtocol.dispense_to(100, corning_384('C18'))
 myProtocol.dispense_to(100, corning_384('D18'))
 myProtocol.dispense_to(100, corning_384('E18'))
-
-myProtocol.set_plate_depth(depth=None)
 
 myProtocol.dispense_to(100, custom('A1'))
 
@@ -66,15 +65,11 @@ myProtocol.aspirate_from(350, custom_small('B1'))
 
 myProtocol.dispense_to(50, custom('A1'))
 
-myProtocol.set_plate_depth(plates[0])
-
 myProtocol.dispense_to(50, corning_384('A19'))
 myProtocol.dispense_to(50, corning_384('B19'))
 myProtocol.dispense_to(50, corning_384('C19'))
 myProtocol.dispense_to(50, corning_384('D19'))
 myProtocol.dispense_to(50, corning_384('E19'))
-
-myProtocol.set_plate_depth(depth=None)
 
 myProtocol.dispense_to(100, custom('A1'))
 
@@ -84,15 +79,11 @@ myProtocol.aspirate_from(200, custom_small('C1'))
 
 myProtocol.dispense_to(50, custom('A1'))
 
-myProtocol.set_plate_depth(plates[0])
-
 myProtocol.dispense_to(20, corning_384('A20'))
 myProtocol.dispense_to(20, corning_384('B20'))
 myProtocol.dispense_to(20, corning_384('C20'))
 myProtocol.dispense_to(20, corning_384('D20'))
 myProtocol.dispense_to(20, corning_384('E20'))
-
-myProtocol.set_plate_depth(depth=None)
 
 myProtocol.dispense_to(100, custom('A1'))
 
@@ -102,15 +93,11 @@ myProtocol.aspirate_from(150, custom_small('D1'))
 
 myProtocol.dispense_to(50, custom('A1'))
 
-myProtocol.set_plate_depth(plates[0])
-
 myProtocol.dispense_to(10, corning_384('A21'))
 myProtocol.dispense_to(10, corning_384('B21'))
 myProtocol.dispense_to(10, corning_384('C21'))
 myProtocol.dispense_to(10, corning_384('D21'))
 myProtocol.dispense_to(10, corning_384('E21'))
-
-myProtocol.set_plate_depth(depth=None)
 
 myProtocol.dispense_to(100, custom('A1'))
 

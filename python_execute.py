@@ -28,6 +28,9 @@ class Py_Execute:
     def set_file_name(self, name):
         self.filename = name
 
+    def get_file_name(self):
+        return self.filename
+
     def set_syringe_file_name(self, name):
         self.syringe_model = name
 

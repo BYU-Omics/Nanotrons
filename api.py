@@ -75,5 +75,5 @@ class Api:
 
     def take_picture(self, source = None):
         if source != None:
-            self.coordinator.go_to_position(source)
+            self.coordinator.go_to_position_to_take_picture(source)
         requests.post(WEB_ADDRESS, json=my_data)

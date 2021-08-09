@@ -211,6 +211,22 @@ class Coordinator:
             location ([tuple]): contains three float numbers indicating a target 3D coordinate
         """
         self.ot_control.move_to(location=location)
+
+    def go_to_position_to_take_picture(self, location):
+        """ 
+        This method moves the motor system to a target 3D location on a sequence of safety displacements as follows:
+            1. Lift Z axis
+            2. Move to the X and Y target positions
+            3. Descend to the Z target position
+
+        Args:
+            location ([tuple]): contains three float numbers indicating a target 3D coordinate
+        """
+        x = location[0]
+        y = location[1]
+        z = location[2] + 3
+        picture_location = [x, y, z]
+        self.ot_control.move_to(location=picture_location)
         
     def go_to_deck_slot(self, slot):
         """ This method goes allows the OT2 to move to a designated physical slot  """

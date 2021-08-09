@@ -22,6 +22,7 @@ from python_execute import Py_Execute
 import platform
 import numpy as np
 import matplotlib.pylab as plt
+import datetime
 
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
@@ -199,15 +200,29 @@ def draw_the_lines(img, lines):
     x3, y3 = 270, 220
     x4, y4 = 330, 280
     font = cv2.FONT_HERSHEY_SIMPLEX
-    lines_image = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_HSV2BGR) # converts to hsv
+
+    lower_blue = np.array([70, 70, 70])
+    upper_blue = np.array([250, 250, 250])
+
+    mask = cv2.inRange(hsv, lowerb = lower_blue, upperb= upper_blue) # which pixels we should keep and which not
+
+    result = cv2.bitwise_and(img, img, mask=mask)
+
+    lines_image = np.zeros((result.shape[0], result.shape[1], 3), dtype=np.uint8)
+
     for line in lines:
         for x1, y1, x2, y2 in line:
+            cv2.line(lines_image, (x1,y1), (x2, y2), (255, 255, 255), thickness=4)
+            cv2.circle(lines_image, (x1, y1), 0, (0,0,255), thickness=7)
             # print(f"{x1},{y1}")
             if (x1 < x3 or x1 > x4) or (y1 < y3 or y1 > y4):
-                # cv2.line(lines_image, (x1,y1), (x2, y2), (255, 255, 255), thickness=4)
-                # cv2.circle(lines_image, (x1, y1), 0, (0,0,255), thickness=7)
+                print("Tip outside square")
                 cv2.rectangle(lines_image, (x3, y3), (x4, y4), (255, 255, 255), 1)
                 cv2.putText(lines_image, "Place tip here:", (10, 250), font, 1, (255, 255, 255), 1, cv2.LINE_4)
+            else: 
+                print("Tip inside square")
     img = cv2.addWeighted(img, 0.8, lines_image, 1, 0.0)
     return img
 
@@ -225,12 +240,12 @@ def gen_2(camera):
         if camera.stopped:
             break
         frame = camera.read()
-        color = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        gray = cv2.cvtColor(color, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray, 100, 200, apertureSize=3)
-        lines = cv2.HoughLinesP(image = edges, rho= 6, theta= np.pi/60, threshold=160, lines= np.array([]), minLineLength=120, maxLineGap=25)
-        
-        image_with_lines = draw_the_lines(frame, lines)
+        # color = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # gray = cv2.cvtColor(color, cv2.COLOR_BGR2GRAY)
+        # edges = cv2.Canny(gray, 100, 200, apertureSize=3)
+        # lines = cv2.HoughLinesP(image = edges, rho= 6, theta= np.pi/60, threshold=190, lines= np.array([]), minLineLength=170, maxLineGap=25)
+        # image_with_lines = draw_the_lines(frame, lines)
+
 
         # for line in image_with_lines:
         #     x5, y5, x6, y6 = line[0]
@@ -245,10 +260,10 @@ def gen_2(camera):
         # cv2.line(frame, (x5, y5), (x6, y6), (0, 0, 128), 1)
         
         # # Writing and drawing rextangles adn text
+        img_with_rect = frame.copy()
+        cv2.rectangle(img_with_rect, (x1, y1), (x2, y2), (255, 255, 255), line_thickness)
         
-        cv2.rectangle(image_with_lines, (x1, y1), (x2, y2), (255, 255, 255), line_thickness)
-        
-        ret, jpeg = cv2.imencode('.jpg', image_with_lines)
+        ret, jpeg = cv2.imencode('.jpg', img_with_rect)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
@@ -256,8 +271,9 @@ def gen_2(camera):
             print("Frame is none")
         if coordinator.get_picture_flag() == True:
             print(coordinator.get_picture_flag())
-            frame = camera.read()
-            img_name = "opencv_frame_{}.jpg".format(img_counter)
+            current_time =  datetime.datetime.now()
+            protocol_name = executer.get_file_name().strip(".py")
+            img_name = f"{protocol_name}_{current_time.year}-{current_time.month}-{current_time.day}_{current_time.hour}-{current_time.minute}-{current_time.second}.jpg"
             cv2.imwrite(directory + img_name, frame)
             print("{} written!".format(img_name))
             img_counter += 1

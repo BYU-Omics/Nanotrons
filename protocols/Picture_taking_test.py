@@ -39,19 +39,14 @@ custom = plates[0].get_location_by_nickname
 
 #----------START OF PROTOCOL----------------------------------------
 
-# myProtocol.set_plate_depth(plates[0], depth = 5)
+myProtocol.take_picture(micropots_3('B5'))
 
-# myProtocol.aspirate_from(amount = 0, source = custom('A1'))
+myProtocol.take_picture(micropots_3('B6'))
 
-# myProtocol.set_plate_depth(plates[0], depth = 0)
+myProtocol.take_picture(micropots_3('B7'))
 
-myProtocol.dispense_to(amount = 0, to = micropots_3('B5'))
+myProtocol.take_picture(micropots_3('B8'))
 
-myProtocol.take_picture()
-
-myProtocol.dispense_to(amount = 0, to = micropots_3('B6'))
-
-myProtocol.take_picture()
 
 #--------------END OF PROTOCOL--------------
 
