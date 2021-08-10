@@ -47,35 +47,53 @@ chips = [micropots_3_top, micropots_3_btm]
 myProtocol.set_block_temp(4, 0)
 
 for chip in chips:
-    myProtocol.aspirate_from(0, custom('A2'))
+    myProtocol.aspirate_from(100, custom('A2'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1000, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('A1'))
+    myProtocol.dispense_to(1000, chip('A1'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1000, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('C1'))
+    myProtocol.dispense_to(1000, chip('C1'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1000, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('A9'))
+    myProtocol.dispense_to(1000, chip('A9'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1000, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('C9'))
+    myProtocol.dispense_to(1000, chip('C9'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1400, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('A2'))
+    myProtocol.dispense_to(200, chip('A2'))
+    myProtocol.dispense_to(200, chip('A3'))
+    myProtocol.dispense_to(200, chip('A4'))
+    myProtocol.dispense_to(200, chip('A5'))
+    myProtocol.dispense_to(200, chip('A6'))
+    myProtocol.dispense_to(200, chip('A7'))
+    myProtocol.dispense_to(200, chip('A8'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1400, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('B2'))
+    myProtocol.dispense_to(200, chip('B2'))
+    myProtocol.dispense_to(200, chip('B3'))
+    myProtocol.dispense_to(200, chip('B4'))
+    myProtocol.dispense_to(200, chip('B5'))
+    myProtocol.dispense_to(200, chip('B6'))
+    myProtocol.dispense_to(200, chip('B7'))
+    myProtocol.dispense_to(200, chip('B8'))
 
-    myProtocol.aspirate_from(0, custom('A1'))
+    myProtocol.aspirate_from(1400, custom('A1'))
 
-    myProtocol.dispense_to(0, chip('C2'))
+    myProtocol.dispense_to(200, chip('C2'))
+    myProtocol.dispense_to(200, chip('C3'))
+    myProtocol.dispense_to(200, chip('C4'))
+    myProtocol.dispense_to(200, chip('C5'))
+    myProtocol.dispense_to(200, chip('C6'))
+    myProtocol.dispense_to(200, chip('C7'))
+    myProtocol.dispense_to(200, chip('C8'))
 
 for number in range(0, 55):
     myProtocol.take_picture(micropots_3_top('B2'))

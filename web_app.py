@@ -138,6 +138,10 @@ def load_labware_setup():
 def script():
     return render_template("script.html")
 
+@app.route('/batch')
+def batch_page():
+    return render_template("batch.html")
+
 @app.route('/settings')
 def system_settings():
     return render_template("settings.html")
