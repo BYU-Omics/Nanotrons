@@ -16,7 +16,7 @@ volume
 
 """
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 as SM
-from opentrons.config.robot_configs import (DEFAULT_GANTRY_STEPS_PER_MM, DEFAULT_PIPETTE_CONFIGS, build_config)
+from opentrons.config.robot_configs import build_config
 from serial.tools import list_ports
 import os
 

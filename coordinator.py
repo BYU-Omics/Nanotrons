@@ -45,7 +45,6 @@ from calibration import *
 from deck import *
 from keyboard import Keyboard
 import asyncio
-# from high_level_script_reader import HighLevelScriptReader	
 import threading
 import math	
 import time
@@ -54,7 +53,6 @@ import os
 import sys
 import platform
 from collections import deque 
-
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
@@ -74,6 +72,14 @@ TIME_TO_SETTLE = 0.5 #SECONDS
 PLATE_DEPTH = "Plate's depth"
 AIR_GAP_NL_AMOUNT = 50
 AIR_GAP_ASPIRATING_Z_STEP_DISTANCE = 25
+
+STANDARD_LEFT_OVER = 200
+STANDARD_CUSHION_1 = 200
+STANDARD_CUSHION_2 = 300
+
+SYRINGE_BOTTOM = -190
+SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
+SYRINGE_TOP = -90
 
 def interrupt_callback(res):
     sys.stderr.write(res)
@@ -109,6 +115,17 @@ class Coordinator:
         self.deck = Deck()
         self.user_input = 0
         self.picture_flag = False
+
+        # variables for protocols. 
+        self.clean_water = None
+        self.wash_water = None
+        self.waste_water = None
+        self.amount_wanted = None
+
+        self.syringe_bottom_coordinate =  SYRINGE_BOTTOM 
+        self.syringe_sweet_spot_coordinate =  SYRINGE_SWEET_SPOT 
+        self.syringe_top_coordinate =  SYRINGE_TOP 
+
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
@@ -434,7 +451,6 @@ class Coordinator:
         plate_list = self.myLabware.plate_list
         labware = [chip_list, plate_list]
         return labware
-    
 
     def get_available_labware_setup_files(self):
         """ Obtain the list of available files with previously calibrated and exported labware components
@@ -551,7 +567,6 @@ class Coordinator:
         else:
             logging.info(f"ERROR: {property_name} PROPERTY NOT LINKED TO ANY MODIFICATION ON THE SYSTEM\n") 
 
-
     """
     FEEDBACK SECTION
         This section is meant to define methods that retrieve information from the 
@@ -619,7 +634,7 @@ class Coordinator:
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
     def aspirate_from(self, amount, source):
-        """This will go to the position of the source and aspirate an amount in nL"""
+        """ This will go to the position of the source and aspirate an amount in nL"""
         self.go_to_position(source)
         self.pick_up_liquid(int(100)) # Pick up an extra 100 for backlash
         self.aspirate(amount, ASPIRATE_SPEED)
@@ -627,44 +642,96 @@ class Coordinator:
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
     def dispense_to(self, amount, to, depth: int = None):
-        """This will go to the position of the destination and dispense an amount in nL"""
+        """ This will go to the position of the destination and dispense an amount in nL"""
         self.go_to_position(to)
         self.dispense(amount, ASPIRATE_SPEED)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
     def move_plunger(self, position):
+        """ This allows the protocol to move the plunger passed the set limit for manual control, 
+            it is important to understand that if the right values are not input correctly for 
+            the syringe being used, this could break """
         self.ot_control.move({'B': position})
+
+    def set_washing_positions(self, clean_water, wash_water, waste_water):
+        """ For every protocol we assume the sicentist will have these three location in which the 
+            different types of water are places for washing the syringe so that there is no contamination"""
+        self.clean_water = clean_water
+        self.wash_water = wash_water
+        self.waste_water = waste_water
+
+    def start_wash(self):
+        """ This is the function that allows the robot to get rid of the contamination on the syringe, 
+            by dispensing everything that was left over from before, then it will pick up clean water 
+            and end in a postition that allows the protocol to aspirate and dispense without hitting limmmits"""
+        # Go to waste and SYRINGE_BOTTOM
+        self.go_to_position(self.waste_water)
+        self.move_plunger(self.syringe_bottom_coordinate)
+        # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
+        self.go_to_position(self.wash_water)
+        self.move_plunger(self.syringe_top_coordinate)
+        self.move_plunger(self.syringe_bottom_coordinate)
+        # Go to clean, SYRINGE_SWEET_SPOT
+        self.go_to_position(self.clean_water)
+        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        # Airgap
+        self.air_gap()
+
+    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
+        """ This is a wash that is done to the syringe when picking up and dispensing different liquids"""
+        # Go to waste, dispense left overs
+        self.go_to_position(self.waste_water)
+        self.dispense(left_over)
+        # Go to wash, aspirate amount wanted + Cushion 1, dipense amount wanted + Cushion 2
+        self.go_to_position(self.wash_water)
+        self.aspirate(self.amount_wanted + cushion_1)
+        self.dispense(self.amount_wanted + cushion_2)
+        # Go to clean, go to sweet spot
+        self.go_to_position(self.clean_water)
+        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        # Airgap
+        self.air_gap()
 
     """
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
     
     def tc_connect(self):
+        """ Here we connect to thr module"""
         asyncio.run(self.tc_control.connect(port= self.tc_port))
 
     def open_lid(self):
+        """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is opened"""
         self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
     def close_lid(self):
+        """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is closed"""
         self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.close())
         self.ot_control.set_tc_lid_flag('closed')
 
     def deactivate_all(self):
+        """ This function deactivates both, the lid and the block of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_all())
     
     def deactivate_lid(self):
+        """ This function deactivates the lid of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_lid())
 
     def deactivate_block(self):
+        """ This function deactivates the block of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_block())
 
     def set_temperature(self ,temp: float, hold_time:  float = None):
+        """ This function sets the temperature of the thermocycler with a holding time in minutes."""
         asyncio.run(self.tc_control.set_temperature(temp, hold_time))
 
     def set_lid_temp(self, temp: float):
+        
         asyncio.run(self.tc_control.set_lid_temperature(temp))
 
     def tc_disconnect(self):
