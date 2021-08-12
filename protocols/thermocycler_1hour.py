@@ -36,32 +36,43 @@ micropots_3 = chips[0].get_location_by_nickname
 corning_384 = plates[0].get_location_by_nickname 
 custom = plates[1].get_location_by_nickname 
 
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
+# -----------PREPROTOCOL SETUP-------------------
+
+# Designater wells for washing tip
+
+waste_water = custom('A1')
+wash_water = custom('A2')
+clean_water = custom('A3')
+
+myProtocol.set_washing_positions(clean_water=clean_water, wash_water=wash_water, waste_water=waste_water)
+
+# If there are any depth voided they are listed here
+
+myProtocol.void_plate_depth(plates[1], True)
+
+myProtocol.start_wash()
 
 #----------START OF PROTOCOL----------------------------------------
 
 myProtocol.set_block_temp(4, 0)
 
-myProtocol.aspirate_from(100, custom('A2'))
-
-myProtocol.aspirate_from(1000, custom('A1'))
+myProtocol.aspirate_from(1000, clean_water)
 
 myProtocol.dispense_to(1000, micropots_3('A1'))
 
-myProtocol.aspirate_from(1000, custom('A1'))
+myProtocol.aspirate_from(1000, clean_water)
 
 myProtocol.dispense_to(1000, micropots_3('C1'))
 
-myProtocol.aspirate_from(1000, custom('A1'))
+myProtocol.aspirate_from(1000, clean_water)
 
 myProtocol.dispense_to(1000, micropots_3('A9'))
 
-myProtocol.aspirate_from(1000, custom('A1'))
+myProtocol.aspirate_from(1000, clean_water)
 
 myProtocol.dispense_to(1000, micropots_3('C9'))
 
-myProtocol.aspirate_from(1400, custom('A1'))
+myProtocol.aspirate_from(1400, clean_water)
 
 myProtocol.dispense_to(200, micropots_3('A2'))
 myProtocol.dispense_to(200, micropots_3('A3'))
@@ -71,7 +82,7 @@ myProtocol.dispense_to(200, micropots_3('A6'))
 myProtocol.dispense_to(200, micropots_3('A7'))
 myProtocol.dispense_to(200, micropots_3('A8'))
 
-myProtocol.aspirate_from(1400, custom('A1'))
+myProtocol.aspirate_from(1400, clean_water)
 
 myProtocol.dispense_to(200, micropots_3('B2'))
 myProtocol.dispense_to(200, micropots_3('B3'))
@@ -81,7 +92,7 @@ myProtocol.dispense_to(200, micropots_3('B6'))
 myProtocol.dispense_to(200, micropots_3('B7'))
 myProtocol.dispense_to(200, micropots_3('B8'))
 
-myProtocol.aspirate_from(1400, custom('A1'))
+myProtocol.aspirate_from(1400, clean_water)
 
 myProtocol.dispense_to(200, micropots_3('C2'))
 myProtocol.dispense_to(200, micropots_3('C3'))
@@ -98,19 +109,12 @@ for number in range(0, 11):
 
     myProtocol.close_lid()
 
-    myProtocol.set_lid_temp(39)
-
     myProtocol.set_block_temp(37, 60)
-
-    myProtocol.deactivate_lid()
 
     myProtocol.set_block_temp(4, 0)
 
     myProtocol.open_lid()
 
 #--------------END OF PROTOCOL--------------
-
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
 
 myProtocol.end_of_protocol()
