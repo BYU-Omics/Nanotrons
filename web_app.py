@@ -235,11 +235,14 @@ def gen_2(camera):
     # Image directory
     directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
     # print(directory)
-    x1, y1 = 250, 200
-    x2, y2 = 350, 300
+    x1_b, y1_b = 245, 200
+    x2_b, y2_b = 345, 300
+    x1_s, y1_s = 285, 240
+    x2_s, y2_s = 305, 260
     x3, y3 = 280, 230
     x4, y4 = 320, 270
-    line_thickness = 2
+    line_thickness_s = 2
+    line_thickness_b = 1
     while True:
         if camera.stopped:
             break
@@ -264,8 +267,13 @@ def gen_2(camera):
         # cv2.line(frame, (x5, y5), (x6, y6), (0, 0, 128), 1)
         
         # # Writing and drawing rextangles adn text
+
+
+
+
         img_with_rect = frame.copy()
-        cv2.rectangle(img_with_rect, (x1, y1), (x2, y2), (255, 255, 255), line_thickness)
+        cv2.rectangle(img_with_rect, (x1_b, y1_b), (x2_b, y2_b), (255, 255, 255), line_thickness_b)
+        cv2.rectangle(img_with_rect, (x1_s, y1_s), (x2_s, y2_s), (255, 255, 255), line_thickness_s)
         
         ret, jpeg = cv2.imencode('.jpg', img_with_rect)
         if jpeg is not None:
@@ -277,7 +285,7 @@ def gen_2(camera):
             print(coordinator.get_picture_flag())
             current_time =  datetime.datetime.now()
             protocol_name = executer.get_file_name().strip(".py")
-            img_name = f"{protocol_name}_{current_time.year}-{current_time.month}-{current_time.day}_{current_time.hour}-{current_time.minute}-{current_time.second}.jpg"
+            img_name = f"{protocol_name} {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
             cv2.imwrite(directory + img_name, frame)
             print("{} written!".format(img_name))
             img_counter += 1

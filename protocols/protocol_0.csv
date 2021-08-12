@@ -1,4 +1,0 @@
-cmd,volume,labware,location,temp,holding_time,plate,depth
-aspirate_from,50,custom,A1,,,,
-aspirate_from,50,corning_384,A2,,,,
-aspirate_from,50,custom,A1,,,,

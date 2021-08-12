@@ -72,6 +72,8 @@ ASPIRATE_SPEED = SLOW_SPEED
 POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT = 150
 TIME_TO_SETTLE = 0.5 #SECONDS
 PLATE_DEPTH = "Plate's depth"
+AIR_GAP_NL_AMOUNT = 50
+AIR_GAP_ASPIRATING_Z_STEP_DISTANCE = 25
 
 def interrupt_callback(res):
     sys.stderr.write(res)
@@ -313,15 +315,24 @@ class Coordinator:
         self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
         
-    def aspirate(self, volume, speed): 
+    def aspirate(self, volume, speed = SLOW_SPEED): 
         """ Pick up amount in nL and speed in nL/min  """
         logging.info(f"Aspirating {volume} nL at speed {speed} nL/s")
-        self.pick_up_liquid(int(volume))
+        self.pick_up_liquid(int(volume)) # Pick up the amount needed
 
-    def dispense(self, amount, speed): 
+    def dispense(self, amount, speed = SLOW_SPEED): 
         """ Drop of amount in nL and speed in nL/min  """
         logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
         self.drop_off_liquid(int(amount))
+
+    def air_gap(self):
+        """This is the function that allows the user to have an 50 nL airgap in the syringe"""
+        x = self.ot_control._position['X']
+        y = self.ot_control._position['Y']
+        z = self.ot_control._position['Z'] + AIR_GAP_ASPIRATING_Z_STEP_DISTANCE
+        new_location = [x, y, z]
+        self.go_to_position(new_location)
+        self.aspirate(AIR_GAP_NL_AMOUNT, speed=ASPIRATE_SPEED)
 
     """
     LABWARE METHODS SECTION
@@ -610,7 +621,9 @@ class Coordinator:
     def aspirate_from(self, amount, source):
         """This will go to the position of the source and aspirate an amount in nL"""
         self.go_to_position(source)
+        self.pick_up_liquid(int(100)) # Pick up an extra 100 for backlash
         self.aspirate(amount, ASPIRATE_SPEED)
+        self.drop_off_liquid(int(100)) # Drop off liquid to account for backlash
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
     def dispense_to(self, amount, to, depth: int = None):
@@ -619,7 +632,7 @@ class Coordinator:
         self.dispense(amount, ASPIRATE_SPEED)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
-    def adjust_syringe(self, position):
+    def move_plunger(self, position):
         self.ot_control.move({'B': position})
 
     """

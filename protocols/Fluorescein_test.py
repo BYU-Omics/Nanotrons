@@ -22,48 +22,58 @@ except ImportError:
 
 myProtocol = Api() 
 
-# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
+# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
+#               this is done from the executer, it is specified on the GUI
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 
+# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
+
 # ------------END OF HEADING-------------------------------------------------
 
-# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
+# ------------START OF PROTOCOL CONFIGURATION--------------------------------
+
+metadata = {
+    'protocolName': 'Nanotrons Test',
+    'author': '',
+    'description': '',
+}
 
 # Labware file loaded: Test_for_protocols.json
 
-micropots_3 = chips[0].get_location_by_nickname 
 corning_384 = plates[0].pot_position_for_protocol
-custom = plates[1].pot_position_for_protocol
-custom_small = plates[2].pot_position_for_protocol
+custom_small = plates[1].pot_position_for_protocol
+custom = plates[2].pot_position_for_protocol
 
-myProtocol.void_plate_depth(plates[1], True)
+# -----------PREPROTOCOL SETUP-------------------
+
+# Designater wells for washing tip
+
+waste_water = custom('A1')
+wash_water = custom('A2')
+clean_water = custom('A3')
+
+myProtocol.set_washing_positions(clean_water=clean_water, wash_water=wash_water, waste_water=waste_water)
+
+# If there are any depth voided they are listed here
+
 myProtocol.void_plate_depth(plates[2], True)
 
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
+myProtocol.start_wash()
 
 #----------START OF PROTOCOL----------------------------------------
 
-myProtocol.aspirate_from(50, custom('A2'))
+myProtocol.aspirate_from(500, custom_small('A1'))
 
-myProtocol.aspirate_from(600, custom_small('A1'))
+myProtocol.dispense_to(100, corning_384('A16'))
+myProtocol.dispense_to(100, corning_384('B16'))
+myProtocol.dispense_to(100, corning_384('C16'))
+myProtocol.dispense_to(100, corning_384('D16'))
+myProtocol.dispense_to(100, corning_384('E16'))
 
-myProtocol.dispense_to(50, custom('A1'))
+myProtocol.mid_wash()
 
-myProtocol.dispense_to(100, corning_384('A18'))
-myProtocol.dispense_to(100, corning_384('B18'))
-myProtocol.dispense_to(100, corning_384('C18'))
-myProtocol.dispense_to(100, corning_384('D18'))
-myProtocol.dispense_to(100, corning_384('E18'))
-
-myProtocol.dispense_to(100, custom('A1'))
-
-myProtocol.aspirate_from(50, custom('A2'))
-
-myProtocol.aspirate_from(350, custom_small('B1'))
-
-myProtocol.dispense_to(50, custom('A1'))
+myProtocol.aspirate_from(250, custom_small('B1'))
 
 myProtocol.dispense_to(50, corning_384('A19'))
 myProtocol.dispense_to(50, corning_384('B19'))
@@ -71,13 +81,9 @@ myProtocol.dispense_to(50, corning_384('C19'))
 myProtocol.dispense_to(50, corning_384('D19'))
 myProtocol.dispense_to(50, corning_384('E19'))
 
-myProtocol.dispense_to(100, custom('A1'))
+myProtocol.mid_wash()
 
-myProtocol.aspirate_from(50, custom('A2'))
-
-myProtocol.aspirate_from(200, custom_small('C1'))
-
-myProtocol.dispense_to(50, custom('A1'))
+myProtocol.aspirate_from(100, custom_small('C1'))
 
 myProtocol.dispense_to(20, corning_384('A20'))
 myProtocol.dispense_to(20, corning_384('B20'))
@@ -85,13 +91,9 @@ myProtocol.dispense_to(20, corning_384('C20'))
 myProtocol.dispense_to(20, corning_384('D20'))
 myProtocol.dispense_to(20, corning_384('E20'))
 
-myProtocol.dispense_to(100, custom('A1'))
+myProtocol.mid_wash()
 
-myProtocol.aspirate_from(50, custom('A2'))
-
-myProtocol.aspirate_from(150, custom_small('D1'))
-
-myProtocol.dispense_to(50, custom('A1'))
+myProtocol.aspirate_from(50, custom_small('D1'))
 
 myProtocol.dispense_to(10, corning_384('A21'))
 myProtocol.dispense_to(10, corning_384('B21'))
@@ -99,11 +101,8 @@ myProtocol.dispense_to(10, corning_384('C21'))
 myProtocol.dispense_to(10, corning_384('D21'))
 myProtocol.dispense_to(10, corning_384('E21'))
 
-myProtocol.dispense_to(100, custom('A1'))
+myProtocol.mid_wash()
 
 #--------------END OF PROTOCOL--------------
-
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
 
 myProtocol.end_of_protocol()

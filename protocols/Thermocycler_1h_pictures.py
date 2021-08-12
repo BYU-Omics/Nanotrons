@@ -36,14 +36,15 @@ micropots_3 = chips[0].get_location_by_nickname
 corning_384 = plates[0].get_location_by_nickname 
 custom = plates[1].get_location_by_nickname 
 
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
-
 #----------START OF PROTOCOL----------------------------------------
 
-myProtocol.set_block_temp(4, 0)
 
-for number in range(0, 1):
+
+time.sleep(17*60)
+
+myProtocol.open_lid()
+
+for number in range(0, 8):
     myProtocol.take_picture(micropots_3('B2'))
     myProtocol.take_picture(micropots_3('B5'))
     myProtocol.take_picture(micropots_3('B8'))
@@ -52,7 +53,7 @@ for number in range(0, 1):
 
     myProtocol.set_lid_temp(39)
 
-    myProtocol.set_block_temp(37, 15)
+    myProtocol.set_block_temp(37, 60)
 
     myProtocol.deactivate_lid()
 
@@ -61,8 +62,5 @@ for number in range(0, 1):
     myProtocol.open_lid()
 
 #--------------END OF PROTOCOL--------------
-
-myProtocol.dispense_to(0, custom('A1'))
-myProtocol.adjust_syringe()
 
 myProtocol.end_of_protocol()

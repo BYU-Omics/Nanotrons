@@ -19,20 +19,67 @@ my_data = {'name': 'True'}
 
 PLATE_DEPTH = "Plate's depth"
 
+SYRINGE_BOTTOM = -190
+SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
+SYRINGE_TOP = -90
+
 class Api:
     def __init__(self):
         self.coordinator = Coordinator()
         self.current_labware_depth = None
+        self.clean_water = None
+        self.wash_water = None
+        self.waste_water = None
+        self.amount_wanted = None
+        
+    def set_washing_positions(self, clean_water, wash_water, waste_water):
+        self.clean_water = clean_water
+        self.wash_water = wash_water
+        self.waste_water = waste_water
 
-    def adjust_syringe(self):
-        self.coordinator.adjust_syringe(B_MIN)
-        self.coordinator.adjust_syringe(-131.5)
+    def start_wash(self):
+        # Go to waste and SYRINGE_BOTTOM
+        self.coordinator.go_to_position(self.waste_water)
+        self.coordinator.move_plunger(SYRINGE_BOTTOM)
+
+        # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
+        self.coordinator.go_to_position(self.wash_water)
+        self.coordinator.move_plunger(SYRINGE_TOP)
+        self.coordinator.move_plunger(SYRINGE_BOTTOM)
+
+        # Go to clean, SYRINGE_SWEET_SPOT
+        self.coordinator.go_to_position(self.clean_water)
+        self.coordinator.move_plunger(SYRINGE_SWEET_SPOT)
+
+        # Airgap
+        self.coordinator.air_gap()
+
+    def mid_wash(self, left_over = 200, cushion_1 = 200, cushion_2 = 300):
+        # Go to waste, dispense left overs
+        self.coordinator.go_to_position(self.waste_water)
+        self.coordinator.dispense(left_over, SLOW_SPEED)
+        
+        # Go to wash, aspirate amount wanted + Cushion 1, dipense amount wanted + Cushion 2
+        self.coordinator.go_to_position(self.wash_water)
+        self.coordinator.aspirate(self.amount_wanted + cushion_1)
+        self.coordinator.dispense(self.amount_wanted + cushion_2)
+
+        # Go to clean, go to sweet spot
+        self.coordinator.go_to_position(self.clean_water)
+        self.coordinator.move_plunger(SYRINGE_SWEET_SPOT)
+
+        # Airgap
+        self.coordinator.air_gap()
+
+    def air_gap(self):
+        self.coordinator.air_gap()
 
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
     def aspirate_from(self, volume, source):
         self.coordinator.aspirate_from(volume, source)
+        self.amount_wanted = volume
 
     def dispense_to(self, volume, to):
         self.coordinator.dispense_to(volume, to)
