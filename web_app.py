@@ -20,8 +20,6 @@ if RUNNING_APP_FOR_REAL:
     from coordinator import *
 from python_execute import Py_Execute
 import platform
-import numpy as np
-import matplotlib.pylab as plt
 import datetime
 
 ALLOWED_EXTENSIONS = ['json']
@@ -38,7 +36,9 @@ RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
 RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
 RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
 RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
-RELATIVE_PATH_TO_PICTURES_W = 'pictures\\1_hour_test_no_lid\\'
+RELATIVE_PATH_TO_PICTURES_W = 'pictures\\'
+RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'Protocol Pictures\\'
+RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'Manual Control Pictures\\'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 MACBOOK_OS = 'Darwin'
@@ -51,6 +51,13 @@ LABWARE_COMPONENT_INDEX = 0 # 'c' or 'p'
 COMPONENT_MODEL_INDEX = 1
 SETTING_NAME_INDEX = 0
 NEW_VALUE_INDEX = 1
+WHITE = (255, 255, 255)
+BIG_SQR_X1, BIG_SQR_Y1 = 245, 200
+BIG_SQR_X2, BIG_SQR_Y2 = 345, 300
+BIG_SQR_LINE_THICKNESS = 2
+SMALL_SQR_X1, SMALL_SQR_Y1 = 285, 240
+SMALL_SQR_X2, SMALL_SQR_Y2 = 305, 260
+SMALL_SQR_LINE_THICKNESS = 1
 
 app = Flask(__name__)
 
@@ -149,7 +156,8 @@ def system_settings():
 @app.route("/", methods =["POST"])
 def PostData():
     data = request.get_json(force=True)
-    coordinator.set_picture_flag(bool(data['name']))
+    coordinator.set_picture_flag(bool(data['take_pic']))
+    coordinator.set_folder_for_pictures(bool(data['folder']))
     
 # This method checks to see if the filename ends with an allowed extension
 def allowed_file(filename):
@@ -199,81 +207,15 @@ def gen_1(camera):
         else:
             print("Frame is none")
 
-def draw_the_lines(img, lines):
-    img = np.copy(img)
-    x3, y3 = 270, 220
-    x4, y4 = 330, 280
-    font = cv2.FONT_HERSHEY_SIMPLEX
-
-    hsv = cv2.cvtColor(img, cv2.COLOR_HSV2BGR) # converts to hsv
-
-    lower_blue = np.array([70, 70, 70])
-    upper_blue = np.array([250, 250, 250])
-
-    mask = cv2.inRange(hsv, lowerb = lower_blue, upperb= upper_blue) # which pixels we should keep and which not
-
-    result = cv2.bitwise_and(img, img, mask=mask)
-
-    lines_image = np.zeros((result.shape[0], result.shape[1], 3), dtype=np.uint8)
-
-    for line in lines:
-        for x1, y1, x2, y2 in line:
-            cv2.line(lines_image, (x1,y1), (x2, y2), (255, 255, 255), thickness=4)
-            cv2.circle(lines_image, (x1, y1), 0, (0,0,255), thickness=7)
-            # print(f"{x1},{y1}")
-            if (x1 < x3 or x1 > x4) or (y1 < y3 or y1 > y4):
-                print("Tip outside square")
-                cv2.rectangle(lines_image, (x3, y3), (x4, y4), (255, 255, 255), 1)
-                cv2.putText(lines_image, "Place tip here:", (10, 250), font, 1, (255, 255, 255), 1, cv2.LINE_4)
-            else: 
-                print("Tip inside square")
-    img = cv2.addWeighted(img, 0.8, lines_image, 1, 0.0)
-    return img
-
 def gen_2(camera):
     img_counter = 0
-    # Image directory
-    directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
-    # print(directory)
-    x1_b, y1_b = 245, 200
-    x2_b, y2_b = 345, 300
-    x1_s, y1_s = 285, 240
-    x2_s, y2_s = 305, 260
-    x3, y3 = 280, 230
-    x4, y4 = 320, 270
-    line_thickness_s = 2
-    line_thickness_b = 1
     while True:
         if camera.stopped:
             break
         frame = camera.read()
-        # color = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # gray = cv2.cvtColor(color, cv2.COLOR_BGR2GRAY)
-        # edges = cv2.Canny(gray, 100, 200, apertureSize=3)
-        # lines = cv2.HoughLinesP(image = edges, rho= 6, theta= np.pi/60, threshold=190, lines= np.array([]), minLineLength=170, maxLineGap=25)
-        # image_with_lines = draw_the_lines(frame, lines)
-
-
-        # for line in image_with_lines:
-        #     x5, y5, x6, y6 = line[0]
-        # # print(f"coordinates: {x5}, {y5}, {x6}, {y6}")
-        # if x5 < x1 or y5 < y1 or x5 > x2 or y5 > y2:
-        #     cv2.rectangle(image_with_lines, (x3, y3), (x4, y4), (255, 255, 255), 1)
-        #     counter += 1
-        # if counter == 15:
-        #     cv2.putText(frame, "Place tip here:", (10, 250), font, 1, (255, 255, 255), 1, cv2.LINE_4)
-        #     counter = 0
-
-        # cv2.line(frame, (x5, y5), (x6, y6), (0, 0, 128), 1)
-        
-        # # Writing and drawing rextangles adn text
-
-
-
-
         img_with_rect = frame.copy()
-        cv2.rectangle(img_with_rect, (x1_b, y1_b), (x2_b, y2_b), (255, 255, 255), line_thickness_b)
-        cv2.rectangle(img_with_rect, (x1_s, y1_s), (x2_s, y2_s), (255, 255, 255), line_thickness_s)
+        cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
+        cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
         
         ret, jpeg = cv2.imencode('.jpg', img_with_rect)
         if jpeg is not None:
@@ -282,12 +224,17 @@ def gen_2(camera):
         else:
             print("Frame is none")
         if coordinator.get_picture_flag() == True:
-            print(coordinator.get_picture_flag())
+            folder = coordinator.get_folder_for_pictures()
+            print(f"Writing picture to {folder}")
+            if folder:
+                directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W + folder + '\\'
+            else:
+                directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
             current_time =  datetime.datetime.now()
             protocol_name = executer.get_file_name().strip(".py")
             img_name = f"{protocol_name} {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
             cv2.imwrite(directory + img_name, frame)
-            print("{} written!".format(img_name))
+            print(f"{img_name} written!")
             img_counter += 1
             coordinator.set_picture_flag(False)
 
@@ -372,8 +319,9 @@ def down_step_size():
     coordinator.down_step_size()
 
 @socketio.on("take_picture")
-def take_picture():
+def take_picture(folder):
     print("take_picture")
+    coordinator.set_folder_for_pictures(folder)
     coordinator.set_picture_flag(True)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
@@ -769,7 +717,6 @@ def get_available_syringes():
     elif os.name == LINUX_OS:
         path_to_calibration = RELATIVE_PATH_TO_SYRINGES_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    # print(f"Files on folder: {list}")
     socketio.emit("syringes_available", list) # send the list back to js
 
 @socketio.on("set_labware_syringes")

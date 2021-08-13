@@ -15,13 +15,13 @@ LABWARE = sys.argv[1]
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 WEB_ADDRESS = 'http://localhost:5000/'
 
-my_data = {'name': 'True'}
-
 class Api:
     def __init__(self):
         self.coordinator = Coordinator()
         self.current_labware_depth = None
-        
+        self.folder_for_this_protocol = ''
+        self.protocol_flags = {'take_pic': 'True', 'folder': 'Protocol Pictures', 'protocol_folder': f'{self.folder_for_this_protocol}'}
+
     def set_washing_positions(self, clean_water, wash_water, waste_water):
         self.coordinator.set_washing_positions(clean_water, wash_water, waste_water)
 
@@ -83,4 +83,4 @@ class Api:
     def take_picture(self, source = None):
         if source != None:
             self.coordinator.go_to_position_to_take_picture(source)
-        requests.post(WEB_ADDRESS, json=my_data)
+        requests.post(WEB_ADDRESS, json=self.protocol_flags)

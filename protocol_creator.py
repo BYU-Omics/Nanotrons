@@ -27,6 +27,12 @@ LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
 # Texxt for the commands 
+SET_WASHING_POSITIONS_CMD = 'set_washing_positions'
+START_WASH_CMD = 'start_wash'
+MID_WASH_CMD = 'mid_wash'
+AIR_GAP_CMD = 'air_gap'
+LOAD_LABWARE_SET_UP_CMD = 'load_labware_setup'
+END_OF_PROTOCOL_CMD = 'end_of_protocol'
 ASPIRATE_CMD = 'aspirate_from'
 DISPENSE_CMD = 'dispense_to'
 OPEN_LID_CMD = 'open_lid'
@@ -193,7 +199,19 @@ class ProtocolCreator:
         # print(f"txt: {txt}")
         return content
 
-    def create_command_txt(self,  cmd = None, volume = None, labware = None, location = None, temp = None, holding_time = None, plate: Plate = None, depth = None, void: bool = None, plate_index: int = None):
+    def create_command_txt(self, cmd = None, 
+                                 volume = None, 
+                                 labware = None, 
+                                 location = None, 
+                                 temp = None, 
+                                 holding_time = None, 
+                                 plate: Plate = None, 
+                                 depth = None, 
+                                 void: bool = None, 
+                                 plate_index: int = None,
+                                 clean_water = None, 
+                                 wash_water = None, 
+                                 waste_water = None):
         # print("Creating command...")
         cmd_text = MY_PROTOCOL_TXT
         if cmd == ASPIRATE_CMD:
@@ -222,6 +240,14 @@ class ProtocolCreator:
             cmd_text += f"{cmd}()" 
         elif cmd == VOID_PLATE_DEPTH_CMD:
             cmd_text += f"{cmd}(plate = plates[{plate_index}], void = {void})"
+        elif cmd == SET_WASHING_POSITIONS_CMD:
+            cmd_text += f"{cmd}
+        elif cmd == START_WASH_CMD:
+            cmd_text += f"{cmd}
+        elif cmd == MID_WASH_CMD:
+            cmd_text += f"{cmd}
+        elif cmd == AIR_GAP_CMD:
+            cmd_text += f"{cmd}
         return cmd_text
 
     def create_cmd_argumens_from_text(self, cmd_text:str):
@@ -350,9 +376,9 @@ class ProtocolCreator:
         commands_list = []
         for line in contents:
             if 'myProtocol.' in line:
-                if 'load_labware_setup' in line:
+                if LOAD_LABWARE_SET_UP_CMD in line:
                     pass
-                elif 'end_of_protocol' in line:
+                elif END_OF_PROTOCOL_CMD in line:
                     pass
                 else:
                     commands_list.append(line)

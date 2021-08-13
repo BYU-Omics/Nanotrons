@@ -125,7 +125,7 @@ function check_tempdeck_status() {
 }
 
 function take_picture() {
-    socket.emit("take_picture")
+    socket.emit("take_picture", "Manual Control Pictures")
 }
 
 let btemp = 0;

@@ -114,6 +114,7 @@ class Coordinator:
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
+        self.folder_for_pictures = None
         self.picture_flag = False
 
         # variables for protocols. 
@@ -136,8 +137,14 @@ class Coordinator:
         # print(f"Setting picture flag to: {value}")
         self.picture_flag = value
 
-    def get_picture_flag(self):
+    def get_picture_flag(self) -> bool:
         return self.picture_flag
+
+    def set_folder_for_pictures(self, folder: str):
+        self.folder_for_pictures = folder
+
+    def get_folder_for_pictures(self) -> str:
+        return self.folder_for_pictures
         
     """
     MANUAL CONTROL SECTION
@@ -241,6 +248,7 @@ class Coordinator:
         Args:
             location ([tuple]): contains three float numbers indicating a target 3D coordinate
         """
+        self.open_lid() # Prevents the pipette to crash with the thermocycler
         x = location[0]
         y = location[1]
         z = location[2] + 3
