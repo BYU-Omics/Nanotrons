@@ -6,7 +6,7 @@
         'dispense_to' 
 """
 
-#-----------IMPORT THE USED PAKAGES---------------------------------------
+#---------------------------IMPORT THE USED LIBRARIES-------------------------------
 
 import sys
 LABWARE = sys.argv[1]
@@ -18,46 +18,49 @@ except ImportError:
     CURRENT_DIRECTORY
     from api import *
 
-# ----------CREATE A PROTOCOL OBJECT--------------------------------------
+#---------------------------CREATE A PROTOCOL OBJECT--------------------------------
 
 myProtocol = Api() 
 
-# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
-#               this is done from the executer, it is specified on the GUI
+#-------------------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
+            # This is done from the executer, it is specified on the GUI.
+            # Chips and plates are loaded in the order they were calibrated.""" 
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 
-# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
-
-# ------------END OF HEADING-------------------------------------------------
+#---------------------------END OF HEADING------------------------------------------
 
 # ------------START OF PROTOCOL CONFIGURATION--------------------------------
 
 metadata = {
     'protocolName': 'Nanotrons Test',
     'author': '',
-    'description': '',
+    'description': ''
 }
 
 # Labware file loaded: Test_for_protocols.json
+
+corning_384 = plates[0]
+custom_small = plates[1]
+custom = plates[2]
+
+# If there are any depth voided they are listed here
+
+myProtocol.void_plate_depth(custom, True)
+
+# -----------PREPROTOCOL SETUP-------------------
 
 corning_384 = plates[0].pot_position_for_protocol
 custom_small = plates[1].pot_position_for_protocol
 custom = plates[2].pot_position_for_protocol
 
-# -----------PREPROTOCOL SETUP-------------------
-
-# Designater wells for washing tip
+# Designated wells for washing tip
 
 waste_water = custom('A1')
 wash_water = custom('A2')
 clean_water = custom('A3')
 
-myProtocol.set_washing_positions(clean_water=clean_water, wash_water=wash_water, waste_water=waste_water)
-
-# If there are any depth voided they are listed here
-
-myProtocol.void_plate_depth(plates[2], True)
+myProtocol.set_washing_positions(clean_water, wash_water, waste_water)
 
 myProtocol.start_wash()
 

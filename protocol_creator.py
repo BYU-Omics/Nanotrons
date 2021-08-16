@@ -5,6 +5,8 @@
 """
 
 from typing import List
+
+from opentrons_shared_data.deck.dev_types import Metadata
 from plate import Plate
 import sys
 import os
@@ -14,10 +16,10 @@ import csv
 import re
 
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
-RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\' # ./ means look within the current directory
+RELATIVE_PATH_TO_PROTOCOLS_W = '\\protocols\\' # ./ means look within the current directory
 RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 
-RELATIVE_PATH_TO_LABWARE_W = '.\\saved_labware\\'
+RELATIVE_PATH_TO_LABWARE_W = '\\saved_labware\\'
 RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
 
 START_OF_PROTOCOL_TEXT = "#----------START OF PROTOCOL----------------------------------------\n"
@@ -50,6 +52,10 @@ PLATE_DEPTH = "Plate's depth"
 TEXT_FOR_VOID_DEPTH_PLATES = "# If the depth has been voided for any of the plates, this is specified here:\n\n"
 NO_PLATES_DEPTH_VOIDED_TXT = "# No plates depth have been voided for this protocol\n"
 MY_PROTOCOL_TXT = "myProtocol."
+CONFIGURATION_TXT = "# ------------START OF PROTOCOL CONFIGURATION--------------------------------\n\n"
+CALIBRATION_ORDER_TXT = "# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------\n\n"
+PRE_PROTOCOL_SETUP_TXT = "# -----------PREPROTOCOL SETUP-------------------\n\n"
+END_OF_PROTOCOL_TXT = '# --------------END OF PROTOCOL--------------\n'
 CMD = 'cmd'
 VOLUME = 'volume'
 LABWARE = 'labware'
@@ -68,77 +74,141 @@ class ProtocolCreator:
         self.index_for_old_command = 0
         self.labware_name_stored = ""
 
-    #------FILE HANDLING SECTION----------
+    # ------FILE HANDLING SECTION----------
 
-    def get_path_to_protocols(self, filename):
+    def get_path_to_protocols(self, filename: str) -> str:
+        """This function builds the path to a file in the protocol's folder
+            given the same of the file
+
+        Args:
+            filename ([type]): a name for a file to open
+
+        Returns:
+            path_to_file str: returns a string that contains the path
+        """        
         path = sys.path
-        # print(path[0] + RELATIVE_PATH_TO_PROTOCOLS_L)
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
-            relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
+            relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_W
         path_to_file =  relative_path + filename
         return path_to_file
 
-    def get_path_to_labware(self, filename):
+    def get_path_to_labware(self, filename: str) -> str:
+        """This function builds the path to a file tthat is in the labware folder
+            given the name of the file
+
+        Args:
+            filename (str): a name for a file to open
+
+        Returns:
+            str: returns a string that contains the path
+        """        
         path = sys.path
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_LABWARE_L
         elif os.name == WINDOWS_OS:
-            relative_path = RELATIVE_PATH_TO_LABWARE_W
+            relative_path = path[0] + RELATIVE_PATH_TO_LABWARE_W
         path_to_file =  relative_path + filename
         return path_to_file
     
-    def create_new_file(self, name):
-        path = self.get_path_to_protocols(name)
+    def create_new_file(self, filename: str):
+        """This function creates a new file in the directory
+
+        Args:
+            filename (str): a name for a file to open
+        """           
+        path = self.get_path_to_protocols(filename)
         f = open(path, "x")
         print(f"File created in {path}")
 
-    def delete_existing_file(self, name):
-        path = self.get_path_to_protocols(name)
-        os.remove(path)
-        print(f"File {name} removed from directory.")
+    def delete_existing_file_in_prot_folder(self, filename: str):
+        """This function deletes a file located in the protocols folder 
 
-    def get_file_contents(self, filename):
+        Args:
+            filename (str): a name for a file to delete
+        """        
+        path = self.get_path_to_protocols(filename)
+        os.remove(path)
+        print(f"File {filename} removed from directory.")
+
+    def get_file_contents(self, filename: str) -> list:
+        """This function
+
+        Args:
+            filename (str): a name for a file to open
+
+        Returns:
+            list: list containing all the lines in a file 
+        """        
         path = self.get_path_to_protocols(filename)
         with open(path, "r") as f:
             contents = f.readlines()
         f.close()
         return contents
 
-    def write_contents_to_file(self, filename, content):
+    def write_contents_to_file(self, filename: str, content):
+        """This function take a list and write the elements in to a file 
+
+        Args:
+            filename (str): a name for a file to open
+            content (list): what its going to be written in the file
+        """        
         path = self.get_path_to_protocols(filename)
         with open(path, 'r+') as f:
             f.write(content)
         f.close()
 
-    #------TXT HANDLING SECTION----------
+    # ------TXT HANDLING SECTION----------
 
-    def create_name_for_new_file(self, extension: str):
+    def create_name_for_new_file(self, extension: str) -> str:
+        """This function creates a name for a new file with a csv or py extension.
+            if the filename already exist in the directory of protocols it will
+            create a new one with a different index so that it does not replace the previous one
+        Args:
+            extension (str): this is the extension that you are trying to create the file with 
+
+        Returns:
+            str: the name for the new file to create. 
+        """           
         protocol = "protocol"
-        number = 0
+        counter = 0
         if extension == 'py':
             extension = ".py"
         elif extension == 'csv':
             extension = ".csv"
-
-        new_file_name = protocol + '_' + str(number) + extension
+        new_file_name = protocol + '_' + str(counter) + extension
         path = self.get_path_to_protocols(new_file_name)
         while Path(path).is_file():
-            number += 1
-            new_file_name = protocol + '_' + str(number) + extension
+            counter += 1
+            new_file_name = protocol + '_' + str(counter) + extension
             path = self.get_path_to_protocols(new_file_name)
         return new_file_name
 
-    def create_protocol_labware_txt(self, labware_filename):
+    def create_protocol_labware_txt(self, labware_filename: str) -> list:
+        """This function puts together the texts used as a template for the labware 
+        that this protocol will use
+
+        Args:
+            labware_filename (str): this is the name of a json file containing all the locations
+            for the calibrated labware that the protocol will use
+
+            this ends looking like this for example:
+                micropots_3 = chips[0] 
+                corning_384 = plates[0] 
+                custom = plates[1] 
+                custom_small = plates[2] 
+
+        Returns:
+            list: text as a list of the contents to put in the protocol
+        """        
         path = self.get_path_to_labware(labware_filename)
-        # print(path)
         content = []
         with open(path) as f:
             data = json.load(f)
         chips = data['chips']
         plates = data['plates']
-        content.append("\n\n# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------\n\n")
+        content.append(CALIBRATION_ORDER_TXT)
         content.append(f"# Labware file loaded: {labware_filename}\n\n")
         chip_count = 0
         plate_count = 0
@@ -152,7 +222,7 @@ class ProtocolCreator:
                 chip_name = f"{chip_name}"
             else:
                 chip_name = f"{chip_name}_{chip_count}"
-            content.append(f"{chip_name} = chips[{chip_count}].get_location_by_nickname \n")
+            content.append(f"{chip_name} = chips[{chip_count}] \n")
             chip_count += 1
             chip_names_list.append(chip_name)
         for plate in plates:
@@ -161,18 +231,53 @@ class ProtocolCreator:
                 plate_name += f"_{copy_plate}"
                 copy_plate += 1
             plate_names_list.append(plate_name)
-            content.append(f"{plate_name} = plates[{plate_count}].get_location_by_nickname \n")
+            content.append(f"{plate_name} = plates[{plate_count}] \n")
             plate_count +=1
-        list_of_labware = chip_names_list + plate_names_list
+        return content, chip_names_list, plate_names_list
+
+    def create_protocol_labware_location_txt(self, chip_names_list: list, plate_names_list: list) -> list:
+        """This function creates the text that will allow the protocol to use the location for each pot or well
+            it ends looking like this as an example: 
+            
+                micropots_3 = micropots_3.get_location_by_nickname 
+                corning_384 = corning_384.get_location_by_nickname 
+                custom = custom.get_location_by_nickname 
+                custom_small = custom_small.get_location_by_nickname 
+
+
+        Args:
+            chip_names_list (list): list of the names for the chips used in the labware configuration file 
+            plate_names_list (list): list of the names for the plates used in the labware configuration file 
+
+        Returns:
+            list: list of lines containing the context to write to the protocol file 
+        """        
+        content = []
+        for chip in chip_names_list:
+            content.append(f"{chip} = {chip}.get_location_by_nickname \n")
+        for plate in plate_names_list:
+            content.append(f"{plate} = {plate}.get_location_by_nickname \n")
         return content
 
-    def create_protocol_voided_depth_for_labware(self, labware_filename, list_of_voided_plates: list = None):
+    def create_protocol_voided_depth_for_labware(self, labware_filename: str, list_of_voided_plates: list = None) -> list:
+        """This function creates the txt that will go into the protocol file 
+            indicating which plates will have their depth voided, this means that the z axis will not move 
+            the plate's specified depth in the .json file. This is a very important step becaue if 
+            it is not in the protocol it will be assumed that the z axis will move Xmm down when aspirating 
+            or dispensing liquid. This downward movement could break the instruments on the way and the mount. 
+            Only the human user can check this so far.
+
+        Args:
+            labware_filename (str): name for a file with the labware calibration 
+            list_of_voided_plates (list, optional): Plates that the user desires to void the depth. Defaults to None.
+
+        Returns:
+            list: the contents to write in the file as a list.
+        """        
         path = self.get_path_to_labware(labware_filename)
         plate_count = 0
-        # print(path)
         plate_names_list = []
         content = []
-        # print(f"List of voided plates: {list_of_voided_plates}")
         content.append(TEXT_FOR_VOID_DEPTH_PLATES)
         with open(path) as f:
             data = json.load(f)
@@ -181,22 +286,18 @@ class ProtocolCreator:
             for plate in plates:
                 plate_name = plate['model'].lower()
                 plate_names_list.append(plate_name)
-            # print(f"plates from file: {plate_names_list}")
-
             #search for the plates that the depth will be voided. 
             # for each plate calibrated, if this name matches a plate in the voided list
             for plate_name in plate_names_list:
                 if plate_name in list_of_voided_plates:
-                    # print(f"Plate {plate_name} found in list of voided plates.")
-                    content.append(self.create_command_txt(cmd = VOID_PLATE_DEPTH_CMD, plate_index=plate_count, void = True) + '\n')
+                    content.append(self.create_command_txt(cmd = VOID_PLATE_DEPTH_CMD, 
+                                                           plate = plate_name,  
+                                                           plate_index=plate_count, 
+                                                           void = True) + '\n')
                 plate_count += 1
-        
         plates_voided_txt = ""
         for cmd in content:
             plates_voided_txt += cmd + '\n'
-        
-        txt = TEXT_FOR_VOID_DEPTH_PLATES + plates_voided_txt
-        # print(f"txt: {txt}")
         return content
 
     def create_command_txt(self, cmd = None, 
@@ -206,13 +307,36 @@ class ProtocolCreator:
                                  temp = None, 
                                  holding_time = None, 
                                  plate: Plate = None, 
-                                 depth = None, 
                                  void: bool = None, 
                                  plate_index: int = None,
                                  clean_water = None, 
                                  wash_water = None, 
-                                 waste_water = None):
-        # print("Creating command...")
+                                 waste_water = None,
+                                 left_over = None, 
+                                 cushion_1 = None, 
+                                 cushion_2 = None) -> str:
+        """[summary]
+
+        Args:
+            cmd ([type], optional): [description]. Defaults to None.
+            volume ([type], optional): [description]. Defaults to None.
+            labware ([type], optional): [description]. Defaults to None.
+            location ([type], optional): [description]. Defaults to None.
+            temp ([type], optional): [description]. Defaults to None.
+            holding_time ([type], optional): [description]. Defaults to None.
+            plate (Plate, optional): [description]. Defaults to None.
+            void (bool, optional): [description]. Defaults to None.
+            plate_index (int, optional): [description]. Defaults to None.
+            clean_water ([type], optional): [description]. Defaults to None.
+            wash_water ([type], optional): [description]. Defaults to None.
+            waste_water ([type], optional): [description]. Defaults to None.
+            left_over ([type], optional): [description]. Defaults to None.
+            cushion_1 ([type], optional): [description]. Defaults to None.
+            cushion_2 ([type], optional): [description]. Defaults to None.
+
+        Returns:
+            str: [description]
+        """                                 
         cmd_text = MY_PROTOCOL_TXT
         if cmd == ASPIRATE_CMD:
             cmd_text += f"{cmd}(volume = {volume}, {SOURCE} = {labware}('{location}'))"
@@ -239,26 +363,24 @@ class ProtocolCreator:
         elif cmd == TAKE_PICTURE:
             cmd_text += f"{cmd}()" 
         elif cmd == VOID_PLATE_DEPTH_CMD:
-            cmd_text += f"{cmd}(plate = plates[{plate_index}], void = {void})"
+            cmd_text += f"{cmd}(plate = {plate}, void = {void})"
         elif cmd == SET_WASHING_POSITIONS_CMD:
-            cmd_text += f"{cmd}
+            cmd_text += f"{cmd}({clean_water}, {wash_water}, {waste_water})"
         elif cmd == START_WASH_CMD:
-            cmd_text += f"{cmd}
+            cmd_text += f"{cmd}"
         elif cmd == MID_WASH_CMD:
-            cmd_text += f"{cmd}
+            cmd_text += f"{cmd}"
         elif cmd == AIR_GAP_CMD:
-            cmd_text += f"{cmd}
+            cmd_text += f"{cmd}({left_over}, {cushion_1}, {cushion_2})"
         return cmd_text
 
-    def create_cmd_argumens_from_text(self, cmd_text:str):
+    def create_cmd_argumens_from_text(self, cmd_text:str) -> dict:
         cmd_dictionary: dict = {}
-        source_arg_dict: dict = {}
         left_side_of_parenthesys = cmd_text.split("(", 1)[0]
         right_side_of_parenthesys = cmd_text.split("(", 1)[1]
         clean_right_side = right_side_of_parenthesys.replace("))", ")")
         command = left_side_of_parenthesys.split(".")[1]
         cmd_dictionary.update({CMD: f"{command}"}) 
-        # print(f"Command: {command}")
         arguments = clean_right_side.split(", ")
         for argument in arguments:
             argument = argument.split(" = ")
@@ -271,27 +393,62 @@ class ProtocolCreator:
                 cmd_dictionary.update({f"{LOCATION}": f"{location}"})
             else:
                 cmd_dictionary.update({f"{argument[0]}": f"{argument[1]}"}) 
-
-        # print(f"Cmd dictionary: {cmd_dictionary}")
         return cmd_dictionary
-    #------PROTOCOL FILE HANDLING SECTION----------
+   
+    def create_metadata_txt(self, metadata: dict = None, 
+                                  protocol_name: str = None, 
+                                  author: str = None, 
+                                  description: str = None) -> list:
+        txt = [CONFIGURATION_TXT]
+        if metadata:
+            # if a dictionary with thte information is given
+            protocol_name = metadata['protocolName']
+            author = metadata['author']
+            description = metadata['description']
+            metadata_txt = f"metadata = {metadata}"
+        else:
+            # if the protocol_name, author, description are passed to the function
+            protocol_name, author, description = protocol_name, author, description
+            metadata_txt = f"metadata = {{'protocolName': '{protocol_name}', 'author': '{author}', 'description': '{description}' }}"
+        txt.append(metadata_txt)
+        return txt
 
-    def add_cmd_to_protocol_file(self, filename, cmd):
+    def create_washing_wells_config_txt(self, waste_water_well: str, 
+                                              wash_water_well: str, 
+                                              clean_water_well: str) -> list:
+        waste_water = waste_water_well # custom('A1')
+        wash_water = wash_water_well # custom('A2')
+        clean_water = clean_water_well # custom('A3')
+
+        waste_water_txt = f"waste_water = {waste_water}\n"
+        wash_water_txt = f"wash_water = {wash_water}\n"
+        clean_water_txt = f"clean_water = {clean_water}\n\n"
+
+        cmd_set = self.create_command_txt(cmd = SET_WASHING_POSITIONS_CMD, 
+                                          clean_water=clean_water, 
+                                          waste_water=waste_water, 
+                                          wash_water=wash_water) 
+        cmd_start = self.create_command_txt(cmd = START_WASH_CMD)
+        content = ["# Designated wells for washing tip\n", waste_water_txt, 
+                                                           wash_water_txt, 
+                                                           clean_water_txt, 
+                                                           cmd_set, "\n\n" , 
+                                                           cmd_start, "\n"]
+        return content
+        
+    # ------PROTOCOL FILE HANDLING SECTION----------
+
+    def add_cmd_to_protocol_file(self, filename: str, cmd: str):
         contents = self.get_file_contents(filename)
         line_count = 0
         txt_to_add: str = "\n" + cmd + "\n"
         while line_count < len(contents):
-            # print(f"line[{line_count}]{contents[line_count]}")
             if contents[line_count] == START_OF_PROTOCOL_TEXT:
-                # print(f"line[{line_count}]: {contents[line_count]}")
-                # print(f"line_old command[{self.index_for_old_command}]: {contents[self.index_for_old_command]}")
-                if contents[line_count + 2] == '#--------------END OF PROTOCOL--------------\n':
-                    # print(f"Adding first command: {txt_to_add}")
+                if contents[line_count + 2] == END_OF_PROTOCOL_TXT:
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command = line_count + 2
                     break
                 elif contents[self.index_for_old_command][:10] == 'myProtocol':
-                    # print(f"Adding command: {cmd}")
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command += 2 
                     break
@@ -299,79 +456,104 @@ class ProtocolCreator:
         end_contents = ""
         for line in contents:
             end_contents += line
-            # print(f"line: {line}")
         self.write_contents_to_file(filename, end_contents)
 
-    def delete_existing_protocol(self, filename):
+    def delete_existing_protocol(self, filename: str):
         contents = self.get_file_contents(filename)
         labware_loaded = ""
         for line in contents:
             if 'Labware file loaded' in line:
                 labware_loaded = line[23:]
         self.labware_name_stored = labware_loaded.strip("\n")
-        self.delete_existing_file(filename)
+        self.delete_existing_file_in_prot_folder(filename)
 
-    def reset_file_commands(self, filename):
+    def reset_file_commands(self, filename: str):
         self.delete_existing_protocol(filename)
         self.create_protocol_file(self.labware_name_stored, filename)
 
-    def add_cmd_to_end_of_protocol_file(self, filename, cmd):
+    def add_cmd_to_end_of_protocol_file(self, filename: str, cmd: str):
         contents = self.get_file_contents(filename)
         line_count = 0
         txt_to_add = "\n" + cmd + "\n"
         while line_count < len(contents):
-            # print(f"line[{line_count}]{contents[line_count]}")
-            if contents[line_count + 2] == '#--------------END OF PROTOCOL--------------\n':
-                # print("Adding command")
+            if contents[line_count + 2] == END_OF_PROTOCOL_TXT:
                 contents.insert(line_count + 1, txt_to_add)
-                # self.index_for_old_command = line_count + 2
                 break
-                # elif contents[self.index_for_old_command][:10] == 'myProtocol':
-                #     print("Adding rest of the commands")
-                #     contents.insert(line_count + 1, txt_to_add)
-                #     self.index_for_old_command += 2 
-                #     break
             line_count += 1      
         end_contents = ""
         for line in contents:
             end_contents += line
-            # print(f"line: {line}")
         self.write_contents_to_file(filename, end_contents)
 
-    def add_list_of_commands_to_protocol_file(self, filename, list_of_cmds: list):
+    def add_list_of_commands_to_protocol_file(self, filename: str, list_of_cmds: list):
         for command in reversed(list_of_cmds):
             self.add_cmd_to_protocol_file(filename=filename, cmd=command) 
-        print(f"List of commands added to {filename}")
                 
-    def create_protocol_file(self, labware_name, filename: str = None, voided_plates: list = None, list_of_commands: list = None):
+    def create_protocol_file(self, labware_name, 
+                                   filename: str = None, 
+                                   voided_plates: list = None, 
+                                   list_of_commands: list = None, 
+                                   author: str = '', 
+                                   description: str = '',
+                                   waste_water_well: str = '',
+                                   wash_water_well: str = '',
+                                   clean_water_well: str = '') -> str:
+        # Set the name for the file to write. 
         if filename != None:
             new_name = filename
         else:
+            # if there is no name given create a new name.
             new_name = self.create_name_for_new_file(extension='py')
-        self.create_new_file(new_name)
-        # print(labware_name)
-        heading = self.get_file_contents("protocol_heading.txt")
-        labware = self.create_protocol_labware_txt(labware_filename=labware_name)
-        text_for_start_of_protocol = [START_OF_PROTOCOL_TEXT]
+    
+        self.create_new_file(new_name) # create the file on directory
+
+        heading = self.get_file_contents("protocol_heading.txt") # Text for heading 
+        start_of_protocol_config_txt = [CONFIGURATION_TXT]
+        metadata = self.create_metadata_txt(protocol_name=new_name, author=author, description=description)
+        labware, chips, plates = self.create_protocol_labware_txt(labware_filename=labware_name) # Text for the labware used (chips and plates loaded)
+        labware_location = self.create_protocol_labware_location_txt(chips, plates)
+        start_of_protocol_txt = [START_OF_PROTOCOL_TEXT] # Start adding text to a list to build the final text
+        pre_protocol_setup_txt = [PRE_PROTOCOL_SETUP_TXT]
+        
         if voided_plates != None:
-            voided_plate_text = self.create_protocol_voided_depth_for_labware(labware_name, voided_plates)
+            voided_plate_txt = self.create_protocol_voided_depth_for_labware(labware_name, voided_plates)
         else:
-            voided_plate_text = [NO_PLATES_DEPTH_VOIDED_TXT]
+            voided_plate_txt = [NO_PLATES_DEPTH_VOIDED_TXT]
+        washing_config_txt = self.create_washing_wells_config_txt(waste_water_well=waste_water_well, 
+                                                                  wash_water_well=wash_water_well, 
+                                                                  clean_water_well=clean_water_well)
         end_of_protocol = self.get_file_contents("protocol_eof.txt")
         newline = ["\n"]
-        txt = heading + labware + newline + voided_plate_text + newline + text_for_start_of_protocol + newline + end_of_protocol
+        
+        txt = [heading, 
+               start_of_protocol_config_txt, 
+               metadata, 
+               labware, 
+               newline, 
+               newline, 
+               voided_plate_txt, 
+               newline, 
+               pre_protocol_setup_txt, 
+               labware_location, 
+               newline, 
+               washing_config_txt, 
+               newline, 
+               start_of_protocol_txt, 
+               newline, 
+               end_of_protocol]
         content = ""
-        for line in txt:
-            content += line 
+        for block in txt:
+            for line in block:
+                content += line
         self.write_contents_to_file(new_name, content)
         if list_of_commands != None:
             self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=list_of_commands)
         print(f"File {new_name} created in directory")
         return new_name
 
-    #------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
+    # ------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
 
-    def get_list_of_commands_from_file(self, filename):
+    def get_list_of_commands_from_file(self, filename: str) -> list:
         contents = self.get_file_contents(filename)
         commands_list = []
         for line in contents:
@@ -384,26 +566,26 @@ class ProtocolCreator:
                     commands_list.append(line)
         return commands_list
 
-    def create_list_of_commands(self):
+    def create_list_of_commands(self) -> list:
         new_list_of_commands = [] 
         return new_list_of_commands
 
-    def erase_command(self, commands: list, position):
+    def erase_command(self, commands: list, position: int):
         if commands.count == 0:
             print("No commands in list of commands")
         else:
             commands.pop(position)
         return commands
 
-    def add_command_to_a_position_on_list(self, cmd, commands: list, position):
+    def add_command_to_a_position_on_list(self, cmd: str, commands: list, position: int) -> list:
         commands.insert(position, cmd)
         return commands
 
-    def add_command_to_end_of_list(self, cmd, commands: list):
+    def add_command_to_end_of_list(self, cmd: str, commands: list) -> list:
         commands.append(cmd)
         return commands
     
-    #------PROTOCOL CSV HANDLING SECTION-----
+    # ------PROTOCOL CSV HANDLING SECTION-----
 
     def convert_csv_to_cmd_list(self, filename: str) -> list:
         path_to_file = self.get_path_to_protocols(filename)
@@ -446,7 +628,14 @@ class ProtocolCreator:
                     depth = row[DEPTH]
                 else:
                     depth = None
-                cmd_list.append(self.create_command_txt(cmd=cmd,volume=volume, labware=labware, location=location, temp=temp, holding_time=holding_time, plate=plate, depth=depth))
+                cmd_list.append(self.create_command_txt(cmd=cmd,
+                                                        volume=volume, 
+                                                        labware=labware, 
+                                                        location=location, 
+                                                        temp=temp, 
+                                                        holding_time=holding_time, 
+                                                        plate=plate, 
+                                                        depth=depth))
                 line_count += 1
         return cmd_list
     
@@ -457,28 +646,19 @@ class ProtocolCreator:
         list_of_dict = self.convert_list_of_cmds_to_list_of_dict(list_of_commands)
         with open(path_to_file, 'w', encoding='UTF8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=first_row)
-            # writer.writerow(first_row)
             writer.writeheader()
             for command in list_of_dict:
                 writer.writerow(command)
-            
-            # list_of_argument_values = []
-            # for key in cmd_dict.keys():
-            #     value = cmd_dict[f"{key}"]
-            #     list_of_argument_values.append(value)
-            # print(list_of_argument_values)
-            # writer.writerow(value)
 
-    def convert_list_of_cmds_to_list_of_dict(self, list_of_commands: list):
+    def convert_list_of_cmds_to_list_of_dict(self, list_of_commands: list) -> dict:
         dict_list: list = []
         for command in list_of_commands:
             command_to_dict = self.create_cmd_argumens_from_text(command)
             dict_list.append(command_to_dict)
-        # print(f"dict_list = {dict_list}")
         return dict_list
 
 
-    #------PROTOCOL DISPLAY SECTION----------
+    # ------PROTOCOL DISPLAY SECTION----------
 
     def display_protocol_commands(self):
         for line in self.contents:
@@ -491,10 +671,41 @@ class ProtocolCreator:
             if line[0] == '#':
                 print(line)
 
-#------FUNCTION TESTS SECTION----------
+# ------FUNCTION TESTS SECTION----------
 
 def tets_creation_of_file():
-    tests_voiding_depth_of_plates()
+    creator = ProtocolCreator()
+
+    labware = "Fluorescein_test.json"
+
+    cmd = "myProtocol.aspirate_from(volume = 50, source = custom('A1'))"
+    cmd2 = "myProtocol.aspirate_from(volume = 50, source = corning_384('A2'))"
+    cmd_3 = "myProtocol.set_block_temp(4, 0)"
+    cmd_4 = "myProtocol.close_lid()"
+    cmd_5 = "myProtocol.set_lid_temp(39)"
+    cmd_6 = "myProtocol.set_block_temp(37, 15)"
+    cmd_7 = "myProtocol.deactivate_lid()"
+    list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
+
+    plates_to_void_depth = ['custom', 'corning_384']
+    
+    author = 'Nathaniel'
+
+    description = 'I am testing how this protocol creator makes the files for the protocols.'
+
+    waste = "custom('A1')"
+    wash = "custom('A2')"
+    clean = "custom('A3')"
+
+    # creator.create_protocol_file(labware_name=labware, voided_plates=plates_to_void_depth, list_of_commands=list_of_commands)
+    creator.create_protocol_file(labware_name=labware, 
+                                 list_of_commands=list_of_commands, 
+                                 voided_plates=plates_to_void_depth,
+                                 author=author,
+                                 description=description,
+                                 waste_water_well=waste,
+                                 wash_water_well=wash,
+                                 clean_water_well=clean)
 
 def tests_adding_lists_of_commands():
     creator = ProtocolCreator()
@@ -569,14 +780,12 @@ def tests_csv():
     # creator.create_protocol_voided_depth_for_labware(labware, plates_to_void_depth)
     # creator.convert_cmd_list_to_csv(list_of_commands)
     
-
-    
 def test():
-    # tets_creation_of_file()
+    tets_creation_of_file()
     # tests_adding_lists_of_commands()
     # tests_adding_a_command_to_the_end_of_file()
     # tests_handling_commands()
-    tests_voiding_depth_of_plates()
+    # tests_voiding_depth_of_plates()
     # tests_csv()
 
 if __name__ == "__main__":
