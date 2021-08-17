@@ -22,7 +22,7 @@ RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 RELATIVE_PATH_TO_LABWARE_W = '\\saved_labware\\'
 RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
 
-START_OF_PROTOCOL_TEXT = "#----------START OF PROTOCOL----------------------------------------\n"
+START_OF_PROTOCOL_TEXT = "# ------------START OF PROTOCOL---------------------------------\n"
 
 
 LINUX_OS = 'posix'
@@ -375,6 +375,15 @@ class ProtocolCreator:
         return cmd_text
 
     def create_cmd_argumens_from_text(self, cmd_text:str) -> dict:
+        """This function recognices a command on a protocol and it disects its parts finding the arguments
+            returning these as a dictionary to later process them easily
+
+        Args:
+            cmd_text (str): This is the command to disect in a string form
+
+        Returns:
+            dict: Disctionary with the arguments 
+        """        
         cmd_dictionary: dict = {}
         left_side_of_parenthesys = cmd_text.split("(", 1)[0]
         right_side_of_parenthesys = cmd_text.split("(", 1)[1]
@@ -399,6 +408,19 @@ class ProtocolCreator:
                                   protocol_name: str = None, 
                                   author: str = None, 
                                   description: str = None) -> list:
+        """This function puts together the information passed to it to create a text that 
+            will appear in the protocol heading. This contains the author, name of the protocol and
+            brief description
+
+        Args:
+            metadata (dict, optional): This could be a json file or simple dictionary with the information. Defaults to None.
+            protocol_name (str, optional): name given to the protocol. Defaults to None.
+            author (str, optional): who is editing the protocol. Defaults to None.
+            description (str, optional): brief explanation of the purpose of the protocol. Defaults to None.
+
+        Returns:
+            list: [description]
+        """                                  
         txt = [CONFIGURATION_TXT]
         if metadata:
             # if a dictionary with thte information is given
@@ -416,6 +438,17 @@ class ProtocolCreator:
     def create_washing_wells_config_txt(self, waste_water_well: str, 
                                               wash_water_well: str, 
                                               clean_water_well: str) -> list:
+        """Puts together the text that indicates which locations from the labware set up will be used as 
+            the waste, wash and clean water so that the syringe can be washed on the start and in the midwash
+
+        Args:
+            waste_water_well (str): a location on the labware
+            wash_water_well (str): a location on the labware
+            clean_water_well (str): a location on the labware
+
+        Returns:
+            list: returns the content to be written to the protocol heading
+        """                                              
         waste_water = waste_water_well # custom('A1')
         wash_water = wash_water_well # custom('A2')
         clean_water = clean_water_well # custom('A3')
@@ -439,38 +472,81 @@ class ProtocolCreator:
     # ------PROTOCOL FILE HANDLING SECTION----------
 
     def add_cmd_to_protocol_file(self, filename: str, cmd: str):
+        """This function takes a protocol, and finds the end of the protocol and adds a command
+
+        Args:
+            filename (str): name of the protocol file to be modified 
+            cmd (str): a command with one of the api.py functions 
+        """        
         contents = self.get_file_contents(filename)
         line_count = 0
         txt_to_add: str = "\n" + cmd + "\n"
         while line_count < len(contents):
-            if contents[line_count] == START_OF_PROTOCOL_TEXT:
-                if contents[line_count + 2] == END_OF_PROTOCOL_TXT:
+            if "--START OF PROTOCOL--" in contents[line_count]:
+                if "END OF PROTOCOL" in contents[line_count + 2]:
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command = line_count + 2
                     break
-                elif contents[self.index_for_old_command][:10] == 'myProtocol':
+                elif "myProtocol" in contents[self.index_for_old_command][:10]:
                     contents.insert(line_count + 1, txt_to_add)
                     self.index_for_old_command += 2 
                     break
-            line_count += 1      
+            line_count += 1  
         end_contents = ""
         for line in contents:
             end_contents += line
         self.write_contents_to_file(filename, end_contents)
 
     def delete_existing_protocol(self, filename: str):
+        """This function delets a protocol, but it stores on memory as an attribute the labware file that was loaded into the protocol
+
+        Args:
+            filename (str): The name of the file to be deleted
+        Returns:
+            [str]: [description]
+        """            
         contents = self.get_file_contents(filename)
         labware_loaded = ""
         for line in contents:
             if 'Labware file loaded' in line:
                 labware_loaded = line[23:]
-        self.labware_name_stored = labware_loaded.strip("\n")
         self.delete_existing_file_in_prot_folder(filename)
+        labware_name = labware_loaded.strip("\n")
+        return labware_name
+        
 
     def reset_file_commands(self, filename: str):
-        self.delete_existing_protocol(filename)
-        self.create_protocol_file(self.labware_name_stored, filename)
+        """This function takes an existing protocol and deletes the commands used on it. 
 
+        Args:
+            filename (str): Name of the protocol file to be modified 
+        """
+        contents = self.get_file_contents(filename)
+        labware_loaded = ""
+        start_of_cmd_indx = 0
+        end_of_cmd_indx = 0
+        counter = 0
+        for line in contents:
+            if "START OF PROTOCOL" in line:
+                start_of_cmd_indx = counter
+            if "END OF PROTOCOL" in line:
+                end_of_cmd_indx = counter
+            counter += 1
+        print(f"start_of_cmd_indx = {start_of_cmd_indx} --- end_of_cmd_indx = {end_of_cmd_indx}")
+        for line_indx in range(start_of_cmd_indx, end_of_cmd_indx):
+            print(f"line_indx = {line_indx}")
+            contents.pop(start_of_cmd_indx + 1)
+            if "END OF PROTOCOL" in contents[start_of_cmd_indx + 1]:
+                contents.insert(start_of_cmd_indx + 1, "\n")
+                break
+        self.delete_existing_file_in_prot_folder(filename)
+        self.create_new_file(filename)
+
+        end_contents = ""
+        for line in contents:
+            end_contents += line
+        self.write_contents_to_file(filename, end_contents)
+        
     def add_cmd_to_end_of_protocol_file(self, filename: str, cmd: str):
         contents = self.get_file_contents(filename)
         line_count = 0
@@ -698,7 +774,7 @@ def tets_creation_of_file():
     clean = "custom('A3')"
 
     # creator.create_protocol_file(labware_name=labware, voided_plates=plates_to_void_depth, list_of_commands=list_of_commands)
-    creator.create_protocol_file(labware_name=labware, 
+    name_of_file = creator.create_protocol_file(labware_name=labware, 
                                  list_of_commands=list_of_commands, 
                                  voided_plates=plates_to_void_depth,
                                  author=author,
@@ -706,6 +782,8 @@ def tets_creation_of_file():
                                  waste_water_well=waste,
                                  wash_water_well=wash,
                                  clean_water_well=clean)
+
+    creator.reset_file_commands(name_of_file)
 
 def tests_adding_lists_of_commands():
     creator = ProtocolCreator()
