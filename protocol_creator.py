@@ -548,6 +548,12 @@ class ProtocolCreator:
         self.write_contents_to_file(filename, end_contents)
         
     def add_cmd_to_end_of_protocol_file(self, filename: str, cmd: str):
+        """This function read the file, and adds a command to the end of the file 
+
+        Args:
+            filename (str): a name for the file to edit
+            cmd (str): an api command
+        """        
         contents = self.get_file_contents(filename)
         line_count = 0
         txt_to_add = "\n" + cmd + "\n"
@@ -562,6 +568,12 @@ class ProtocolCreator:
         self.write_contents_to_file(filename, end_contents)
 
     def add_list_of_commands_to_protocol_file(self, filename: str, list_of_cmds: list):
+        """This function reverses the list and ads it to the protocol file 
+
+        Args:
+            filename (str): a name for a file 
+            list_of_cmds (list): list of api commands 
+        """        
         for command in reversed(list_of_cmds):
             self.add_cmd_to_protocol_file(filename=filename, cmd=command) 
                 
@@ -574,6 +586,24 @@ class ProtocolCreator:
                                    waste_water_well: str = '',
                                    wash_water_well: str = '',
                                    clean_water_well: str = '') -> str:
+        """This is the main function for the protocol creator. This function crates a new file with 
+           all the input from the user. It creates a readable file for the executer. Organizes the order of elements 
+           to be written to the protocol like the heading, configuration and several other parts 
+
+        Args:
+            labware_name ([type]): name of the json file located in saved_labware
+            filename (str, optional): filename for the new script. Defaults to None.
+            voided_plates (list, optional): list of plates that the depth will not be taken into account. Defaults to None.
+            list_of_commands (list, optional): list of the commands for the protocol. Defaults to None.
+            author (str, optional): name of the author of the protocol. Defaults to ''.
+            description (str, optional): brief explanation of the protocol. Defaults to ''.
+            waste_water_well (str, optional): a position in which the waste water is located for the protocol. Defaults to ''.
+            wash_water_well (str, optional): a position in which the wash water is located for the protocol. Defaults to ''.
+            clean_water_well (str, optional): a position in which the clean water is located for the protocol. Defaults to ''.
+
+        Returns:
+            str: the name of the new file created 
+        """                                   
         # Set the name for the file to write. 
         if filename != None:
             new_name = filename
@@ -630,6 +660,14 @@ class ProtocolCreator:
     # ------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
 
     def get_list_of_commands_from_file(self, filename: str) -> list:
+        """This function reads a file and it gets the commands that it has into a list to be processed for another function
+
+        Args:
+            filename (str): name of the file in which we are getting the commands 
+
+        Returns:
+            list: list of the commands for better handling 
+        """        
         contents = self.get_file_contents(filename)
         commands_list = []
         for line in contents:
@@ -643,10 +681,24 @@ class ProtocolCreator:
         return commands_list
 
     def create_list_of_commands(self) -> list:
+        """Simple function that initialices a new list of commands 
+
+        Returns:
+            list: list of commands empty
+        """        
         new_list_of_commands = [] 
         return new_list_of_commands
 
     def erase_command(self, commands: list, position: int):
+        """This function is so that we can pop a command from the list 
+
+        Args:
+            commands (list): list of commands 
+            position (int): an index in which the desired command to erase is located
+
+        Returns:
+            [type]: modified list of commands 
+        """        
         if commands.count == 0:
             print("No commands in list of commands")
         else:
@@ -654,10 +706,30 @@ class ProtocolCreator:
         return commands
 
     def add_command_to_a_position_on_list(self, cmd: str, commands: list, position: int) -> list:
+        """This function takes a commands and it inserts it into a list in the position given 
+
+        Args:
+            cmd (str): a commands from the api
+            commands (list): list of commands to add to 
+            position (int): index in which the desired command will be inserted
+
+        Returns:
+            list: modified list of commands 
+        """        
         commands.insert(position, cmd)
         return commands
 
     def add_command_to_end_of_list(self, cmd: str, commands: list) -> list:
+        """This function adds a commnands to the end of a list of commands. Similar to the 
+        add command to the end of the protocol but working with lists 
+
+        Args:
+            cmd (str): a command from the api
+            commands (list): [description]
+
+        Returns:
+            list: [description]
+        """        
         commands.append(cmd)
         return commands
     
