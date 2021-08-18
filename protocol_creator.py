@@ -851,8 +851,8 @@ def tets_creation_of_file():
 
     labware = "Fluorescein_test.json"
 
-    cmd = "myProtocol.aspirate_from(volume = 50, source = custom('A1'))"
-    cmd2 = "myProtocol.aspirate_from(volume = 50, source = corning_384('A2'))"
+    cmd = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
+    cmd2 = "myProtocol.aspirate_from(volume = 5000000000000000000, source = corning_384('A2'))"
     cmd_3 = "myProtocol.set_block_temp(4, 0)"
     cmd_4 = "myProtocol.close_lid()"
     cmd_5 = "myProtocol.set_lid_temp(39)"
@@ -860,27 +860,25 @@ def tets_creation_of_file():
     cmd_7 = "myProtocol.deactivate_lid()"
     list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
 
-    plates_to_void_depth = ['custom', 'corning_384']
+    plates_to_void_depth = None
     
-    author = 'Nathaniel'
+    author = 'Hailey'
 
-    description = 'I am testing how this protocol creator makes the files for the protocols.'
-
+    description = 'I am testing how this protocol creator works.'
     waste = "custom('A1')"
     wash = "custom('A2')"
     clean = "custom('A3')"
 
     # creator.create_protocol_file(labware_name=labware, voided_plates=plates_to_void_depth, list_of_commands=list_of_commands)
     name_of_file = creator.create_protocol_file(labware_name=labware, 
-                                 list_of_commands=list_of_commands, 
-                                 voided_plates=plates_to_void_depth,
-                                 author=author,
-                                 description=description,
-                                 waste_water_well=waste,
-                                 wash_water_well=wash,
-                                 clean_water_well=clean)
+                                                list_of_commands=list_of_commands, 
+                                                voided_plates=plates_to_void_depth,
+                                                author=author,
+                                                description=description,
+                                                waste_water_well=waste,
+                                                wash_water_well=wash,
+                                                clean_water_well=clean)
 
-    creator.reset_file_commands(name_of_file)
 
 def tests_adding_lists_of_commands():
     creator = ProtocolCreator()

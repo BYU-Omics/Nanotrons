@@ -132,7 +132,6 @@ class Coordinator:
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")
 
-
     def set_picture_flag(self, value: bool):
         # print(f"Setting picture flag to: {value}")
         self.picture_flag = value
@@ -767,7 +766,6 @@ class Coordinator:
             time.sleep(30)
             min_count = min_count + 0.5
         logging.info("Holding time done. Proceeding to complete next step.")
-
 
     """
     PROTOCOL METHODS SECTION FOR TEMPDECK 
