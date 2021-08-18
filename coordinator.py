@@ -32,79 +32,58 @@ COORDINATOR CLASS
     VI. Feedback
         This section provides current values for dynamic variables and states such as the current X,Y,Z coordinate of the motors, and current gear, and 
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
+
+    VII. Hi I'm Hailey
+    
+    VII. Hi my name is alejandro
 """
 
-<<<<<<< HEAD
-from asyncio.tasks import sleep
-from OTdriver import OT2_nanopots_driver, SLOW_SPEED
-from TDdriver import TempDeck
-from TCdriver import Thermocycler, testing
+from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
+from drivers.TDdriver import TempDeck
+from drivers.TCdriver import Thermocycler
 from joystick import XboxJoystick
-from typing import Any, Dict
-import subprocess
-=======
-from OTdriver import OT2_nanopots_driver, SLOW_SPEED
-from TDdriver import TempDeck
-from TCdriver import Thermocycler
-from joystick import XboxJoystick
->>>>>>> newrepo
 from joystick_profile import *
 from labware_class import *
 from models_manager import ModelsManager
 from calibration import *
 from deck import *
+from keyboard import Keyboard
 import asyncio
-# from high_level_script_reader import HighLevelScriptReader	
 import threading
 import math	
 import time
 import logging
 import os
 import sys
-<<<<<<< HEAD
-from collections import deque
-
-DISTANCE = 10 #mm
-# REAL_RUN = RUNNING_APP_FOR_REAL
-WINDOWS_SERIAL_PORT_OT2 = "COM4"  # This is the com port generally used by the motors on Windows, but it could be a different number
-LINUX_SERIAL_PORT_OT2 = "/dev/ttyUSB0"  # This is the com port used by the motors on Linux-based operating systems (including Raspberry OS)
-WINDOWS_SERIAL_PORT_TC = "COM5"
-LINUX_SERIAL_PORT_TC = "/dev/ttyACM0"
-LINUX_OS = 'posix'
-WINDOWS_OS = 'nt'
-UNIT_CONVERSION  = 4.23 #3.8896 4.16
-CALIBRATION_POINTS = 3
-=======
+import platform
 from collections import deque 
-import constants
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_OS = 'Darwin'
 UNIT_CONVERSION  = 4.23 #3.8896 4.16
->>>>>>> newrepo
 INBETWEEN_LIFT_DISTANCE = -10 # Default distance the syringe will be lifted/lowered when going from one nanopots well\reagent pot to another
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 DEFAULT_PROFILE = "default_profile.json"
-<<<<<<< HEAD
-FROM_NANOLITERS = 0.00
-REFRESH_COORDINATE_INTERVAL = 0.1
-ASPIRATE_SPEED = SLOW_SPEED
-LABWARE_COMPONENT_CHIP = 'c'
-LABWARE_COMPONENT_PLATE = 'p'
-COMPONENT_MODEL_CHIP = 'MICROPOTS_3'
-COMPONENT_MODEL_CORNING = 'CORNING_384'
-COMPONENT_MODEL_CUSTOM = 'CUSTOM'
-COMPONENT_MODEL_CUSTOM_SM = 'CUSTOM_SMALL'
-=======
 FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
->>>>>>> newrepo
 POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT = 150
 TIME_TO_SETTLE = 0.5 #SECONDS
+PLATE_DEPTH = "Plate's depth"
+AIR_GAP_NL_AMOUNT = 50
+AIR_GAP_ASPIRATING_Z_STEP_DISTANCE = 25
+
+STANDARD_LEFT_OVER = 200
+STANDARD_CUSHION_1 = 200
+STANDARD_CUSHION_2 = 300
+
+SYRINGE_BOTTOM = -190
+SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
+SYRINGE_TOP = -90
 
 def interrupt_callback(res):
     sys.stderr.write(res)
@@ -118,58 +97,58 @@ class Coordinator:
         """
         operating_system = ""
         os_recognized = os.name
+        self.ot_control = OT2_nanotrons_driver()
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
-<<<<<<< HEAD
-            self.ot_port = WINDOWS_SERIAL_PORT_OT2
-            self.tc_port = WINDOWS_SERIAL_PORT_TC
             operating_system = "w"
-        elif os_recognized == LINUX_OS:
-            logging.info("Operating system: Linux")
-            self.ot_port = LINUX_SERIAL_PORT_OT2
-            self.tc_port = LINUX_SERIAL_PORT_TC
-            operating_system = "r"
-        self.myLabware = Labware_class("HAMILTON_175")
-        self.joystick_profile = DEFAULT_PROFILE
-        # if REAL_RUN:
-        self.ot_control = OT2_nanopots_driver(port=self.ot_port)
-        self.tc_control = Thermocycler(interrupt_callback=interrupt_callback, port=self.tc_port)
-        self.td_control = TempDeck()
-        self.myController = XboxJoystick(operating_system)
-        self.myProfile = Profile(self.joystick_profile)
-        # self.myReader = HighLevelScriptReader(self)
-        
-=======
-            operating_system = "w"
+            self.myController = XboxJoystick(operating_system)
         elif os_recognized == LINUX_OS:
             logging.info("Operating system: Linux")
             operating_system = "r"
+            if platform.system() == MACBOOK_OS:
+                self.myController = Keyboard(self.ot_control)
+            else:
+                self.myController = XboxJoystick(operating_system)
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        self.ot_control = OT2_nanopots_driver()
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        self.myController = XboxJoystick(operating_system)
         self.myProfile = Profile(self.joystick_profile)
->>>>>>> newrepo
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
-<<<<<<< HEAD
-        self.flag = False
-        self.log = deque()
-        self.job = deque()
-        self.run_flag = False
-        self.calibration_flag = False
-=======
->>>>>>> newrepo
-        
+        self.folder_for_pictures = None
+        self.picture_flag = False
+
+        # variables for protocols. 
+        self.clean_water = None
+        self.wash_water = None
+        self.waste_water = None
+        self.amount_wanted = None
+
+        self.syringe_bottom_coordinate =  SYRINGE_BOTTOM 
+        self.syringe_sweet_spot_coordinate =  SYRINGE_SWEET_SPOT 
+        self.syringe_top_coordinate =  SYRINGE_TOP 
+
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")
 
+    def set_picture_flag(self, value: bool):
+        # print(f"Setting picture flag to: {value}")
+        self.picture_flag = value
+
+    def get_picture_flag(self) -> bool:
+        return self.picture_flag
+
+    def set_folder_for_pictures(self, folder: str):
+        self.folder_for_pictures = folder
+
+    def get_folder_for_pictures(self) -> str:
+        return self.folder_for_pictures
+        
     """
     MANUAL CONTROL SECTION
         The only method that should be called on an instance of the Application class is manual_control(). The
@@ -215,11 +194,14 @@ class Coordinator:
     def manual_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
-        t1 = threading.Thread(target=self.myController.listen)
-        t1.start()
-        while(t1.is_alive()):
-            self.monitor_joystick()
-            time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+        if platform.system() == MACBOOK_OS:
+            self.myController.listen()
+        else: 
+            t1 = threading.Thread(target=self.myController.listen)
+            t1.start()
+            while(t1.is_alive()):
+                self.monitor_joystick()
+                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
 
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
@@ -227,16 +209,6 @@ class Coordinator:
         self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
 
     def home_all_motors(self):
-<<<<<<< HEAD
-        """ This method homes all the motors on the OT2 except fot the Syrenges
-        """
-        self.ot_control.home("X Y Z A")
-
-    def up_step_size(self):
-        self.ot_control.double_step_size_XYZ("") # "" is the dummy argument
-    
-    def down_step_size(self):
-=======
         """ This method homes all the motors on the OT2 except for the Syringes
         """
         self.ot_control.home("X Y Z A") # Not B and C
@@ -249,7 +221,6 @@ class Coordinator:
     def down_step_size(self):
         """ This method goes through a list of predefined steps  """
        
->>>>>>> newrepo
         self.ot_control.half_step_size_XYZ("") # "" is the dummy argument
     
     """
@@ -269,11 +240,29 @@ class Coordinator:
             location ([tuple]): contains three float numbers indicating a target 3D coordinate
         """
         self.ot_control.move_to(location=location)
+
+    def go_to_position_to_take_picture(self, location):
+        """ 
+        This method moves the motor system to a target 3D location on a sequence of safety displacements as follows:
+            1. Lift Z axis
+            2. Move to the X and Y target positions
+            3. Descend to the Z target position
+
+        Args:
+            location ([tuple]): contains three float numbers indicating a target 3D coordinate
+        """
+        self.open_lid() # Prevents the pipette to crash with the thermocycler
+        x = location[0]
+        y = location[1]
+        z = location[2] + 3
+        picture_location = [x, y, z]
+        self.ot_control.move_to(location=picture_location)
         
     def go_to_deck_slot(self, slot):
+        """ This method goes allows the OT2 to move to a designated physical slot  """
         slot_number = float(slot)
         logging.info(f"Moving to slot {slot}")
-        x= self.deck.get_slot_center(slot)[0]
+        x = self.deck.get_slot_center(slot)[0]
         y = self.deck.get_slot_center(slot)[1]
         z = POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT
         location = [x, y, z]
@@ -305,37 +294,6 @@ class Coordinator:
         # Get the location of the well by its nickname
         location = self.myLabware.get_pot_location(plate, pot_nickname) # [x, y, z]
         self.go_to_position(location)
-
-    def movexyz(self, x, y, z):
-        coordinates = { 'X': x, 'Y': y, 'Z': z }
-        self.go_to_position(coordinates)
-<<<<<<< HEAD
-    '''
-    PROTOCOL METHODS SECTION
-        This section defines methods that get called to facilitate reading a script of instructions 
-        *** NEEDS UPDATED DOCUMENTATION FROM JACOB***
-    '''
-=======
-
-    def move(self, location, nicknames):
-        if location == "mySample":
-            logging.info(f"Moving to '{location}' at '{nicknames.mySample}'")
-            locationString = nicknames.mySample
-        else:
-            logging.info(f"Moving to '{location}' at '{nicknames.get_nickname_location(location)}'")
-            locationString = nicknames.get_nickname_location(location)
-
-        # parse the string. Ex. p 1c4 --> type = 'p', number = 1, position = 'c4'
-        type = locationString[0]
-        number = locationString[2]
-        position = locationString[3:]
-        # call function to move motors (move_to_pot() or move_to_well())
-        if type == 'p':
-            self.go_to_pot(int(number), position)
-        elif type == 'c':
-            self.go_to_well(int(number), position)
-        else:
-            logging.info("ERROR: cannot move to any location other than POT or WELL")
     
     def pick_up_liquid(self, volume, speed = SLOW_SPEED): 
         """ Sends a command to the syringe motor to displace a distance that is equivalent to aspirating a given volume of liquid
@@ -359,7 +317,6 @@ class Coordinator:
         self.ot_control.set_step_size_syringe_motor(step_displacement)
         self.ot_control.plunger_L_Down(size=self.ot_control.s_step_size)
     
->>>>>>> newrepo
     def volume_to_displacement_converter(self, volume):
         """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
 
@@ -385,89 +342,25 @@ class Coordinator:
         # Return the distance needed to displace that amount of volume
         self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
-
-<<<<<<< HEAD
-    def pick_up_liquid(self, volume, speed = SLOW_SPEED): 
-        """ Sends a command to the syringe motor to displace a distance that is equivalent to aspirating a given volume of liquid
-
-        Args:
-            volume ([float]): volume of liquid to be aspirated. UNIT: NANOLITERS
-            speed ([float]): speed at which the given volume of liquid will be aspirated. UNIT: MILIMITERS/SECOND
-        """     
-        step_displacement = self.volume_to_displacement_converter(volume) 
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Up(size=self.ot_control.s_step_size)
-
-    def drop_off_liquid(self, volume, speed =SLOW_SPEED):
-        """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
-
-        Args:
-            volume ([float]): volume of liquid to be dispensed,. UNIT: NANOLITERS
-            speed ([float]): speed at which the given volume of liquid will be dispensed. UNIT: MILIMITERS/SECOND
-        """
-        step_displacement = self.volume_to_displacement_converter(volume)
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Down(size=self.ot_control.s_step_size)
-
-    def move(self, location, nicknames):
-        if location == "mySample":
-            logging.info(f"Moving to '{location}' at '{nicknames.mySample}'")
-            locationString = nicknames.mySample
-        else:
-            logging.info(f"Moving to '{location}' at '{nicknames.get_nickname_location(location)}'")
-            locationString = nicknames.get_nickname_location(location)
-
-        # parse the string. Ex. p 1c4 --> type = 'p', number = 1, position = 'c4'
-        type = locationString[0]
-        number = locationString[2]
-        position = locationString[3:]
-        # call function to move motors (move_to_pot() or move_to_well())
-        if type == 'p':
-            self.go_to_pot(int(number), position)
-        elif type == 'c':
-            self.go_to_well(int(number), position)
-        else:
-            logging.info("ERROR: cannot move to any location other than POT or WELL")
-     
-    def set_syringe_speed(self, nLminSpeed):
-        mmspeed = self.volume_to_displacement_converter(nLminSpeed)/60
         
-    # pick up amount in nL and speed in nL/min
-    def aspirate(self, volume, speed): 
-        logging.info(f"Aspirating {volume} nL at speed {speed} nL/s")
-        self.pick_up_liquid(int(volume))
-
-    # drop of amount in nL and speed in nL/min
-    def dispense(self, amount, speed): 
-        self.flag = True
-        logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
-        self.drop_off_liquid(int(amount))
-    
-    # This will go to the position of the source and aspirate an amount in nL
-    def goto_and_aspirate(self, amount, source):
-        self.go_to_position(source)
-        self.aspirate(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
-
-    # This will go to the position of the destination and dispense an amount in nL
-    def goto_and_dispense(self, amount, to):
-        self.go_to_position(to)
-        self.dispense(amount, ASPIRATE_SPEED)
-        time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
-=======
-    def set_syringe_speed(self, nLminSpeed):
-        mmspeed = self.volume_to_displacement_converter(nLminSpeed)/60
-        
-    def aspirate(self, volume, speed): 
+    def aspirate(self, volume, speed = SLOW_SPEED): 
         """ Pick up amount in nL and speed in nL/min  """
         logging.info(f"Aspirating {volume} nL at speed {speed} nL/s")
-        self.pick_up_liquid(int(volume))
+        self.pick_up_liquid(int(volume)) # Pick up the amount needed
 
-    def dispense(self, amount, speed): 
+    def dispense(self, amount, speed = SLOW_SPEED): 
         """ Drop of amount in nL and speed in nL/min  """
         logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
         self.drop_off_liquid(int(amount))
->>>>>>> newrepo
+
+    def air_gap(self):
+        """This is the function that allows the user to have an 50 nL airgap in the syringe"""
+        x = self.ot_control._position['X']
+        y = self.ot_control._position['Y']
+        z = self.ot_control._position['Z'] + AIR_GAP_ASPIRATING_Z_STEP_DISTANCE
+        new_location = [x, y, z]
+        self.go_to_position(new_location)
+        self.aspirate(AIR_GAP_NL_AMOUNT, speed=ASPIRATE_SPEED)
 
     """
     LABWARE METHODS SECTION
@@ -565,13 +458,10 @@ class Coordinator:
             input_file_name ([str]): name of desired input file
         """
         self.myLabware.load_labware_from_file(input_file_name)
-<<<<<<< HEAD
-=======
         chip_list = self.myLabware.chip_list
         plate_list = self.myLabware.plate_list
-        return chip_list, plate_list
-    
->>>>>>> newrepo
+        labware = [chip_list, plate_list]
+        return labware
 
     def get_available_labware_setup_files(self):
         """ Obtain the list of available files with previously calibrated and exported labware components
@@ -638,10 +528,7 @@ class Coordinator:
     """
     SETTINGS SECTION
     """
-<<<<<<< HEAD
-=======
     
->>>>>>> newrepo
     def get_current_settings(self):
         """ Retrieve the current state of all the relevant settings of the system and store them in a dictionary
 
@@ -657,7 +544,6 @@ class Coordinator:
         
         settings_dict["xyz_axis_step_size"] = self.ot_control.get_step_size_xyz_motor()
         settings_dict["xyz_axis_step_speed"] = self.ot_control.get_step_speed_xyz_motor()
-        settings_dict["x_axis_orientation"] = self.myController.get_axis_direction(self.get_linked_joystick_axis_index("x"))
         return settings_dict
 
     def update_setting(self, property_name, value):
@@ -692,16 +578,12 @@ class Coordinator:
         else:
             logging.info(f"ERROR: {property_name} PROPERTY NOT LINKED TO ANY MODIFICATION ON THE SYSTEM\n") 
 
-
     """
     FEEDBACK SECTION
         This section is meant to define methods that retrieve information from the 
         components of the system
     """
-<<<<<<< HEAD
-=======
     
->>>>>>> newrepo
     def get_current_coordinates(self):
         """ Gets the position of each of the stages associated with 3 dimensional motion: X, Y, and Z axes
 
@@ -726,63 +608,141 @@ class Coordinator:
         """
         self.coordinates_refresh_rate = new_rate
 
-<<<<<<< HEAD
+    def get_type_of_labware_by_slot(self, slot: int, plate: Plate = None, chip: Chip = None):
+        if plate != None:
+            plate_pot_properties = plate.export_plate_properties()
+            locations = plate_pot_properties["pot_locations"]
+            # print(locations)
+        elif chip != None:
+            print(chip.well_locations)
 
-    """
-    THERMOCYCLER COORDINATION SECTION
-    """
-=======
+    def get_depth_of_labware(self, labware: Plate):
+        plate_pot_properties = labware.export_plate_properties()
+        depth = plate_pot_properties["pot_depths"]
+        return depth
+
+    def set_plate_depth(self, plate, depth):
+        # .get_depth_of_labware return a list, so we get the first elements since all of the deoths are the same [0]
+        plate_default_depth = self.get_depth_of_labware(plate)[0]
+        if depth == PLATE_DEPTH:
+            # we set the depth here to the distance of the pot minus 1 milimiter so that it has some room. 
+            return plate_default_depth - 1
+        # if the depth value is an integer it means that the user wants to dispense or aspirate at a higher point that is smaller in distance than the plates depth, otherwise it would hit the bottom of the plate 
+        elif (type(depth) == int) and (depth < plate_default_depth): 
+            if depth < plate_default_depth:
+                return depth
+            else: 
+                print("Number input for depth greater than allowed, using default depth. ")
+                return None 
+        else: 
+            return None
+
+    def void_plate_depth(self, plate: Plate, void: bool = False):
+        plate.void_plate_depth(void)
+
     '''
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
     def aspirate_from(self, amount, source):
-        """This will go to the position of the source and aspirate an amount in nL"""
+        """ This will go to the position of the source and aspirate an amount in nL"""
         self.go_to_position(source)
+        self.pick_up_liquid(int(100)) # Pick up an extra 100 for backlash
         self.aspirate(amount, ASPIRATE_SPEED)
+        self.drop_off_liquid(int(100)) # Drop off liquid to account for backlash
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, amount, to):
-        """This will go to the position of the destination and dispense an amount in nL"""
-        print(f"Go to {to} and dispense ")
+    def dispense_to(self, amount, to, depth: int = None):
+        """ This will go to the position of the destination and dispense an amount in nL"""
         self.go_to_position(to)
         self.dispense(amount, ASPIRATE_SPEED)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
-    
-    def adjust_syringe(self, position):
+        
+    def move_plunger(self, position):
+        """ This allows the protocol to move the plunger passed the set limit for manual control, 
+            it is important to understand that if the right values are not input correctly for 
+            the syringe being used, this could break """
         self.ot_control.move({'B': position})
+
+    def set_washing_positions(self, clean_water, wash_water, waste_water):
+        """ For every protocol we assume the sicentist will have these three location in which the 
+            different types of water are places for washing the syringe so that there is no contamination"""
+        self.clean_water = clean_water
+        self.wash_water = wash_water
+        self.waste_water = waste_water
+
+    def start_wash(self):
+        """ This is the function that allows the robot to get rid of the contamination on the syringe, 
+            by dispensing everything that was left over from before, then it will pick up clean water 
+            and end in a postition that allows the protocol to aspirate and dispense without hitting limmmits"""
+        # Go to waste and SYRINGE_BOTTOM
+        self.go_to_position(self.waste_water)
+        self.move_plunger(self.syringe_bottom_coordinate)
+        # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
+        self.go_to_position(self.wash_water)
+        self.move_plunger(self.syringe_top_coordinate)
+        self.move_plunger(self.syringe_bottom_coordinate)
+        # Go to clean, SYRINGE_SWEET_SPOT
+        self.go_to_position(self.clean_water)
+        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        # Airgap
+        self.air_gap()
+
+    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
+        """ This is a wash that is done to the syringe when picking up and dispensing different liquids"""
+        # Go to waste, dispense left overs
+        self.go_to_position(self.waste_water)
+        self.dispense(left_over)
+        # Go to wash, aspirate amount wanted + Cushion 1, dipense amount wanted + Cushion 2
+        self.go_to_position(self.wash_water)
+        self.aspirate(self.amount_wanted + cushion_1)
+        self.dispense(self.amount_wanted + cushion_2)
+        # Go to clean, go to sweet spot
+        self.go_to_position(self.clean_water)
+        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        # Airgap
+        self.air_gap()
 
     """
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
     
->>>>>>> newrepo
     def tc_connect(self):
+        """ Here we connect to thr module"""
         asyncio.run(self.tc_control.connect(port= self.tc_port))
 
     def open_lid(self):
-        self.go_to_deck_slot('12') # for avoiding collitions
+        """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is opened"""
+        self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
     def close_lid(self):
-        self.go_to_deck_slot('12') # for avoiding collitions
+        """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is closed"""
+        self.go_to_deck_slot('3') # for avoiding collitions
         asyncio.run(self.tc_control.close())
         self.ot_control.set_tc_lid_flag('closed')
 
     def deactivate_all(self):
+        """ This function deactivates both, the lid and the block of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_all())
     
     def deactivate_lid(self):
+        """ This function deactivates the lid of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_lid())
 
     def deactivate_block(self):
+        """ This function deactivates the block of the thermocycler"""
         asyncio.run(self.tc_control.deactivate_block())
 
     def set_temperature(self ,temp: float, hold_time:  float = None):
+        """ This function sets the temperature of the thermocycler with a holding time in minutes."""
         asyncio.run(self.tc_control.set_temperature(temp, hold_time))
 
     def set_lid_temp(self, temp: float):
+        
         asyncio.run(self.tc_control.set_lid_temperature(temp))
 
     def tc_disconnect(self):
@@ -810,27 +770,6 @@ class Coordinator:
             time.sleep(30)
             min_count = min_count + 0.5
         logging.info("Holding time done. Proceeding to complete next step.")
-
-<<<<<<< HEAD
-    # stops batch entirely, stops loading and the rest of the LC and MS calls
-    def hard_stop(self): 
-        self.myReader.hard_stop()
-
-    # stops batch after loading current sample. Loaded samples still go to the MS
-    def stop_load(self): 
-        self.myReader.stop_load()
-
-    # this pauses the batch so you can add scripts to the queue (stops you from runnning the finishup routine and starting over. saves maybe 3 hours)
-    def pause_batch(self):
-        self.myReader.pause_batch()
-
-    def pause_protocol(self):
-        self.myReader.pause_batch()
-
-    # makes a script reader and runs the batch through the reader
-    def run_batch(self): 
-        self.myReader.run()
-=======
 
     """
     PROTOCOL METHODS SECTION FOR TEMPDECK 
@@ -875,10 +814,9 @@ class Coordinator:
     RUN PROTOCOL COORDINATION SECTION
     """
 
-    def pause_protocol(self):
-        """This method pauses the protocol process"""
+    def stop_protocol(self):
+        """This method stops the protocol process"""
         pass
->>>>>>> newrepo
 
     def verify_container_existence(self, container_description):
         """Verify that a given well or pot exists in a given chip or plate, respectively, by providing a coded description
@@ -889,18 +827,6 @@ class Coordinator:
         """
         return self.myLabware.check_well_pot_existence(container_description)
 
-<<<<<<< HEAD
-    def disconnect_all(self):
-        self.tc_disconnect()
-        self.ot_control.disconnect()
-
-    def connect_all(self):
-        self.ot_control.connect(self.ot_port)
-        self.tc_control.connect(self.tc_port)
-
-def test():
-    myApp = Coordinator(joystick_profile=DEFAULT_PROFILE)
-=======
     def connect_all(self):
         """This method connects the modules connected to the computer"""
         self.disconnect_all()
@@ -912,12 +838,19 @@ def test():
         """This method disconnects the modules connected to the computer"""
         self.tc_disconnect()
         self.ot_control.disconnect()
-        self.ot_control.disconnect()
+        self.td_control.disconnect()
+
+    def end_of_protocol(self):
+        self.go_to_deck_slot('12')
+        self.disconnect_all()
 
 def test():
     myApp = Coordinator()
->>>>>>> newrepo
     
+    tc_mod = myApp.prot_context.load_module('thermocycler module', '7')
+    
+    tc_mod.close_lid()
+    # print(platform.system())
     # myApp.go_to_deck_slot('6')
     # myApp.close_lid()
     # myApp.set_block_temp(4, 5)
@@ -926,15 +859,6 @@ def test():
     # myApp.manual_control()
     # myApp.go_to_position([200, Y_MIN, 40 ])
 
-<<<<<<< HEAD
-    # print("Moving slots")
-    
-    protocol = "protocol_1.py"
-    myApp.execute_protocol(protocol)
-
-
-=======
->>>>>>> newrepo
 if __name__ == "__main__":
     test()
 

@@ -12,9 +12,15 @@
         <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
         <br>
         <br>
-        <label for="calibration">Labware calibration</label>
+        <label for="syringe">Labware calibration</label>
+        <select id="syringe" name="syringe" onclick="option_select_syringe()">
+            <option value="default" selected>- Select Syringes to Display -</option>
+        </select>
+        <!-- <br>
+        <br>
+        <label for="calibration">Labware calibration</label> -->
         <select id="calibration" name="calibration" onclick="option_select_labware_calibration()">
-            <option value="default" selected>- Select Calibration to Display -</option>
+            <option value="default" selected>- Select Calibrations to Display -</option>
         </select>
         <br>
         <br>
@@ -27,7 +33,12 @@
             <option value="default" selected>- Select Protocols to Display -</option>
         </select>
         <br>
-        <button type="button" disabled="disabled" id="display_protocol">Display Protocol</button>
+        <button type="button" disabled="disabled" id="display_protocol" onclick="display_contents()">Display Protocol</button>
+        <br>
+
+        <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
+        
+        <br>        
         <br>
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
@@ -102,7 +113,7 @@
         </body>
 
 
-
+        
         
         
         

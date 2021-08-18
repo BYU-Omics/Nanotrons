@@ -22,7 +22,15 @@
 
         <button id="go_button" disabled="disabled" onclick="go_button_listener()">GO</button>
         
+        
         <label id="user_feedback"></label><br><br>
+
+        <select id="slot_nickname" onclick="slots_onclick()">
+            <option value="default" selected>- Select a Slot -</option>
+        </select>
+
+        <button id="show_component_button" disabled="disabled" onclick="show_component_button_listener()">Show component in slot</button>
+        <button onclick='get_labware_in_slot()'>Show labware in slot</button><br><br>
 
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>

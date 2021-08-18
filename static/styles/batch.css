@@ -1,0 +1,44 @@
+html,
+body {
+    height: 100%;
+    counter-reset: section;/* Set a counter named 'section', and its initial value is 0. How to use counters: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Lists_and_Counters/Using_CSS_counters*/
+}
+  
+li::before {
+    counter-increment: section;
+    content: "#" counter(section);    
+    width: 20%;
+}
+
+.container {
+    margin: 20px auto 0;
+    max-width: 80%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+#container_script_title {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.batch_element {
+    margin: 5px 0;
+    padding: 0 20px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 8px;
+    background: rgb(0,212,255);
+    background:  rgb(140, 161, 165); /* gradient generated with: https://cssgradient.io/   */
+    color: rgb(0, 0, 0);
+    display: flex;
+    justify-content: flex-start;
+    font-family: "Lucida Console", "Courier New", monospace;
+}

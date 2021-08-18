@@ -16,13 +16,9 @@ volume
 
 """
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 as SM
-from opentrons.config.robot_configs import (DEFAULT_GANTRY_STEPS_PER_MM, DEFAULT_PIPETTE_CONFIGS, build_config)
-<<<<<<< HEAD
-RASPBERRY_OS = "r"
-=======
+from opentrons.config.robot_configs import build_config
 from serial.tools import list_ports
 import os
->>>>>>> newrepo
 
 X_MAX= 418
 X_MIN= 25
@@ -32,10 +28,10 @@ Z_MAX= 170.15
 Z_MIN= 10 
 A_MAX= 170.15
 A_MIN= 10 
-B_MAX= 18
-B_MIN= -1*154 
-C_MAX= 18
-C_MIN= -1*154 
+B_MAX= 0
+B_MIN= -1*190 # TO-DO: change thee limit according to the syringe we are sugin. note for self. 
+C_MAX= 0
+C_MIN= -1*190 
 TC_X = 211
 TC_Y = 155
 TC_Z_OPEN_LID = 170
@@ -72,33 +68,24 @@ XYZ = 'X Y Z'
 LEFT = 'Left' #X
 RIGHT = 'Right' #B
 
-<<<<<<< HEAD
-list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 10, 30, 63, 100]
-
-class OT2_nanopots_driver(SM):
-    def __init__(self, port):
-=======
 WINDOWS_OT_PORT = 'COM4'
+WINDOWS_OT_SER = 'A50285BIA'
 LINUX_OT_PORT = '/dev/ttyACM0'
+MACBOOK_OT_PORT = "/dev/cu.usbserial-A50285BI"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
-list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 10, 30, 63, 100]
+list_of_sizes = [0.015, 0.05, 0.1, 0.5, 1, 4.5, 9, 13, 30, 51.5, 63, 67.5, 69.5, 103.5]
 
-class OT2_nanopots_driver(SM):
+class OT2_nanotrons_driver(SM):
     def __init__(self):#, port):
->>>>>>> newrepo
         super().__init__(config=build_config({}))
 
         # Atributes that control the size and speed of the X Y and Z axis. 
         #   When changed, all of them move at the same rate
         self.xyz_step_size = STEP_SIZE
         self.xyz_step_speed = STEP_SPEED
-<<<<<<< HEAD
-        self._port = port
-=======
-        self._port = WINDOWS_OT_PORT
->>>>>>> newrepo
+        self._port = None
         # Attributes that control the size and speed of the plunger. 
         self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
         self.s_step_speed = SLOW_SPEED #Step speed for the syringe
@@ -109,18 +96,10 @@ class OT2_nanopots_driver(SM):
         self.i = MIDDLE_STEP
         self.tc_flag = True
         self.tc_lid_flag = 'Open'
-<<<<<<< HEAD
-
-        self.connect(self._port)
-
-# Functions that help movements
-
-=======
         self.connect_driver()
 
 # Functions that help movements
         
->>>>>>> newrepo
     def check_for_valid_move(self, pos, axis, size) -> bool:
         # print(pos)
         """
@@ -198,66 +177,69 @@ class OT2_nanopots_driver(SM):
 # Functions to move the different axis, X, Y, Z and sirenge:    
 
     def move_up(self, step_size = STEP_SIZE):  
-        y_pos = self._position['Y']
-        y_pos += step_size
-        if(self.check_for_valid_move(y_pos, 'Y', step_size)):
-            self.move({'Y': y_pos}, speed= self.check_speed(step_size))
+        """
+        This functions moves the pippetes by steps. 
+        """
+        y_pos = self._position['Y'] # stores the current position
+        y_pos += step_size # adds a step size to the current position
+        if(self.check_for_valid_move(y_pos, 'Y', step_size)): # if the future position is a valid move 
+            self.move({'Y': y_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
-            pass
+            pass # if the move is not valid just dont move 
 
     def move_down(self, step_size = STEP_SIZE):
-        y_pos = self._position['Y']
-        y_pos -= step_size
-        if(self.check_for_valid_move(y_pos, 'Y', step_size*(-1))):
-            self.move({'Y': y_pos}, speed= self.check_speed(step_size))
+        y_pos = self._position['Y'] # stores the current position
+        y_pos -= step_size # adds a step size to the current position
+        if(self.check_for_valid_move(y_pos, 'Y', step_size*(-1))): # if the future position is a valid move 
+            self.move({'Y': y_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
-            pass
+            pass # if the move is not valid just dont move 
 
     def move_left(self, step_size = STEP_SIZE):
-        x_pos = self._position['X']
-        x_pos -= step_size
-        if(self.check_for_valid_move(x_pos, 'X', step_size*(-1))):
-            self.move({'X': x_pos}, speed= self.check_speed(step_size))
+        x_pos = self._position['X'] # stores the current position
+        x_pos -= step_size # adds a step size to the current position
+        if(self.check_for_valid_move(x_pos, 'X', step_size*(-1))): # if the future position is a valid move 
+            self.move({'X': x_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
 
     def move_right(self, step_size = STEP_SIZE):
-        x_pos = self._position['X']
-        x_pos += step_size
-        if(self.check_for_valid_move(x_pos, 'X', step_size)):
-            self.move({'X': x_pos}, speed= self.check_speed(step_size))
+        x_pos = self._position['X'] # stores the current position
+        x_pos += step_size # adds a step size to the current position
+        if(self.check_for_valid_move(x_pos, 'X', step_size)): # if the future position is a valid move 
+            self.move({'X': x_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
 
     def pipete_R_Down(self, step_size = STEP_SIZE):
-        z_pos = self._position['A']
-        z_pos -= step_size
-        if(self.check_for_valid_move(z_pos, 'A', step_size*(-1))):
-            self.move({'A': z_pos}, speed= self.check_speed(step_size))
+        z_pos = self._position['A'] # stores the current position
+        z_pos -= step_size # adds a step size to the current position
+        if(self.check_for_valid_move(z_pos, 'A', step_size*(-1))): # if the future position is a valid move 
+            self.move({'A': z_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
 
     def pipete_R_Up(self, size = STEP_SIZE):
-        z_pos = self._position['A']
-        z_pos += size
-        if(self.check_for_valid_move(z_pos, 'A', size)):
-            self.move({'A': z_pos}, speed= self.check_speed(size))
+        z_pos = self._position['A'] # stores the current position
+        z_pos += size # adds a step size to the current position
+        if(self.check_for_valid_move(z_pos, 'A', size)): # if the future position is a valid move 
+            self.move({'A': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
     
     def pipete_L_Down(self, size = STEP_SIZE):
-        z_pos = self._position['Z']
-        z_pos -= size
-        if(self.check_for_valid_move(z_pos, 'Z', size*(-1)) ):
-            self.move({'Z': z_pos}, speed= self.check_speed(size))
+        z_pos = self._position['Z'] # stores the current position
+        z_pos -= size # adds a step size to the current position
+        if(self.check_for_valid_move(z_pos, 'Z', size*(-1)) ): # if the future position is a valid move 
+            self.move({'Z': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
 
     def pipete_L_Up(self, size = STEP_SIZE):
-        z_pos = self._position['Z']
-        z_pos += size
-        if(self.check_for_valid_move(z_pos, 'Z', size) ):
-            self.move({'Z': z_pos}, speed= self.check_speed(size))
+        z_pos = self._position['Z'] # stores the current position
+        z_pos += size # adds a step size to the current position
+        if(self.check_for_valid_move(z_pos, 'Z', size) ): # if the future position is a valid move 
+            self.move({'Z': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
 
@@ -265,35 +247,35 @@ class OT2_nanopots_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        b_pos: float = self._position['B']
-        b_pos += size
-        if(self.check_for_valid_move(b_pos, 'B', size)):
-            self.move({'B': b_pos}, speed= self.s_step_speed)
+        b_pos: float = self._position['B'] # stores the current position
+        b_pos += size # adds a step size to the current position
+        if(self.check_for_valid_move(b_pos, 'B', size)): # if the future position is a valid move 
+            self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_L_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        b_pos: float = self._position['B']
-        b_pos -= size
+        b_pos: float = self._position['B'] # stores the current position
+        b_pos -= size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size*(-1))):
-            self.move({'B': b_pos}, speed= self.s_step_speed)
+            self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_R_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         if self.flag == True:
             size = S_STEP_SIZE
-        c_pos: float = self._position['C']
-        c_pos = c_pos + size
-        if(self.check_for_valid_move(c_pos, 'B', size)):
-            self.move({'C': c_pos}, speed= self.s_step_speed)
+        c_pos: float = self._position['C'] # stores the current position
+        c_pos = c_pos + size # adds a step size to the current position
+        if(self.check_for_valid_move(c_pos, 'B', size)): # if the future position is a valid move 
+            self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_R_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         if self.flag == True:
             size = S_STEP_SIZE
-        c_pos: float = self._position['C']
-        c_pos = c_pos - size
-        if(self.check_for_valid_move(c_pos, 'B', size*(-1))):
-            self.move({'C': c_pos}, speed= self.s_step_speed)
+        c_pos: float = self._position['C'] # stores the current position
+        c_pos = c_pos - size # adds a step size to the current position
+        if(self.check_for_valid_move(c_pos, 'B', size*(-1))): # if the future position is a valid move 
+            self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
 ## These functions are just as the ones without the _aut but the logic is a little
 ## different since they are used by coordinator/volume etc. The step size input in 
@@ -302,22 +284,22 @@ class OT2_nanopots_driver(SM):
     def plunger_L_Up_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
         b_pos = self._position['B']
         b_pos += size
-        self.move({'B': b_pos}, speed= self.s_step_speed)
+        self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_L_Down_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
         b_pos = self._position['B']
         b_pos += size
-        self.move({'B': b_pos}, speed= self.s_step_speed)
+        self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_R_Up_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
         c_pos = self._position['C']
         c_pos += size
-        self.move({'C': c_pos}, speed= self.s_step_speed)
+        self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_R_Down_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
         c_pos = self._position['C']
         c_pos += size
-        self.move({'C': c_pos}, speed= self.s_step_speed)
+        self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
 # Getters and Setters 
 
@@ -371,6 +353,7 @@ class OT2_nanopots_driver(SM):
 
     def set_tc_lid_flag(self, status: str):
         self.tc_lid_flag = status
+
 
 # Joystick functions
 
@@ -485,10 +468,11 @@ class OT2_nanopots_driver(SM):
             self.move({'Z': TC_Z_OPEN_LID}, speed= MEDIUM_SPEED)
         else:
             self.move({'Z': current_z_pos + 20}, speed= MEDIUM_SPEED)
-        if(self.check_for_valid_move(x, 'X', None)):
-            self.move({'X': x}, speed= MEDIUM_SPEED)
-            if(self.check_for_valid_move(y, 'Y', None)):
-                self.move({'Y': y}, speed= MEDIUM_SPEED)
+        if(self.check_for_valid_move(y, 'Y', None)):
+            # First move the Y axis so that it does not collapse with the thermocycler
+            self.move({'Y': y}, speed= MEDIUM_SPEED)
+            if(self.check_for_valid_move(x, 'X', None)):
+                self.move({'X': x}, speed= MEDIUM_SPEED)
                 if(self.check_for_valid_move(z, 'Z', None)):
                     self.move({'Z': z}, speed= MOVE_TO_SPEED)
 
@@ -508,9 +492,7 @@ class OT2_nanopots_driver(SM):
     
     def home_all(self, dummyarg):
         # print("Example:  'X Y Z A B C' or 'all' ")
-        userinput = input("Indicate the axis you would like to set: ")
-        self.home(userinput)
-        print(f"{userinput} homed")
+        self.home('X Y Z A')
         
     def stop_motor(self, device = 'XYZABC'):
         self.disengage_axis(device)
@@ -529,35 +511,39 @@ class OT2_nanopots_driver(SM):
         print("")
         print("............................................")
 
-<<<<<<< HEAD
-=======
     def find_port(self):
+        """
+        This allows the class to connect to a port when called, this makes the calling chain cleaner. 
+        It is basicaly a ger_port_by_name from the driver_3_0_0 that does not work
+        """
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
-            if operating_system == WINDOWS_OS and p.device == WINDOWS_OT_PORT:
+            # print(p)
+            if operating_system == WINDOWS_OS and p.serial_number == WINDOWS_OT_SER:
                 self._port = p.device
                 print(f"OT2 connected to: {p}")
-            elif operating_system == LINUX_OS and p == LINUX_OT_PORT:
-                self._port = p.device
-                print(f"OT2 connected to: {p}")
+            elif operating_system == LINUX_OS:
+                if p == LINUX_OT_PORT or p.device == MACBOOK_OT_PORT:
+                    self._port = p.device
+                    # print(self._port)
+                    print(f"OT2 connected to: {p}")
+                else: 
+                    # print(f"Port not found: {p.device}")
+                    pass
+            # else:
+            #     print(f"No operating system recognized: {operating_system}")
             
     def connect_driver(self):
+        """
+        This function is called at the beginning of the class in the init function to connect the robot
+        """
         self.find_port()
         self.connect(self._port)
->>>>>>> newrepo
 
 def test():
-    robot_portname_windows = 'COM4'
-    robot = OT2_nanopots_driver()
-<<<<<<< HEAD
-    robot.connect(port=robot_portname_windows)
-    robot.home('B')
-    # while True:
-    #     print(robot._position) 
-
-=======
->>>>>>> newrepo
+    robot = OT2_nanotrons_driver()
+    robot.find_port()
 
 if __name__ == '__main__':
     test()

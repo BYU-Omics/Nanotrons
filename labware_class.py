@@ -159,11 +159,11 @@ class Labware_class:
             plate_properties = plate.export_plate_properties()
             labware_dictionary["plates"].append(plate_properties)
 
-        print(f"Labware dictionary: {labware_dictionary}")
+        # print(f"Labware dictionary: {labware_dictionary}")
         return labware_dictionary
 
     def dictionary_to_labware(self, labware_dictionary):
-        print(f"Current Labware before additions: {self.get_current_labware()}")
+        # print(f"Current Labware before additions: {self.get_current_labware()}")
         
         chips_list = labware_dictionary["chips"] # This is a list of dictionaries, each of which containes prooperties for a given chip
         plates_list = labware_dictionary["plates"] # This is a list of dictionaries, each of which containes prooperties for a given plate
@@ -178,7 +178,7 @@ class Labware_class:
             new_plate = Plate(plate_properties=plate_properties)
             self.plate_list.append(new_plate)
             
-        print(f"Current Labware after additions: {self.get_current_labware()}")
+        # print(f"Current Labware after additions: {self.get_current_labware()}")
 
     def get_path_to_saved_labware_folder(self):
         current_path = os.getcwd() # Returns a string representing the location of this file
@@ -214,8 +214,6 @@ class Labware_class:
 
         # Create labware out of the dictionary
         self.dictionary_to_labware(labware_dictionary)
-<<<<<<< HEAD
-=======
 
         chip_number = 0
         plate_number = 0
@@ -225,7 +223,6 @@ class Labware_class:
                 chip_number += 1
             elif key == 'plate':
                 plate_number += 1
->>>>>>> newrepo
         
     def available_saved_labware_files(self):
         return os.listdir(self.get_path_to_saved_labware_folder())

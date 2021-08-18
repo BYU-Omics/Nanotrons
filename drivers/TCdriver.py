@@ -14,11 +14,8 @@ from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import utils, serial_communication
 from opentrons.drivers.serial_communication import SerialNoResponse
-<<<<<<< HEAD
-=======
 from serial.tools import list_ports
 import os
->>>>>>> newrepo
 
 if TYPE_CHECKING:
     # avoid an issue where Queue doesn't support generics at runtime
@@ -88,289 +85,19 @@ POLLING_FREQUENCY_MS = 1000
 HOLD_TIME_FUZZY_SECONDS = POLLING_FREQUENCY_MS / 1000 * 5
 TEMP_THRESHOLD = 0.3
 
-<<<<<<< HEAD
-=======
 WINDOWS_TC_PORT = 'COM5'
+WINDOWS_TC_SER = 'B71546CF50533336372E3120FF12202C'
 LINUX_TC_PORT = '/dev/ttyACM0'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
->>>>>>> newrepo
+MACBOOK_TC_PORT = '/dev/cu.usbmodem142101'
 
 class ThermocyclerError(Exception):
     pass
 
-<<<<<<< HEAD
-
-class SimulatingDriver:
-    def __init__(self, sim_model: str = None):
-        self._target_temp: Optional[float] = None
-        self._ramp_rate: Optional[float] = None
-        self._hold_time: Optional[float] = None
-        self._active = False
-        self._port = None
-        self._lid_status = 'open'
-        self._lid_target: Optional[float] = None
-        self._lid_heating_active = False
-
-    async def open(self):
-        self._lid_status = 'open'
-        return self._lid_status
-
-    async def close(self):
-        self._lid_status = 'closed'
-        return self._lid_status
-
-    @property
-    def status(self):
-        return 'holding at target' if self._active else 'idle'
-
-    @property
-    def lid_status(self):
-        return self._lid_status
-
-    @property
-    def ramp_rate(self):
-        return self._ramp_rate
-
-    @property
-    def hold_time(self):
-        # Simulating driver acts as if cycles end immediately
-        return 0
-
-    @property
-    def temperature(self):
-        return self._target_temp
-
-    @property
-    def target(self):
-        return self._target_temp
-
-    @property
-    def lid_target(self):
-        return self._lid_target
-
-    @property
-    def lid_temp_status(self):
-        return 'holding at target' if self._lid_heating_active else 'idle'
-
-    @property
-    def lid_temp(self):
-        return self._lid_target
-
-    async def connect(self, port):
-        self._port = port
-
-    def disconnect(self):
-        self._port = None
-
-    async def set_temperature(self,
-                              temp: float,
-                              hold_time: float = None,
-                              ramp_rate: float = None,
-                              volume: float = None) -> None:
-        self._target_temp = temp
-        self._hold_time = hold_time
-        self._ramp_rate = ramp_rate
-        self._active = True
-
-    async def set_lid_temperature(self, temp: Optional[float]):
-        """ Set the lid temperature in deg Celsius """
-        self._lid_heating_active = True
-        self._lid_target = temp
-
-    async def deactivate_lid(self):
-        self._lid_heating_active = False
-        self._lid_target = None
-
-    async def deactivate_block(self):
-        self._target_temp = None
-        self._ramp_rate = None
-        self._hold_time = None
-        self._active = False
-
-    async def deactivate_all(self):
-        self._target_temp = None
-        self._ramp_rate = None
-        self._hold_time = None
-        self._active = False
-        self._lid_heating_active = False
-        self._lid_target = None
-
-    async def get_device_info(self):
-        return {'serial': 'dummySerialTC',
-                'model': 'dummyModelTC',
-                'version': 'dummyVersionTC'}
-
-    async def enter_programming_mode(self):
-        pass
-
-
-class TCPoller(threading.Thread):
-    POLLING_FD_PATH = '/var/run/'
-
-    def __init__(self, port, interrupt_callback, temp_status_callback,
-                 lid_status_callback, lid_temp_status_callback):
-        if not select:
-            raise RuntimeError("Cannot connect to a Thermocycler from Windows")
-        self._port = port
-        self._connection = self._connect_to_port()
-        self._interrupt_callback = interrupt_callback
-        self._temp_status_callback = temp_status_callback
-        self._lid_status_callback = lid_status_callback
-        self._lid_temp_status_callback = lid_temp_status_callback
-        self._lock = threading.Lock()
-        self._command_queue: CommandQueue = Queue()
-
-        # Note: the options and order of operations for opening file
-        # descriptors is very specific. For more info, see:
-        # http://pubs.opengroup.org/onlinepubs/007908799/xsh/open.html
-        self._send_path = os.path.join(
-            self.POLLING_FD_PATH, f"tc_send_fifo_{hash(self)}")
-        os.mkfifo(self._send_path)
-        send_read_fd = os.open(
-            self._send_path, flags=os.O_RDONLY | os.O_NONBLOCK)
-        self._send_read_file = os.fdopen(send_read_fd, 'rb')
-        self._send_write_fd = open(self._send_path, 'wb', buffering=0)
-
-        self._halt_path = os.path.join(
-            self.POLLING_FD_PATH, f"tc_halt_fifo_{hash(self)}")
-        os.mkfifo(self._halt_path)
-        halt_read_fd = os.open(
-            self._halt_path, flags=os.O_RDONLY | os.O_NONBLOCK)
-        self._halt_read_file = os.fdopen(halt_read_fd, 'rb')
-        self._halt_write_fd = open(self._halt_path, 'wb', buffering=0)
-
-        self._poller = select.poll()
-        self._poller.register(self._send_read_file, select.POLLIN)
-        self._poller.register(self._halt_read_file, select.POLLIN)
-        self._poller.register(self._connection, select.POLLIN)
-        serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
-        super().__init__(target=self._serial_poller, name=serial_thread_name)
-        log.info("Starting TC thread {}".format(serial_thread_name))
-        super().start()
-
-    @property
-    def port(self):
-        return self._port
-
-    def _serial_poller(self):
-        """ Priority-sorted list of checks
-
-        Highest priority is the 'halt' channel, which is used to kill the
-        thread and the serial communication channel and allow everything to be
-        cleaned up.
-
-        Second is the lid-open interrupt, which should trigger a callback
-        (typically to halt the robot).
-
-        Third is an enqueued command to send to the Thermocycler.
-
-        Fourth (if no other work is available) is to query the Thermocycler for
-        its current temp, target temp, and time remaining in its current cycle.
-        """
-        while True:
-            _next = dict(self._poller.poll(POLLING_FREQUENCY_MS))
-            if self._halt_read_file.fileno() in _next:
-                log.debug("Poller [{}]: halt".format(hash(self)))
-                self._halt_read_file.read()
-                # Note: this is discarded because we send a set message to halt
-                # the thread--don't currently need to parse it
-                break
-
-            elif self._connection.fileno() in _next:
-                # Lid-open interrupt
-                log.debug("Poller [{}]: interrupt".format(hash(self)))
-                res = self._connection.read_until(SERIAL_ACK)
-                self._interrupt_callback(res)
-
-            elif self._send_read_file.fileno() in _next:
-                self._send_read_file.read(1)
-                command, callback = self._command_queue.get()
-                log.debug("Poller [{}]: send {}".format(hash(self), command))
-                res = self._send_command(command)
-                callback(res)
-            else:
-                # Nothing else to do--update device status
-                log.debug("Poller [{}]: updating temp".format(hash(self)))
-                res = self._send_command(GCODES['GET_PLATE_TEMP'])
-                self._temp_status_callback(res)
-                res = self._send_command(GCODES['GET_LID_STATUS'])
-                self._lid_status_callback(res)
-                res = self._send_command(GCODES['GET_LID_TEMP'])
-                self._lid_temp_status_callback(res)
-        log.info("Exiting TC poller loop [{}]".format(hash(self)))
-
-    def _wait_for_ack(self):
-        """
-        This method writes a sequence of newline characters, which will
-        guarantee the device responds with 'ok\r\nok\r\n' within 1 second
-        """
-        self._send_command(SERIAL_ACK, timeout=DEFAULT_TC_TIMEOUT)
-
-    def _send_command(self, command, timeout=DEFAULT_TC_TIMEOUT):
-        command_line = command + ' ' + TC_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
-        if ERROR_KEYWORD in ret_code.lower():
-            log.error('Received error message from Thermocycler: {}'.format(
-                ret_code))
-            raise ThermocyclerError(ret_code)
-        return ret_code.strip()
-
-    def _recursive_write_and_return(self, cmd, timeout, retries):
-        try:
-            return serial_communication.write_and_return(
-                cmd, TC_ACK, self._connection, timeout,
-                tag=f'thermocycler {id(self)}')
-        except SerialNoResponse as e:
-            retries -= 1
-            if retries <= 0:
-                raise e
-            sleep(DEFAULT_STABILIZE_DELAY)
-            if self._connection:
-                self._connection.close()
-                self._connection.open()
-            return self._recursive_write_and_return(
-                cmd, timeout, retries)
-
-    def _connect_to_port(self):
-        try:
-            return serial_communication.connect(port=self._port,
-                                                baudrate=TC_BAUDRATE)
-        except SerialException:
-            raise SerialException(
-                "Thermocycler device not found on {}".format(self._port))
-
-    def send(self, command, callback):
-        with self._lock:
-            self._command_queue.put((command, callback))
-            self._send_write_fd.write(b'c')
-
-    def close(self):
-        log.debug("Halting TCPoller")
-        self._halt_write_fd.write(b'q')
-
-    def __del__(self):
-        """ Clean up thread fifos"""
-        log.debug("Cleaning up thread fifos in TCPoller.")
-        try:
-            os.unlink(self._send_path)
-        except NameError:
-            pass
-        try:
-            os.unlink(self._halt_path)
-        except NameError:
-            pass
-
-
-class Thermocycler:
-    def __init__(self, interrupt_callback, port):
-        self._port = port
-=======
 class Thermocycler:
     def __init__(self, interrupt_callback):
         self._port = WINDOWS_TC_PORT
->>>>>>> newrepo
         self._connection = self._connect_to_port()
         self._update_thread = None
         self._current_temp = None
@@ -407,33 +134,13 @@ class Thermocycler:
         return self._connection.is_open
 
     def _connect_to_port(self):
-<<<<<<< HEAD
-=======
         self.find_port()
->>>>>>> newrepo
         try:
             return serial_communication.connect(port=self._port,
                                                 baudrate=TC_BAUDRATE)
         except SerialException:
             raise SerialException(
                 "Thermocycler device not found on {}".format(self._port))
-<<<<<<< HEAD
-        # try:
-        #     self._connection = serial_communication.connect(
-        #         port=self._port,
-        #         baudrate=TC_BAUDRATE
-        #     )
-        #     self.simulating = False
-        # except SerialException:
-        #     # if another process is using the port, pyserial raises an
-        #     # exception that describes a "readiness to read" which is confusing
-        #     error_msg = 'Unable to access UART port to Smoothie. This is '
-        #     error_msg += 'because another process is currently using it, or '
-        #     error_msg += 'the UART port is disabled on this device (OS)'
-        #     raise SerialException(error_msg)
-
-=======
->>>>>>> newrepo
 
     def _wait_for_ack(self):
         """
@@ -707,39 +414,36 @@ class Thermocycler:
         trigger_connection.close()
         self.disconnect()
 
-<<<<<<< HEAD
-async def testing():
-    tc_portname = '/dev/ttyACM0'
-    tc_portname_windows = 'COM5' 
-    TC = Thermocycler(interrupt_callback=interrupt_callback, port=tc_portname_windows)
-=======
     def find_port(self):
         ports = list_ports.comports()
         operating_system = os.name
         for p in ports:
-            if operating_system == WINDOWS_OS and p.device == WINDOWS_TC_PORT:
+            # print(p)
+            if operating_system == WINDOWS_OS and p.serial_number == WINDOWS_TC_SER:
                 self._port = p.device
                 print(f"Thermocycler connected to: {p}")
-            elif operating_system == LINUX_OS and p.device == LINUX_TC_PORT:
-                self._port = p.device
-                print(f"Thermocycler connected to: {p}")
-            
-        
-
+            elif operating_system == LINUX_OS:
+                if p == LINUX_TC_PORT or p.device == MACBOOK_TC_PORT:
+                    self._port = p.device
+                    # print(self._port)
+                    print(f"Thermocycler connected to: {p}")
+                else: 
+                    # print(f"Port not found: {p.device}")
+                    pass
+            # else:
+            #     print(f"No operating system recognized: {operating_system}")
+                
 
 async def testing():
     tc_portname = '/dev/ttyACM0'
     tc_portname_windows = 'COM5' 
     TC = Thermocycler(interrupt_callback=interrupt_callback)
->>>>>>> newrepo
     # await TC.close()
     await TC.set_temperature(4, 30)
     # await TC.deactivate_all()
     # await TC.close()
     # await TC.set_temperature(60, 60)
     # await TC.set_lid_temperature(40)
-
-
 
 async def interrupt_callback(res):
     sys.stderr.write(res)

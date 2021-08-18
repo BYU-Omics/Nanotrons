@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>Nanotrons Script Editor</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="https://www.gstatic.com/jsaction/contract.js"></script>
+		<script src="https://www.gstatic.com/jsaction/dispatcher.js" async></script>
+		<link rel= "stylesheet" type= "text/css" href= "/static/styles/batch.css">
+    </head>
+
+    <body>
+		<div class="container">
+			<h1>Batch Creation</h1>
+
+			<button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+
+			<button id="add_element">Add element</button>
+			<button id="log_current_list">Log current list</button><br><br>
+			<div id="container_script_title"><label class="sample_number">Sample #</label><label class="sample_container">Container</label><label class="script_name">Script</label></div>
+
+			<ul class="drag-sort-enable" id="batch_elements_list">
+				<li class="batch_element"><label class="sample_container">Micropots_3 A1</label><label>script_bieeeeen_largo</label>
+				</li>
+
+				<li class="batch_element"><label class="sample_container">Micropots_3 A2</label><label>script_bieeeeen_largo</label>
+				</li>
+
+				<li class="batch_element"><label class="sample_container">Micropots_3 A3</label><label>my_script#2</label>
+				</li>
+
+				<li class="batch_element"><label class="sample_container">Micropots_3 A4</label><label>my_script#2</label>
+				</li>
+
+				<li class="batch_element"><label class="sample_container">Micropots_3 A5</label><label>my_script#3</label>
+				</li>
+			</ul>
+
+		</div>
+		<script src="{{url_for('static', filename='batch.js')}}"></script>
+	</body>
+	
+</html>

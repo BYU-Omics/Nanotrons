@@ -5,32 +5,43 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
-RUNNING_APP_FOR_REAL = True
+RUNNING_APP_FOR_REAL = False
 import cv2
 import os
 import time
+from flask import request
 from flask import Flask, render_template, url_for, Response, flash, request, redirect
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from video_stream import VideoStream
 from flag import Flag
 import logging
-# if RUNNING_APP_FOR_REAL:
-from coordinator import *
+if RUNNING_APP_FOR_REAL:
+    from coordinator import *
 from python_execute import Py_Execute
+import platform
+import datetime
 
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 CAMERA_PORT = 0
+CAMERA_PORT_MACBOOK = 1
 PIPPETE_CAMERA_PORT = 1
+PIPPETE_CAMERA_PORT_MACBOOK = 2
 RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
-RELATIVE_PATH_TO_PROTOCOLS_L = 'protocols/'
+RELATIVE_PATH_TO_PROTOCOLS_L = './protocols/'
 RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
-RELATIVE_PATH_TO_LABWARE_L = 'saved_labware/'
+RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
+RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
+RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
+RELATIVE_PATH_TO_PICTURES_W = 'pictures\\'
+RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'Protocol Pictures\\'
+RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'Manual Control Pictures\\'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
+MACBOOK_OS = 'Darwin'
 TEMP = 0
 HOLD_TIME = 1
 X, Y, Z = 0, 1 ,2
@@ -40,6 +51,13 @@ LABWARE_COMPONENT_INDEX = 0 # 'c' or 'p'
 COMPONENT_MODEL_INDEX = 1
 SETTING_NAME_INDEX = 0
 NEW_VALUE_INDEX = 1
+WHITE = (255, 255, 255)
+BIG_SQR_X1, BIG_SQR_Y1 = 245, 200
+BIG_SQR_X2, BIG_SQR_Y2 = 345, 300
+BIG_SQR_LINE_THICKNESS = 2
+SMALL_SQR_X1, SMALL_SQR_Y1 = 285, 240
+SMALL_SQR_X2, SMALL_SQR_Y2 = 305, 260
+SMALL_SQR_LINE_THICKNESS = 1
 
 app = Flask(__name__)
 
@@ -55,20 +73,24 @@ logging.getLogger("engineio").setLevel(logging.ERROR)
 
 # -----------------------------------
 
-# if RUNNING_APP_FOR_REAL:
-coordinator = Coordinator()
+if RUNNING_APP_FOR_REAL:
+    coordinator = Coordinator()
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
-myCamera = VideoStream(CAMERA_PORT)
-my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
+if platform.system() == MACBOOK_OS:
+    myCamera = VideoStream(CAMERA_PORT_MACBOOK)
+    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
+else: 
+    myCamera = VideoStream(CAMERA_PORT)
+    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
-# if RUNNING_APP_FOR_REAL:
-app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
-app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
-app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
+if RUNNING_APP_FOR_REAL:
+    app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
+    app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
+    app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
 app.secret_key = "hola"
 
@@ -123,9 +145,19 @@ def load_labware_setup():
 def script():
     return render_template("script.html")
 
+@app.route('/batch')
+def batch_page():
+    return render_template("batch.html")
+
 @app.route('/settings')
 def system_settings():
     return render_template("settings.html")
+
+@app.route("/", methods =["POST"])
+def PostData():
+    data = request.get_json(force=True)
+    coordinator.set_picture_flag(bool(data['take_pic']))
+    coordinator.set_folder_for_pictures(bool(data['folder']))
     
 # This method checks to see if the filename ends with an allowed extension
 def allowed_file(filename):
@@ -173,21 +205,38 @@ def gen_1(camera):
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
-            print("frame is none")
+            print("Frame is none")
 
 def gen_2(camera):
+    img_counter = 0
     while True:
         if camera.stopped:
             break
         frame = camera.read()
-        # font = cv2.FONT_HERSHEY_SIMPLEX
-        # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
-        ret, jpeg = cv2.imencode('.jpg',frame)
+        img_with_rect = frame.copy()
+        cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
+        cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
+        
+        ret, jpeg = cv2.imencode('.jpg', img_with_rect)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
-            print("frame is none")
+            print("Frame is none")
+        if coordinator.get_picture_flag() == True:
+            folder = coordinator.get_folder_for_pictures()
+            print(f"Writing picture to {folder}")
+            if folder:
+                directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W + folder + '\\'
+            else:
+                directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
+            current_time =  datetime.datetime.now()
+            protocol_name = executer.get_file_name().strip(".py")
+            img_name = f"{protocol_name} {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
+            cv2.imwrite(directory + img_name, frame)
+            print(f"{img_name} written!")
+            img_counter += 1
+            coordinator.set_picture_flag(False)
 
 @app.route('/video_1_feed')
 def video_1_feed():
@@ -200,7 +249,7 @@ def video_2_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def text_coordinates():
-    x, y, z = coordinator.get_current_coordinates() # This should be replaced by the actual method in the App class that returns the coordinates of the syringe
+    x, y, z = coordinator.get_current_coordinates() 
     return f"({x}, {y}, {z})"
 
 def start_sending_coordinates():
@@ -269,6 +318,12 @@ def down_step_size():
     print("down_step_size")
     coordinator.down_step_size()
 
+@socketio.on("take_picture")
+def take_picture(folder):
+    print("take_picture")
+    coordinator.set_folder_for_pictures(folder)
+    coordinator.set_picture_flag(True)
+
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
 @socketio.on("open_lid")
@@ -329,8 +384,6 @@ def hold_time():
     print("hold_time")
     coordinator.tc_control.hold_time()
 
-<<<<<<< HEAD
-=======
 #----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
 
 @socketio.on("set_tempdeck_temp")
@@ -355,7 +408,7 @@ def check_tempdeck_status():
     coordinator.check_tempdeck_status()
     status = coordinator.check_tempdeck_status()
     socketio.emit("check_tempdeck_status", status)
->>>>>>> newrepo
+
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
@@ -374,7 +427,7 @@ def start_calibration():
     while not read_done_calibration_flag():
         # Enable manual control
         coordinator.manual_control()
-        print("Added")
+        print("Calibration point added")
         # Once manual control is over (user pressed START button), read the position of the syringe
         position = coordinator.get_current_coordinates()
         # Store the position in the calibration points list
@@ -475,6 +528,10 @@ def new_labware_model(model_properties):
     elif (model_properties["component_type"] == "Syringe"):
         coordinator.create_new_syringe_model(model_properties)
 
+@socketio.on("get_type_of_labware_by_slot")
+def get_type_of_labware_by_slot(slot):
+    coordinator.get_type_of_labware_by_slot(slot)
+
 #----------------------------------------------- SETTINGS EVENTS SECTION
 @socketio.on("get_current_settings")
 def get_current_settings():
@@ -493,6 +550,7 @@ def get_syringe_models():
     socketio.emit('dynamic_selects_options', dynamic_selects_options)
 
 #----------------------------------------------- INSTANTANEOUS COMMANDS EVENTS SECTION
+
 @socketio.on("instant_command")
 def execute_instant_command(command_description):
     # Here goes the App.whatever that sends an instantaneous command to the OT_CONTROL object -> "INSTANTANEOUS COMMANDS" section of Application class
@@ -585,10 +643,9 @@ def connect_all():
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
     # if RUNNING_APP_FOR_REAL:
-    coordinator.tc_disconnect()
-    coordinator.ot_control.disconnect()
-    executer.set_file_name(protocol_name)
-    executer.execute_python_protocol()
+    coordinator.disconnect_all() # First we disconnect all the modules
+    executer.set_file_name(protocol_name) # Then we add the calibration to use
+    executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 
 @socketio.on("give_me_protocol_python")
 def give_me_protocol_python(protocolName):
@@ -617,26 +674,16 @@ def pause_protocol():
     coordinator.pause_protocol()
 
 
-#------------------WORKING WITH A SCRIPT.JSON SECTION--------------------
-@socketio.on("run_script")
-def run_script():
-    # print("I am running script")
-    coordinator.run_batch()
+@socketio.on("set_protocol_filename")
+def set_protocol_filename(protocol_name):
+    print(f"Filename set to: {protocol_name}")
+    executer.set_file_name(protocol_name) # Then we add the calibration to use
 
-@socketio.on("give_me_script_json")
-def give_me_script_json(scriptName):
-    # read file
-    path_to_script = "../scripts/" + scriptName # moves to script folder
-    with open(path_to_script, 'r') as myfile:
-        data = myfile.read()
-
-    socketio.emit("script_json_data", data) # send data back to js in a json string
-
-@socketio.on("get_available_scripts")
-def get_available_scripts():
-    path_to_scripts_folder = "../scripts" # path to folder
-    list = os.listdir(path_to_scripts_folder) # make a list of scripts in folder
-    socketio.emit("scripts_available", list) # send the list back to js
+@socketio.on("display_contents")
+def display_contents():
+    print("display_contents")
+    list_of_lines = executer.display_contents()
+    socketio.emit("protocol_python_data", list_of_lines)
 
 #------------------WORKING WITH A CALIBRATION.JSON SECTION--------------------
 
@@ -645,17 +692,16 @@ def get_available_calibrations():
     if os.name == WINDOWS_OS:
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_W  # moves to script folder
     elif os.name == LINUX_OS:
+        # print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    print(list)
+    # print(f"Files on folder: {list}")
     socketio.emit("calibrations_available", list) # send the list back to js
 
 @socketio.on("set_labware_calibration")
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
 
-<<<<<<< HEAD
-=======
 @socketio.on("stop_protocol")
 def stop_protocol():
     executer.stop_execution()
@@ -664,7 +710,18 @@ def stop_protocol():
 def reconnect_coordinator():
     coordinator.connect_all()
 
->>>>>>> newrepo
+@socketio.on("get_available_syringes")
+def get_available_syringes():
+    if os.name == WINDOWS_OS:
+        path_to_calibration = RELATIVE_PATH_TO_SYRINGES_W  # moves to script folder
+    elif os.name == LINUX_OS:
+        path_to_calibration = RELATIVE_PATH_TO_SYRINGES_L  # moves to script folder
+    list = os.listdir(path_to_calibration) # make a list of scripts in folder
+    socketio.emit("syringes_available", list) # send the list back to js
+
+@socketio.on("set_labware_syringes")
+def set_labware_syringes(syringes_file_name):
+    executer.set_syringes_file_name(syringes_file_name)
 
 #------------------EXTRA STUFF THAT WE DON'T NEED FOR NOW--------------------
 
@@ -686,6 +743,26 @@ def stop_load():
 def pause_batch():
     print("pause_batch")
     #coordinator.pause_batch()
+
+@socketio.on("run_script")
+def run_script():
+    # print("I am running script")
+    coordinator.run_batch()
+
+@socketio.on("give_me_script_json")
+def give_me_script_json(scriptName):
+    # read file
+    path_to_script = "../scripts/" + scriptName # moves to script folder
+    with open(path_to_script, 'r') as myfile:
+        data = myfile.read()
+
+    socketio.emit("script_json_data", data) # send data back to js in a json string
+
+@socketio.on("get_available_scripts")
+def get_available_scripts():
+    path_to_scripts_folder = "../scripts" # path to folder
+    list = os.listdir(path_to_scripts_folder) # make a list of scripts in folder
+    socketio.emit("scripts_available", list) # send the list back to js
 
 if __name__ == "__main__":
     socketio.run(app)

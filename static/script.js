@@ -3,9 +3,12 @@ var socket = io.connect('http://127.0.0.1:5000');
 var run_protocol_button = document.getElementById("run_protocol");
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
 var calibrationOptions = document.getElementById("calibration"); // Dropdown list that shows the available models
+var syringeOptions = document.getElementById("syringe"); // Dropdown list that shows the available models
+
 
 var display_protocol_button = document.getElementById("display_protocol");
 var display_calibration_button = document.getElementById("display_calibration");
+var display_syringe_button = document.getElementById("display_syringe");
 
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
@@ -18,34 +21,25 @@ var protocol_description = document.getElementById("protocol_description");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
+var contents = ""
 var protocols = {}
 var calibrations = {}
+var syringes = {}
 var script_to_display = "error" // save as error until over written
 var protocol_to_display = "error"
 var calibration_to_display = "error"
+var syringe_to_display = "error"
+
 var json_data = "" // will hold the json data from the script
 var python_data = ""
 
 // asks python to send the list of scripts
 
-<<<<<<< HEAD
-socket.emit("get_available_scripts");
-=======
->>>>>>> newrepo
 socket.emit("get_available_protocols")
 socket.emit("get_available_calibrations")
+socket.emit("get_available_syringes")
 
 // listens for the list of available scripts
-<<<<<<< HEAD
-socket.on('scripts_available', function(received_scripts) {
-    scripts = received_scripts; // save list in scripts variable
-    console.log("scripts recieved")
-    fill_script_drop_down() // add the options to the list
-});   
-
-// listens for the list of available scripts
-=======
->>>>>>> newrepo
 socket.on('protocols_available', function(received_protocols) {
     protocols = received_protocols; // save list in scripts variable
     console.log("protocol received")
@@ -59,33 +53,19 @@ socket.on('calibrations_available', function(received_calibrations) {
     fill_calibrations_drop_down() // add the options to the list
 }); 
 
-// fills drop down list with the availble scripts
-<<<<<<< HEAD
-function fill_script_drop_down(){
-    // Erase all the options inside the dropdown list (select object)
-    var length = scriptOptions.options.length;
-    // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
-    for (var i = length - 1; i >= 0; i--) {
-        scriptOptions.remove(i);
-    };
-    
-    // Add instruction option ()
-    var script_option = document.createElement("option"); // Adding instruction option
-    script_option.text = "- Select a Script -"; // Adding instruction option
-    scriptOptions.add(script_option); // Adding instruction option
+// listens for the list of available scripts
+socket.on('syringes_available', function(received_syringes) {
+    syringes = received_syringes; // save list in scripts variable
+    console.log("syringes received")
+    fill_syringes_drop_down() // add the options to the list
+}); 
 
-    // Loop that adds the options to the options_list
-    for (var i = 0; i < scripts.length; i++){  
-        var script_option = document.createElement("option");
-        script_option.text = scripts[i];
-        scriptOptions.add(script_option);
-    }
+socket.on('display_contents', function(file_contents) {
+    python_file_contents = file_contents
+});
 
-}
 
 // fills drop down list with the availble scripts
-=======
->>>>>>> newrepo
 function fill_protocol_drop_down(){
     // Erase all the options inside the dropdown list (select object)
     var length = protocolOptions.options.length;
@@ -130,29 +110,35 @@ function fill_calibrations_drop_down(){
     }
 }
 
-// this runs each time you select an option from the script list
-<<<<<<< HEAD
-function option_select_script(){
-    // This either blocks or unblocks the submit button
-    var selected_script = scriptOptions.options[ scriptOptions.selectedIndex ].value;
-    script_to_display = selected_script; // set variable to the selected value
-    console.log(selected_script);
-    if ( selected_script != "- Select a Script -" ) { // if you select something from the list
-        display_script_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_script_button.disabled = true; // disable button
+// fills drop down list with the availble scripts
+function fill_syringes_drop_down(){
+    // Erase all the options inside the dropdown list (select object)
+    var length = syringeOptions.options.length;
+    // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
+    for (var i = length - 1; i >= 0; i--) {
+        syringeOptions.remove(i);
+    };
+    
+    // Add instruction option ()
+    var python_option = document.createElement("option"); // Adding instruction option
+    python_option.text = "- Select a syringe -"; // Adding instruction option
+    syringeOptions.add(python_option); // Adding instruction option
+
+    // Loop that adds the options to the options_list
+    for (var i = 0; i < syringes.length; i++){  
+        var python_option = document.createElement("option");
+        python_option.text = syringes[i];
+        syringeOptions.add(python_option);
     }
 }
 
 // this runs each time you select an option from the script list
-=======
->>>>>>> newrepo
 function option_select_protocol(){
     // This either blocks or unblocks the submit button
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
     console.log(selected_protocol);
+    socket.emit("set_protocol_filename", protocol_to_display)
     if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
         display_protocol_button.disabled = false; // enable the button
     }
@@ -175,66 +161,63 @@ function option_select_labware_calibration(){
         display_calibration_button.disabled = true; // disable button
     }
 }
-<<<<<<< HEAD
-// this runs when you click the display script button
-display_script_button.addEventListener("click", function() {
-    clear_script_Table() // clear out the old table data
-    console.log("clearing table")
-    socket.emit("give_me_script_json", script_to_display);
-});
-=======
->>>>>>> newrepo
 
-// this runs when you click the display script button
-display_protocol_button.addEventListener("click", function() {
-    clear_protocol_Table() // clear out the old table data
-    console.log("clearing table")
-    socket.emit("give_me_protocol_python", protocol_to_display);
-});
-
-
-// listens for the json data
-socket.on('protocol_python_data', function(python_string) {
-    python_data = python_string; // save list in scripts variable
-    console.log("protocols received")
-    make_and_display_protocol_table()
-});  
-
-<<<<<<< HEAD
-// listens for the json data
-socket.on('script_json_data', function(json_string) {
-    json_data = json_string; // save list in scripts variable
-    console.log("scripts recieved")
-    make_and_display_script_table()
-});  
-
-// fills in the table with script commands
-function make_and_display_script_table(){
-    console.log(json_data)
-    var obj = JSON.parse(json_data); // parse the JSON string into JSON obj
-    console.log("Name " + obj.name);
-
-    script_name.innerHTML = obj.name;               // These 6 lines get name, description, MStime, LCtime, GradientTime, and SPEtime
-    script_description.innerHTML = obj.description; // from the json data
-    MStime.innerHTML = obj.MStime;                  // The command vector is parced and displayed in a table in the for loop below
-    LCtime.innerHTML = obj.LCtime;
-    gradientTime.innerHTML = obj.gradientTime;
-    SPEtime.innerHTML = obj.SPEtime;
-
-    for(var i = 0; i < obj.commands.length; i++) { // loop for each command
-        var command = obj.commands[i]; 
-    
-        var commmandType = command.type;
-        var parameters = command.parameters;
-        addRow(commmandType, parameters); // add row to table with the command and parameters
+// this runs each time you select an option from the script list
+function option_select_syringe(){
+    // This either blocks or unblocks the submit button
+    var selected_syringe = syringeOptions.options[ syringeOptions.selectedIndex ].value;
+    syringe_to_display = selected_syringe; // set variable to the selected value
+    console.log(selected_syringe);
+    socket.emit("set_labware_syringe", selected_syringe)
+    if ( selected_syringe != "- Select a syringe -" ) { // if you select something from the list
+        display_syringe_button.disabled = false; // enable the button
+    }
+    else { // if you select the instructions from the list
+        display_syringe_button.disabled = true; // disable button
     }
 }
 
-=======
->>>>>>> newrepo
+// this runs when you click the display script button
+display_protocol_button.addEventListener("click", function() {
+    // clear_protocol_Table() // clear out the old table data
+    console.log("clearing table")
+});
+
+
+// listens for the json data
+socket.on('protocol_python_data', function(python_lines_list) {
+    console.log("protocols received")
+    python_data = python_lines_list; // save list in scripts variable
+    var content = document.getElementById("file_contents")
+    
+    text_area_left = '<textarea id="w3review" name="w3review" rows="4" cols="50">'
+    text_area_right = '</textarea>'
+    text = "<br>" + text_area_left
+    for (let i = 36; i < python_data.length; i++) {
+        console.log(python_data[i][0])
+        if (python_data[i][0] == '#') {
+            text +=  python_data[i] ;
+        } else {
+            
+            text += python_data[i] ;
+        }
+    }
+    content.innerHTML = text + text_area_right + "<br>"
+    // console.log(text)
+    
+    
+    // make_and_display_protocol_table()
+});  
+
+function display_contents() {
+    socket.emit("display_contents")
+}
+
+
 // fills in the table with script commands
 function make_and_display_protocol_table(){
     console.log(python_data)
+    var obj1 = PY.parse(python_data)
     var obj = JSON.parse(python_data); // parse the JSON string into JSON obj
     console.log("Name " + obj.name);
 
@@ -252,35 +235,17 @@ function make_and_display_protocol_table(){
     }
 }
 
-<<<<<<< HEAD
-// the play button in HTML. Calls the run batch function
-run_script_button.addEventListener("click", function() {
-    socket.emit("run_script");
-});
-
-=======
->>>>>>> newrepo
 run_protocol_button.addEventListener("click", function() {
     socket.emit("run_protocol", protocol_to_display);
 });
 
 // the pause button in HTML. Calls the pause batch function
-<<<<<<< HEAD
-pause_button_script.addEventListener("click", function() {
-    socket.emit("pause_batch");
-});
-
-// the pause button in HTML. Calls the pause batch function
-pause_button_script.addEventListener("click", function() {
-    socket.emit("pause_protocol");
-=======
 pause_button_protocol.addEventListener("click", function() {
     socket.emit("pause_protocol");
 });
 
 stop_button_protocol.addEventListener("click", function() {
     socket.emit("stop_protocol")
->>>>>>> newrepo
 });
 
 // the stop load button in HTML. Calls the stop_load function
@@ -296,14 +261,10 @@ hardStop_button.addEventListener("click", function() {
 // allows you to upload a new script that you can display
 function uploadScript() {
     var socket = io.connect('http://127.0.0.1:5000');
-<<<<<<< HEAD
-
     console.log("upload script")
-
-=======
-    console.log("upload script")
->>>>>>> newrepo
 }
+
+
 
 // adds a row to the table with the given parameters
 function addRow(command, parameters) {
@@ -374,7 +335,6 @@ function addTable() {
        }
     }
     myTableDiv.appendChild(table);
-    
 }
  
 function load() {
