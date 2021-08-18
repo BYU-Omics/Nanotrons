@@ -33,7 +33,7 @@ COORDINATOR CLASS
         This section provides current values for dynamic variables and states such as the current X,Y,Z coordinate of the motors, and current gear, and 
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
 
-    VII. Testing teamwork1
+    VII. Testing teamwork99
 """
 
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
