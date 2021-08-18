@@ -736,6 +736,14 @@ class ProtocolCreator:
     # ------PROTOCOL CSV HANDLING SECTION-----
 
     def convert_csv_to_cmd_list(self, filename: str) -> list:
+        """This function reads a csv file formated as cmd,volume,labware,location,temp,holding_time,plate,depth for the columns
+
+        Args:
+            filename (str): a name for a csv file
+
+        Returns:
+            list: returns a list with the commands on the csv file
+        """        
         path_to_file = self.get_path_to_protocols(filename)
         colums_names = []
         cmd_list = []
@@ -788,6 +796,11 @@ class ProtocolCreator:
         return cmd_list
     
     def convert_cmd_list_to_csv(self, list_of_commands: list):
+        """This function takes a list of commands and it converts it to csv file formated as the example
+
+        Args:
+            list_of_commands (list): list of commands from the api
+        """        
         csv_filename = self.create_name_for_new_file('csv')
         path_to_file = self.get_path_to_protocols(csv_filename)
         first_row = [CMD, VOLUME, LABWARE, LOCATION, TEMP, HOLDING_TIME, PLATE, DEPTH]
@@ -799,6 +812,14 @@ class ProtocolCreator:
                 writer.writerow(command)
 
     def convert_list_of_cmds_to_list_of_dict(self, list_of_commands: list) -> dict:
+        """This function converts commands on a list to a dictionary for easier access
+
+        Args:
+            list_of_commands (list): list of commands 
+
+        Returns:
+            dict: dictionary with the keys: arguments, values: assignments
+        """        
         dict_list: list = []
         for command in list_of_commands:
             command_to_dict = self.create_cmd_argumens_from_text(command)
@@ -809,12 +830,16 @@ class ProtocolCreator:
     # ------PROTOCOL DISPLAY SECTION----------
 
     def display_protocol_commands(self):
+        """this function prints to the screen the command contents of a list. 
+        """        
         for line in self.contents:
             if 'myProtocol.' in line:
                 print(line.strip("'myProtocol"))
         pass
 
     def display_protocol_comments(self):
+        """This function prints to the screen the comments of a protocol
+        """        
         for line in self.contents:
             if line[0] == '#':
                 print(line)

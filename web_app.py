@@ -5,7 +5,7 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
-RUNNING_APP_FOR_REAL = True
+RUNNING_APP_FOR_REAL = False
 import cv2
 import os
 import time

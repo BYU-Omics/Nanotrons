@@ -4,6 +4,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+		<script src="https://www.gstatic.com/jsaction/contract.js"></script>
+		<script src="https://www.gstatic.com/jsaction/dispatcher.js" async></script>
 		<link rel= "stylesheet" type= "text/css" href= "/static/styles/batch.css">
     </head>
 
@@ -16,22 +18,6 @@
 			<button id="add_element">Add element</button>
 			<button id="log_current_list">Log current list</button><br><br>
 			<div id="container_script_title"><label class="sample_number">Sample #</label><label class="sample_container">Container</label><label class="script_name">Script</label></div>
-			
-
-            <button jstcache="1685" class=" widget-directions-searchbox-container waypoint-add-container" style="" vet="7095" jsaction="pane.directions-options.addWaypoint" jsan="7.widget-directions-searchbox-container,7.waypoint-add-container,0.vet,22.jsaction"> 
-                <div class="widget-directions-searchbox-handle"> 
-                    <div data-tooltip=" Add destination " jstcache="1686" jsaction="focus:pane.focusTooltip;blur:pane.blurTooltip" class="widget-directions-icon waypoint-add"> 
-
-                    </div> 
-                </div> 
-                <div jstcache="1687" class="searchbox add-waypoint-text" jsan="7.searchbox,7.add-waypoint-text"> 
-                    <span jstcache="1688"> Add command
-
-                    </span> 
-                </div> 
-            </button>
-
-
 
 			<ul class="drag-sort-enable" id="batch_elements_list">
 				<li class="batch_element"><label class="sample_container">Micropots_3 A1</label><label>script_bieeeeen_largo</label>
@@ -46,9 +32,10 @@
 				<li class="batch_element"><label class="sample_container">Micropots_3 A4</label><label>my_script#2</label>
 				</li>
 
-				<li class="batch_element"><label class="sample_container">Micropots_3 A5</label><label>my_script#2</label>
+				<li class="batch_element"><label class="sample_container">Micropots_3 A5</label><label>my_script#3</label>
 				</li>
 			</ul>
+
 		</div>
 		<script src="{{url_for('static', filename='batch.js')}}"></script>
 	</body>

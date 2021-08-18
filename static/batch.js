@@ -72,6 +72,16 @@ function handleDrop(item) {
 
 // --------------------------- LOAD GROUP METHODS ---------------------------
 
+let divElement = document.createElement('div')
+
+let textNode = document.createTextNode('This is newly created element')
+
+divElement.appendChild(textNode)
+
+let containerDiv = document.querySelector('.container')
+
+containerDiv.appendChild(divElement)
+
 // --------------------------- DELETE SAMPLE METHODS --------------------------- 
 /*
 Here there will be methods that assign the id to each trash can image in accordance with the index of the list element that they belong to 
