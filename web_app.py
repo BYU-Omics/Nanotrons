@@ -5,7 +5,6 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
-RUNNING_APP_FOR_REAL = False
 import cv2
 import os
 import time
@@ -16,12 +15,11 @@ from werkzeug.utils import secure_filename
 from video_stream import VideoStream
 from flag import Flag
 import logging
-if RUNNING_APP_FOR_REAL:
-    from coordinator import *
+from coordinator import *
 from python_execute import Py_Execute
 import platform
 import datetime
-
+from constants import RUNNING_APP_FOR_REAL
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -59,9 +57,14 @@ SMALL_SQR_X1, SMALL_SQR_Y1 = 285, 240
 SMALL_SQR_X2, SMALL_SQR_Y2 = 305, 260
 SMALL_SQR_LINE_THICKNESS = 1
 
-app = Flask(__name__)
+app = Flask(__name__) # __name__ return the name of the file when called by another function. If called within the file it will return "__main__"
 
 print("Running web_app.py")
+if RUNNING_APP_FOR_REAL:
+    print("Make sure the computer is connected to the modules and controller.")
+else: 
+    print("Running app as a test. This means the server is not connected to the modules or the controller.")
+
 
 # -----------------------------------
 # This section gets rid of console messages from the server (that way we don't loose error messages from the system in development after a long run time)
@@ -73,8 +76,7 @@ logging.getLogger("engineio").setLevel(logging.ERROR)
 
 # -----------------------------------
 
-if RUNNING_APP_FOR_REAL:
-    coordinator = Coordinator()
+coordinator = Coordinator()
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
@@ -87,10 +89,9 @@ else:
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
-if RUNNING_APP_FOR_REAL:
-    app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
-    app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
-    app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
+app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
+app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
+app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
 app.secret_key = "hola"
 
