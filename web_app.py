@@ -87,12 +87,13 @@ else:
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
+
+#This uploads the dropdown options on the script and add labware pages
 if RUNNING_APP_FOR_REAL:
     app.config['UPLOAD_CHIP_FOLDER'] = coordinator.get_component_models_location(LABWARE_CHIP) # Establishes path to save uploads of chip models
     app.config['UPLOAD_PLATE_FOLDER'] = coordinator.get_component_models_location(LABWARE_PLATE) # Establishes path to save uploads of plate models
     app.config['UPLOAD_SYRINGE_FOLDER'] = coordinator.get_component_models_location(LABWARE_SYRINGE) # Establishes path to save uploads of syringe models
 app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
-app.secret_key = "hola"
 
 """
 ------------------------------------------------ ROUTES FOR FLASK APP
@@ -197,7 +198,7 @@ def gen_1(camera):
         if camera.stopped:
             break
         frame = camera.read()
-        cam = cv2.flip(frame, -1)
+        cam = cv2.flip(frame, -1)#its flipped because the camera veiwing all of OT2 is upside down
         # font = cv2.FONT_HERSHEY_SIMPLEX
         # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
         ret, jpeg = cv2.imencode('.jpg', cam)
@@ -206,6 +207,7 @@ def gen_1(camera):
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
             print("Frame is none")
+        
 
 def gen_2(camera):
     img_counter = 0
