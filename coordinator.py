@@ -83,6 +83,9 @@ SYRINGE_BOTTOM = -190
 SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
 SYRINGE_TOP = -90
 
+from constants import RUNNING_APP_FOR_REAL
+
+
 def interrupt_callback(res):
     sys.stderr.write(res)
 
@@ -111,7 +114,8 @@ class Coordinator:
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        self.myProfile = Profile(self.joystick_profile)
+        if RUNNING_APP_FOR_REAL:
+            self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
