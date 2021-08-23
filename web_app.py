@@ -534,6 +534,7 @@ def get_type_of_labware_by_slot(slot):
     coordinator.get_type_of_labware_by_slot(slot)
 
 #----------------------------------------------- SETTINGS EVENTS SECTION
+#---------------this section is currently unused
 @socketio.on("get_current_settings")
 def get_current_settings():
     current_settings= coordinator.get_current_settings()
@@ -606,7 +607,7 @@ def get_labware_summary():
         summary["nicknames"] = plate_properties["pot_nicknames"]
         labware_summary["plates"].append(summary)
 
-    # print(f"labware_summary: {labware_summary}")
+    print(f"labware_summary: {labware_summary}")
     socketio.emit("labware_summary", labware_summary)
 
 @socketio.on("go_to_deck_slot")
