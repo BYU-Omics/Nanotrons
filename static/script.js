@@ -38,6 +38,7 @@ var python_data = ""
 socket.emit("get_available_protocols")
 socket.emit("get_available_calibrations")
 socket.emit("get_available_syringes")
+// socket.emit("give_me_protocol_python")
 
 // listens for the list of available scripts
 socket.on('protocols_available', function(received_protocols) {
