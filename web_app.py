@@ -31,9 +31,9 @@ PIPPETE_CAMERA_PORT_MACBOOK = 2
 RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\'
 RELATIVE_PATH_TO_PROTOCOLS_L = './protocols/'
 RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
-RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
+RELATIVE_PATH_TO_LABWARE_L = './saved_labware/'
 RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
-RELATIVE_PATH_TO_SYRINGES_L = '/models/syringes/'
+RELATIVE_PATH_TO_SYRINGES_L = './models/syringes/'
 RELATIVE_PATH_TO_PICTURES_W = 'pictures\\'
 RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'Protocol Pictures\\'
 RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'Manual Control Pictures\\'
@@ -648,17 +648,6 @@ def run_protocol(protocol_name):
     coordinator.disconnect_all() # First we disconnect all the modules
     executer.set_file_name(protocol_name) # Then we add the calibration to use
     executer.execute_python_protocol() # Then we execute an external file: the protocol.py
-
-@socketio.on("give_me_protocol_python")
-def give_me_protocol_python(protocolName):
-    # read file
-    if os.name == WINDOWS_OS:
-        path_to_protocol = RELATIVE_PATH_TO_PROTOCOLS_W + protocolName # moves to script folder
-    elif os.name == LINUX_OS:
-        path_to_protocol = RELATIVE_PATH_TO_PROTOCOLS_L + protocolName # moves to script folder
-    with open(path_to_protocol, 'r') as myfile:
-        data = myfile.read()
-    socketio.emit("protocol_python_data", data) # send data back to js in a json string
 
 @socketio.on("get_available_protocols")
 def get_available_protocols():

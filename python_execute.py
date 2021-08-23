@@ -8,7 +8,7 @@ import asyncio
 
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
 RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\' # ./ means look within the current directory
-RELATIVE_PATH_TO_PROTOCOLS_L = 'protocols/'
+RELATIVE_PATH_TO_PROTOCOLS_L = '/protocols/'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 
