@@ -1,5 +1,5 @@
 """
-    This class allows the user to create a 
+    This class allows the user to create a protocol
 
 
 """

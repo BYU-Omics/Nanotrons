@@ -28,7 +28,7 @@ CAMERA_PORT = 0
 CAMERA_PORT_MACBOOK = 1
 PIPPETE_CAMERA_PORT = 1
 PIPPETE_CAMERA_PORT_MACBOOK = 2
-RELATIVE_PATH_TO_PROTOCOLS_W = 'protocols\\'
+RELATIVE_PATH_TO_PROTOCOLS_W = '.\\protocols\\'
 RELATIVE_PATH_TO_PROTOCOLS_L = './protocols/'
 RELATIVE_PATH_TO_LABWARE_W = 'saved_labware\\'
 RELATIVE_PATH_TO_LABWARE_L = '/saved_labware/'
@@ -667,14 +667,12 @@ def get_available_protocols():
     elif os.name == LINUX_OS:
         path_to_protocol = RELATIVE_PATH_TO_PROTOCOLS_L  # moves to script folder
     list = os.listdir(path_to_protocol) # make a list of scripts in folder
-    print(list)
     socketio.emit("protocols_available", list) # send the list back to js
 
 @socketio.on("pause_protocol")
 def pause_protocol():
     print("pause_protocol")
     coordinator.pause_protocol()
-
 
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
