@@ -668,7 +668,7 @@ class Coordinator:
         self.ot_control.move({'B': position})
 
     def set_washing_positions(self, clean_water, wash_water, waste_water):
-        """ For every protocol we assume the sicentist will have these three location in which the 
+        """ For every protocol we assume the scientist will have these three location in which the 
             different types of water are places for washing the syringe so that there is no contamination"""
         self.clean_water = clean_water
         self.wash_water = wash_water
@@ -710,9 +710,6 @@ class Coordinator:
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
     
-    def tc_connect(self):
-        """ Here we connect to thr module"""
-        asyncio.run(self.tc_control.connect(port= self.tc_port))
 
     def open_lid(self):
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
