@@ -10,9 +10,9 @@ LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 
-RELATIVE_PATH_TO_CHIPS_W = "models\\chips"
-RELATIVE_PATH_TO_PLATES_W = "models\\plates"
-RELATIVE_PATH_TO_SYRINGES_W = "models\\syringes"
+RELATIVE_PATH_TO_CHIPS_W = "\\models\\chips"
+RELATIVE_PATH_TO_PLATES_W = "\\models\\plates"
+RELATIVE_PATH_TO_SYRINGES_W = "\\models\\syringes"
 
 RELATIVE_PATH_TO_CHIPS_R = "models/chips"
 RELATIVE_PATH_TO_PLATES_R = "models/plates"
@@ -27,7 +27,6 @@ class ModelsManager:
     def get_path(self, component_type):
         current_path = os.getcwd() # returns the current directory (where this file is stored) ---------> MIGHT BE PROBLEMATIC if this class is imported and run on a different path, will this return the path of the file that called this module or will it return the path of this file?
         relative_path = "" # relative path with respect to the path where this file is contained
-
         if (component_type == LABWARE_CHIP):
             if (self.operating_system == "w"):
                 relative_path = RELATIVE_PATH_TO_CHIPS_W
@@ -45,17 +44,13 @@ class ModelsManager:
                 relative_path = RELATIVE_PATH_TO_SYRINGES_W
             elif (self.operating_system == "r"):
                 relative_path = RELATIVE_PATH_TO_SYRINGES_R
-        
-        path_of_interest = os.path.join(current_path, relative_path) # This command joins both the current absolute path (of this file) and the relative path
-        
+        path_of_interest = current_path + relative_path
         return path_of_interest
 
     # Returns the list of models for chips
     def get_component_models(self, component_type):
         component_models = list() # Create an empty list to store the names of each file
-        
         path_of_interest = self.get_path(component_type) # This command gets the path to the chips folder
-        
         component_models = [f.split(".")[0] for f in os.listdir(path_of_interest) if os.path.isfile(os.path.join(path_of_interest, f))] # This returns a list of all the files in the path_of_interest
             
         return component_models

@@ -183,9 +183,9 @@ class Labware_class:
     def get_path_to_saved_labware_folder(self):
         current_path = os.getcwd() # Returns a string representing the location of this file
         if os.name == LINUX_OS:
-            path_of_interest = os.path.join(current_path, RELATIVE_PATH_L) # Joins the current location with the name of the folder thhat contains all the saved labware setup files
+            path_of_interest = current_path + RELATIVE_PATH_L # Joins the current location with the name of the folder thhat contains all the saved labware setup files
         elif os.name == WINDOWS_OS:
-            path_of_interest = os.path.join(current_path, RELATIVE_PATH_W)
+            path_of_interest = current_path + RELATIVE_PATH_W
         return path_of_interest
 
     def save_labware_to_file(self, file_name):
@@ -225,5 +225,7 @@ class Labware_class:
                 plate_number += 1
         
     def available_saved_labware_files(self):
-        return os.listdir(self.get_path_to_saved_labware_folder())
+        path = os.listdir(self.get_path_to_saved_labware_folder())
+        print(f"Path = {path}")
+        return path
 

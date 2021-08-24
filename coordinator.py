@@ -104,18 +104,21 @@ class Coordinator:
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        if RUNNING_APP_FOR_REAL:
-            if os_recognized == WINDOWS_OS:
-                logging.info("Operating system: Windows")
-                operating_system = "w"
+        
+        if os_recognized == WINDOWS_OS:
+            logging.info("Operating system: Windows")
+            operating_system = "w"
+            if RUNNING_APP_FOR_REAL:
                 self.myController = XboxJoystick(operating_system)
-            elif os_recognized == LINUX_OS:
-                logging.info("Operating system: Linux")
-                operating_system = "r"
+        elif os_recognized == LINUX_OS:
+            logging.info("Operating system: Linux")
+            operating_system = "r"
+            if RUNNING_APP_FOR_REAL:
                 if platform.system() == MACBOOK_OS:
                     self.myController = Keyboard(self.ot_control)
                 else:
                     self.myController = XboxJoystick(operating_system)
+        if RUNNING_APP_FOR_REAL:
             self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
