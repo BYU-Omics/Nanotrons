@@ -55,14 +55,17 @@ class Py_Execute:
         self.path_to_file =  relative_path + self.filename 
         return self.path_to_file
 
+    def pause_execution(self):
+        print("Pausing execution")
+        os.kill(self.p.pid, signal.SIGSTOP)
+
+    def continue_execution(self):
+        print("Continuing execution")
+        os.kill(self.p.pid, signal.SIGCONT)
 
     def stop_execution(self):
-        # print("Terminate protocol")
-        first_arg = self.set_get_path()
-        second_arg = self.calibration_file_name
-        third_arg = self.syringe_model
-        cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
-        subprocess.Popen(cmd, shell=True).kill()
+        print("Terminate protocol")
+        subprocess.Popen.terminate(self=self.p)
 
     def display_contents(self):
         # print(f"self.set_get_path(): {self.set_get_path()}")

@@ -832,10 +832,13 @@ class Coordinator:
 
     def connect_all(self):
         """This method connects the modules connected to the computer"""
-        self.disconnect_all()
-        self.tc_control._connection = self.tc_control._connect_to_port()
-        self.ot_control.connect_driver()
-        self.td_control.connect(self.ot_control._port)
+        try:
+            self.disconnect_all()
+            self.tc_control._connection = self.tc_control._connect_to_port()
+            self.ot_control.connect_driver()
+            self.td_control.connect(self.ot_control._port)
+        except TypeError:
+            print("Not able to disconnect and connect back to the modules")
 
     def disconnect_all(self):
         """This method disconnects the modules connected to the computer"""

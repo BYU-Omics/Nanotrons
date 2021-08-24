@@ -658,11 +658,6 @@ def get_available_protocols():
     list = os.listdir(path_to_protocol) # make a list of scripts in folder
     socketio.emit("protocols_available", list) # send the list back to js
 
-@socketio.on("pause_protocol")
-def pause_protocol():
-    print("pause_protocol")
-    coordinator.pause_protocol()
-
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
@@ -673,6 +668,18 @@ def display_contents():
     print("display_contents")
     list_of_lines = executer.display_contents()
     socketio.emit("protocol_python_data", list_of_lines)
+
+@socketio.on("stop_protocol")
+def stop_protocol():
+    executer.stop_execution()
+
+@socketio.on("pause_protocol")
+def pause_protocol():
+    executer.pause_execution()
+
+@socketio.on("continue_protocol")
+def continue_protocol():
+    executer.continue_execution()
 
 #------------------WORKING WITH A CALIBRATION.JSON SECTION--------------------
 
@@ -690,10 +697,6 @@ def get_available_calibrations():
 @socketio.on("set_labware_calibration")
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
-
-@socketio.on("stop_protocol")
-def stop_protocol():
-    executer.stop_execution()
 
 @socketio.on("reconnect_coordinator")
 def reconnect_coordinator():

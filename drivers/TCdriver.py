@@ -98,7 +98,8 @@ class ThermocyclerError(Exception):
 
 class Thermocycler:
     def __init__(self, interrupt_callback):
-        self._port = WINDOWS_TC_PORT
+        self._port = None
+        self._connection = None
         if RUNNING_APP_FOR_REAL:
             self._connection = self._connect_to_port()
         else:
