@@ -6,7 +6,7 @@
         'dispense_to' 
 """
 
-#-----------IMPORT THE USED PAKAGES---------------------------------------
+#---------------------------IMPORT THE USED LIBRARIES-------------------------------
 
 import sys
 LABWARE = sys.argv[1]
@@ -18,12 +18,14 @@ except ImportError:
     CURRENT_DIRECTORY
     from api import *
 
-# ----------CREATE A PROTOCOL OBJECT--------------------------------------
+#---------------------------CREATE A PROTOCOL OBJECT--------------------------------
 
 myProtocol = Api() 
 
-# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
+#-------------------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
+            # This is done from the executer, it is specified on the GUI.
+            # Chips and plates are loaded in the order they were calibrated.""" 
 
 chips, plates = myProtocol.load_labware_setup(LABWARE)
 
-# ------------END OF HEADING-------------------------------------------------
+#---------------------------END OF HEADING------------------------------------------
