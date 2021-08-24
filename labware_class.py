@@ -12,8 +12,8 @@ import sys
 import os
 import json
 
-RELATIVE_PATH_L = "OT2/saved_labware"
-RELATIVE_PATH_W = "saved_labware"
+RELATIVE_PATH_L = "saved_labware"
+RELATIVE_PATH_W = "\\saved_labware"
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LINUX_OS = 'posix'

@@ -32,6 +32,8 @@ COORDINATOR CLASS
     VI. Feedback
         This section provides current values for dynamic variables and states such as the current X,Y,Z coordinate of the motors, and current gear, and 
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
+
+    VII. Testing teamwork
 """
 
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
@@ -81,6 +83,9 @@ SYRINGE_BOTTOM = -190
 SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
 SYRINGE_TOP = -90
 
+from constants import RUNNING_APP_FOR_REAL
+
+
 def interrupt_callback(res):
     sys.stderr.write(res)
 
@@ -94,22 +99,24 @@ class Coordinator:
         operating_system = ""
         os_recognized = os.name
         self.ot_control = OT2_nanotrons_driver()
-        if os_recognized == WINDOWS_OS:
-            logging.info("Operating system: Windows")
-            operating_system = "w"
-            self.myController = XboxJoystick(operating_system)
-        elif os_recognized == LINUX_OS:
-            logging.info("Operating system: Linux")
-            operating_system = "r"
-            if platform.system() == MACBOOK_OS:
-                self.myController = Keyboard(self.ot_control)
-            else:
-                self.myController = XboxJoystick(operating_system)
+        
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        self.myProfile = Profile(self.joystick_profile)
+        if RUNNING_APP_FOR_REAL:
+            if os_recognized == WINDOWS_OS:
+                logging.info("Operating system: Windows")
+                operating_system = "w"
+                self.myController = XboxJoystick(operating_system)
+            elif os_recognized == LINUX_OS:
+                logging.info("Operating system: Linux")
+                operating_system = "r"
+                if platform.system() == MACBOOK_OS:
+                    self.myController = Keyboard(self.ot_control)
+                else:
+                    self.myController = XboxJoystick(operating_system)
+            self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
@@ -131,7 +138,6 @@ class Coordinator:
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")
-
 
     def set_picture_flag(self, value: bool):
         # print(f"Setting picture flag to: {value}")
@@ -767,7 +773,6 @@ class Coordinator:
             time.sleep(30)
             min_count = min_count + 0.5
         logging.info("Holding time done. Proceeding to complete next step.")
-
 
     """
     PROTOCOL METHODS SECTION FOR TEMPDECK 
