@@ -80,12 +80,13 @@ coordinator = Coordinator()
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
-if platform.system() == MACBOOK_OS:
-    myCamera = VideoStream(CAMERA_PORT_MACBOOK)
-    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
-else: 
-    myCamera = VideoStream(CAMERA_PORT)
-    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
+if RUNNING_APP_FOR_REAL:
+    if platform.system() == MACBOOK_OS:
+        myCamera = VideoStream(CAMERA_PORT_MACBOOK)
+        my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
+    else: 
+        myCamera = VideoStream(CAMERA_PORT)
+        my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
@@ -193,7 +194,7 @@ def upload_new_model():
     return render_template("upload_new_model.html")
 
 def gen_1(camera):
-    while True:
+    while RUNNING_APP_FOR_REAL:
         if camera.stopped:
             break
         frame = camera.read()
@@ -210,7 +211,7 @@ def gen_1(camera):
 
 def gen_2(camera):
     img_counter = 0
-    while True:
+    while RUNNING_APP_FOR_REAL:
         if camera.stopped:
             break
         frame = camera.read()
