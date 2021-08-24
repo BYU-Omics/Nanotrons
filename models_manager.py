@@ -14,9 +14,9 @@ RELATIVE_PATH_TO_CHIPS_W = "\\models\\chips"
 RELATIVE_PATH_TO_PLATES_W = "\\models\\plates"
 RELATIVE_PATH_TO_SYRINGES_W = "\\models\\syringes"
 
-RELATIVE_PATH_TO_CHIPS_R = "models/chips"
-RELATIVE_PATH_TO_PLATES_R = "models/plates"
-RELATIVE_PATH_TO_SYRINGES_R = "models/syringes"
+RELATIVE_PATH_TO_CHIPS_R = "/models/chips"
+RELATIVE_PATH_TO_PLATES_R = "/models/plates"
+RELATIVE_PATH_TO_SYRINGES_R = "/models/syringes"
 
 class ModelsManager:
     def __init__(self, operating_system):
@@ -75,8 +75,6 @@ class ModelsManager:
             file_path = open(path_to_models_folder + "/" + component_model + ".json")
         
         parameters = json.load(file_path)
-
-        # print(f"Parameters: {parameters})
 
         return parameters
 

@@ -12,7 +12,7 @@ import sys
 import os
 import json
 
-RELATIVE_PATH_L = "saved_labware"
+RELATIVE_PATH_L = "/saved_labware"
 RELATIVE_PATH_W = "\\saved_labware"
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -158,13 +158,9 @@ class Labware_class:
         for plate in self.plate_list:
             plate_properties = plate.export_plate_properties()
             labware_dictionary["plates"].append(plate_properties)
-
-        # print(f"Labware dictionary: {labware_dictionary}")
         return labware_dictionary
 
-    def dictionary_to_labware(self, labware_dictionary):
-        # print(f"Current Labware before additions: {self.get_current_labware()}")
-        
+    def dictionary_to_labware(self, labware_dictionary):        
         chips_list = labware_dictionary["chips"] # This is a list of dictionaries, each of which containes prooperties for a given chip
         plates_list = labware_dictionary["plates"] # This is a list of dictionaries, each of which containes prooperties for a given plate
 
@@ -178,8 +174,6 @@ class Labware_class:
             new_plate = Plate(plate_properties=plate_properties)
             self.plate_list.append(new_plate)
             
-        # print(f"Current Labware after additions: {self.get_current_labware()}")
-
     def get_path_to_saved_labware_folder(self):
         current_path = os.getcwd() # Returns a string representing the location of this file
         if os.name == LINUX_OS:
@@ -226,6 +220,5 @@ class Labware_class:
         
     def available_saved_labware_files(self):
         path = os.listdir(self.get_path_to_saved_labware_folder())
-        print(f"Path = {path}")
         return path
 

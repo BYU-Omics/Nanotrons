@@ -42,16 +42,18 @@ class Py_Execute:
         # print(f"cmd: {cmd}")
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
-        print(err)
-        print(out)
-
+        if err == None:
+            print("Protocol ended without errors")
+        else:
+            print(err)
+            if out != None:
+                print(out)
     def set_get_path(self):
         path = sys.path
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
             relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
-        # print(f"relative_path: {relative_path}")
         self.path_to_file =  relative_path + self.filename 
         return self.path_to_file
 
@@ -68,10 +70,8 @@ class Py_Execute:
         subprocess.Popen.terminate(self=self.p)
 
     def display_contents(self):
-        # print(f"self.set_get_path(): {self.set_get_path()}")
         with open(self.set_get_path(), 'r') as f:
             contents = f.readlines()
-            print(contents)
             return contents
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)

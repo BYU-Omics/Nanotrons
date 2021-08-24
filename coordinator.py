@@ -201,18 +201,27 @@ class Coordinator:
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
         if platform.system() == MACBOOK_OS:
-            self.myController.listen()
-        else: 
-            t1 = threading.Thread(target=self.myController.listen)
-            t1.start()
-            while(t1.is_alive()):
-                self.monitor_joystick()
-                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+            try:
+                self.myController.listen()
+            except AttributeError:
+                print("No controller connected")
+        else:
+            try:  
+                t1 = threading.Thread(target=self.myController.listen)
+                t1.start()
+                while(t1.is_alive()):
+                    self.monitor_joystick()
+                    time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+            except AttributeError:
+                print("No controller connected")
 
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
         """
-        self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
+        try:
+            self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
+        except AttributeError:
+            print("Trying to stop listening controller inputs but no controller connected")
 
     def home_all_motors(self):
         """ This method homes all the motors on the OT2 except for the Syringes
@@ -618,7 +627,6 @@ class Coordinator:
         if plate != None:
             plate_pot_properties = plate.export_plate_properties()
             locations = plate_pot_properties["pot_locations"]
-            # print(locations)
         elif chip != None:
             print(chip.well_locations)
 

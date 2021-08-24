@@ -532,9 +532,7 @@ class ProtocolCreator:
             if "END OF PROTOCOL" in line:
                 end_of_cmd_indx = counter
             counter += 1
-        print(f"start_of_cmd_indx = {start_of_cmd_indx} --- end_of_cmd_indx = {end_of_cmd_indx}")
         for line_indx in range(start_of_cmd_indx, end_of_cmd_indx):
-            print(f"line_indx = {line_indx}")
             contents.pop(start_of_cmd_indx + 1)
             if "END OF PROTOCOL" in contents[start_of_cmd_indx + 1]:
                 contents.insert(start_of_cmd_indx + 1, "\n")

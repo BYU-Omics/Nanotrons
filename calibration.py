@@ -32,8 +32,6 @@ def guess_fourth_calibration_point(calibration_points):
 
     # Calculate 4th point
     fourth_calibration_point = np.array(ordered_calibration_points[0]) + vector_c
-    # print(f"4th calibration point guessed: ({fourth_calibration_point[0]}, {fourth_calibration_point[1]}, {fourth_calibration_point[2]})")
-    # print(fourth_calibration_point)
     return fourth_calibration_point
 
 # This method receives a list of three points in space (a list) and reorders them to be understandable for the system
@@ -130,11 +128,6 @@ def map_out_wells(chip_parameters, calibration_points):
             new_tuple = (x,y,z) # Pack locations in appropriate format
             # locations.append(new_tuple)
             locations.append(array_location)
-    # print("Calibration Points")
-    # print(ordered_calibration_points)
-    
-    # print("Mapped Locations")
-    # print(locations)
     return locations#locations
 
 # This method is provided a grid and row_types and returns a list with the type of well that corresponds to each index
@@ -219,8 +212,6 @@ def map_out_pots(plate_parameters, calibration_points):
             x,y,z = new_location # Unpack locations from the numpy array
             new_tuple = (x,y,z) # Pack locations in appropriate format
             locations.append(new_tuple)
-
-    # print(f"locations of the plate: {locations}")
     return locations
 
 def create_plate(model_name, plate_parameters, pot_locations):
@@ -244,7 +235,6 @@ def create_plate(model_name, plate_parameters, pot_locations):
     # Store the locations, nicknames, and well types of the wells in the chip
     for index in range(amount_of_pots):
         new_plate.set_location(index, pot_locations[index])
-        # print(f"index:{index}, nick:{nicknames}")
         new_plate.set_nickname(index, nicknames[index])
         new_plate.set_pot_depth(index, pot_depth[index])
 
