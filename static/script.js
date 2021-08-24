@@ -12,6 +12,7 @@ var display_syringe_button = document.getElementById("display_syringe");
 
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
+var continue_button_protocol = document.getElementById("continue_protocol")
 
 var stopLoad_button = document.getElementById("stop_load");
 var hardStop_button = document.getElementById("hard_stop");
@@ -249,6 +250,10 @@ stop_button_protocol.addEventListener("click", function() {
     socket.emit("stop_protocol")
 });
 
+continue_button_protocol.addEventListener("click", function() {
+    socket.emit("continue_protocol")
+});
+
 // the stop load button in HTML. Calls the stop_load function
 stopLoad_button.addEventListener("click", function() {
     socket.emit("stop_load");
@@ -264,8 +269,6 @@ function uploadScript() {
     var socket = io.connect('http://127.0.0.1:5000');
     console.log("upload script")
 }
-
-
 
 // adds a row to the table with the given parameters
 function addRow(command, parameters) {

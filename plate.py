@@ -30,7 +30,6 @@ class Plate:
     
     # Stores the nickname of a specified pot
     def set_nickname(self, pot_index, nickname):
-        # print(f"{pot_index}  {nickname}")
         self.nicknames[pot_index] = nickname
         self.nicknames_inv[nickname] = pot_index
 
@@ -61,7 +60,6 @@ class Plate:
     
     # Returns the location of a given pot specified by its nickname    
     def get_location_by_nickname(self, pot_nickname):
-        # print(f"get_location_by_nickname. Nickname: {pot_nickname} - > {self.pot_locations[self.nicknames_inv[pot_nickname]]}")
         return self.pot_locations[self.nicknames_inv[pot_nickname]]
 
     def pot_position_for_protocol(self, pot_nickname):

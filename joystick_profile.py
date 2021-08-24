@@ -66,13 +66,9 @@ class Profile:
 
     # This returns the function associated to the provided string name. It searches on all the classes specified inside of the method
     def find_method(self, function_name):
-        # print("Function name: {}".format(function_name))
         method = getattr(OT2_nanotrons_driver, function_name, "NOT_FOUND")
-        # if method == "NOT_FOUND":
-        #     method = getattr(Scripter, function_name, "NOT_FOUND")
         if method == "NOT_FOUND":
             method = getattr(XboxJoystick, function_name, "NOT_FOUND")
-        # print("Method: {}".format(method))
         return method
 
     # This returns the amount of arguments needed by a method (this is not yet in use but might come in handy to not have the need for dummy arguments in function definitions that don't take arguments)
@@ -102,16 +98,12 @@ class Profile:
 
     # This loads the provided file onto the Profile object. It DOES NOT check for erroneous input. The file is supposed to be formatted correctly
     def load_profile(self, file_name = 'default_profile.py'):
-        # print(CURRENT_DIRECTORY)
-        # print(f"Path to current directory: {CURRENT_DIRECTORY}")
         path_to_file: str = CURRENT_DIRECTORY
         if 'protocols' in path_to_file:
             stripped = path_to_file.strip('protocols')
-            # print(f"Stripping: {stripped}")
             path_to_file = stripped + file_name
         else:
             path_to_file += "\\" + file_name
-        # print(f"Path used to open profile: {path_to_file}")
         json_path = open(path_to_file, "r")
         myFile = json.load(json_path)
         for line in myFile.items():
@@ -153,9 +145,7 @@ class Profile:
 
     def to_string_buttons_mapping(self):
         mapping = "BUTTONS MAPPING\n"
-        #print("key: {}, value: {}".format(self.buttons_mapping.keys(), self.buttons_mapping.values()))
         for key, value in self.buttons_mapping.items():
-            #print("key: {}, value: {}".format(key, value))
             mapping = mapping + f"[{key}] - {value.__name__}\n"
         return mapping
 
@@ -167,9 +157,7 @@ class Profile:
 
     def to_string_axes_mapping(self):
         mapping = "AXES MAPPING\n"
-        #print("to_string_axes_mapping")
         for i in range(len(self.axes_mapping)):
-            # print(f"self.axes_mapping[i]: {self.axes_mapping[i]}")
             mapping = mapping + f"[{i}] - {self.axes_mapping[i].__name__}\n"
         return mapping
 

@@ -80,12 +80,13 @@ coordinator = Coordinator()
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
 executer = Py_Execute()
-if platform.system() == MACBOOK_OS:
-    myCamera = VideoStream(CAMERA_PORT_MACBOOK)
-    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
-else: 
-    myCamera = VideoStream(CAMERA_PORT)
-    my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
+if RUNNING_APP_FOR_REAL:
+    if platform.system() == MACBOOK_OS:
+        myCamera = VideoStream(CAMERA_PORT_MACBOOK)
+        my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
+    else: 
+        myCamera = VideoStream(CAMERA_PORT)
+        my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
@@ -193,7 +194,7 @@ def upload_new_model():
     return render_template("upload_new_model.html")
 
 def gen_1(camera):
-    while True:
+    while RUNNING_APP_FOR_REAL:
         if camera.stopped:
             break
         frame = camera.read()
@@ -210,7 +211,7 @@ def gen_1(camera):
 
 def gen_2(camera):
     img_counter = 0
-    while True:
+    while RUNNING_APP_FOR_REAL:
         if camera.stopped:
             break
         frame = camera.read()
@@ -606,8 +607,6 @@ def get_labware_summary():
         summary["model"] = plate_properties["model"]
         summary["nicknames"] = plate_properties["pot_nicknames"]
         labware_summary["plates"].append(summary)
-
-    print(f"labware_summary: {labware_summary}")
     socketio.emit("labware_summary", labware_summary)
 
 @socketio.on("go_to_deck_slot")
@@ -658,11 +657,6 @@ def get_available_protocols():
     list = os.listdir(path_to_protocol) # make a list of scripts in folder
     socketio.emit("protocols_available", list) # send the list back to js
 
-@socketio.on("pause_protocol")
-def pause_protocol():
-    print("pause_protocol")
-    coordinator.pause_protocol()
-
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
@@ -674,6 +668,18 @@ def display_contents():
     list_of_lines = executer.display_contents()
     socketio.emit("protocol_python_data", list_of_lines)
 
+@socketio.on("stop_protocol")
+def stop_protocol():
+    executer.stop_execution()
+
+@socketio.on("pause_protocol")
+def pause_protocol():
+    executer.pause_execution()
+
+@socketio.on("continue_protocol")
+def continue_protocol():
+    executer.continue_execution()
+
 #------------------WORKING WITH A CALIBRATION.JSON SECTION--------------------
 
 @socketio.on("get_available_calibrations")
@@ -681,19 +687,13 @@ def get_available_calibrations():
     if os.name == WINDOWS_OS:
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_W  # moves to script folder
     elif os.name == LINUX_OS:
-        # print(f"PATH: {RELATIVE_PATH_TO_LABWARE_L}")
         path_to_calibration = RELATIVE_PATH_TO_LABWARE_L  # moves to script folder
     list = os.listdir(path_to_calibration) # make a list of scripts in folder
-    # print(f"Files on folder: {list}")
     socketio.emit("calibrations_available", list) # send the list back to js
 
 @socketio.on("set_labware_calibration")
 def set_labware_calibration(calibration_file_name):
     executer.set_calibration_file_name(calibration_file_name)
-
-@socketio.on("stop_protocol")
-def stop_protocol():
-    executer.stop_execution()
 
 @socketio.on("reconnect_coordinator")
 def reconnect_coordinator():
