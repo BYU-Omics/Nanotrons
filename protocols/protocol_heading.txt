@@ -1,9 +1,7 @@
 """
-    Template for writing protocols. 
-
     Instructions: 
-        'aspirate_from' assumes nanoliters
-        'dispense_to' 
+        This protocol has been created with the class protocol_creator.
+        If this file is edited it must need to be renamed modifiying the date of edition.        
 """
 
 #---------------------------IMPORT THE USED LIBRARIES-------------------------------

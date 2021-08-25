@@ -195,7 +195,7 @@ socket.on('protocol_python_data', function(python_lines_list) {
     text_area_left = '<textarea id="w3review" name="w3review" rows="4" cols="50">'
     text_area_right = '</textarea>'
     text = "<br>" + text_area_left
-    for (let i = 36; i < python_data.length; i++) {
+    for (let i = 0; i < python_data.length; i++) {
         console.log(python_data[i][0])
         if (python_data[i][0] == '#') {
             text +=  python_data[i] ;
@@ -204,11 +204,7 @@ socket.on('protocol_python_data', function(python_lines_list) {
             text += python_data[i] ;
         }
     }
-    content.innerHTML = text + text_area_right + "<br>"
-    // console.log(text)
-    
-    
-    // make_and_display_protocol_table()
+    content.innerHTML = text + text_area_right + "<br>"    
 });  
 
 function display_contents() {

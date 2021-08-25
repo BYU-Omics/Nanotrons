@@ -14,6 +14,7 @@ from pathlib import Path
 import json
 import csv
 import re
+import datetime
 
 # RELATIVE_PATH_TO_PROTOCOLS_W = ''
 RELATIVE_PATH_TO_PROTOCOLS_W = '\\protocols\\' # ./ means look within the current directory
@@ -172,12 +173,14 @@ class ProtocolCreator:
             str: the name for the new file to create. 
         """           
         protocol = "protocol"
+        current_time =  datetime.datetime.now()
         counter = 0
         if extension == 'py':
             extension = ".py"
         elif extension == 'csv':
             extension = ".csv"
-        new_file_name = protocol + '_' + str(counter) + extension
+        date_and_time = f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}:{current_time.minute}:{current_time.second}"
+        new_file_name = protocol + '_' + date_and_time + extension
         path = self.get_path_to_protocols(new_file_name)
         while Path(path).is_file():
             counter += 1
@@ -431,7 +434,7 @@ class ProtocolCreator:
         else:
             # if the protocol_name, author, description are passed to the function
             protocol_name, author, description = protocol_name, author, description
-            metadata_txt = f"metadata = {{'protocolName': '{protocol_name}', 'author': '{author}', 'description': '{description}' }}"
+            metadata_txt = f"metadata = {{\n\t'protocolName': '{protocol_name}', \n\t'author': '{author}', \n\t'description': '{description}' \n}}\n\n"
         txt.append(metadata_txt)
         return txt
 
@@ -602,11 +605,12 @@ class ProtocolCreator:
         Returns:
             str: the name of the new file created 
         """                                   
+        current_time =  datetime.datetime.now()
         # Set the name for the file to write. 
         if filename != None:
-            new_name = filename
+            new_name = filename + f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}:{current_time.minute}:{current_time.second}" + ".py"
         else:
-            # if there is no name given create a new name.
+            # if there is no name given freate a new name.
             new_name = self.create_name_for_new_file(extension='py')
     
         self.create_new_file(new_name) # create the file on directory
@@ -847,10 +851,8 @@ class ProtocolCreator:
 def tets_creation_of_file():
     creator = ProtocolCreator()
 
-    labware = "Fluorescein_test.json"
-
     cmd = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
-    cmd2 = "myProtocol.aspirate_from(volume = 5000000000000000000, source = corning_384('A2'))"
+    cmd2 = "myProtocol.aspirate_from(volume = 5000, source = corning_384('A2'))"
     cmd_3 = "myProtocol.set_block_temp(4, 0)"
     cmd_4 = "myProtocol.close_lid()"
     cmd_5 = "myProtocol.set_lid_temp(39)"
@@ -858,11 +860,11 @@ def tets_creation_of_file():
     cmd_7 = "myProtocol.deactivate_lid()"
     list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
 
-    plates_to_void_depth = None
-    
-    author = 'Hailey'
-
+    name_of_file = "Testing_matching"
+    author = 'Alejandro Brozalez'
     description = 'I am testing how this protocol creator works.'
+    labware = "Fluorescein_test.json"
+    plates_to_void_depth = None
     waste = "custom('A1')"
     wash = "custom('A2')"
     clean = "custom('A3')"
@@ -875,7 +877,8 @@ def tets_creation_of_file():
                                                 description=description,
                                                 waste_water_well=waste,
                                                 wash_water_well=wash,
-                                                clean_water_well=clean)
+                                                clean_water_well=clean,
+                                                filename=name_of_file)
 
 
 def tests_adding_lists_of_commands():

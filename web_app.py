@@ -664,7 +664,6 @@ def set_protocol_filename(protocol_name):
 
 @socketio.on("display_contents")
 def display_contents():
-    print("display_contents")
     list_of_lines = executer.display_contents()
     socketio.emit("protocol_python_data", list_of_lines)
 
