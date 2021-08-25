@@ -25,7 +25,3 @@ class Nicknames():
 
     def get_nickname_location(self, nickname):
         return self.nicknames['name'][nickname]
-
-#myNicknames = Nicknames()
-#print(myNicknames.nicknames)
-#print(myNicknames.get_nickname_location("buffer"))

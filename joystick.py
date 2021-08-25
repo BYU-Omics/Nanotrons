@@ -134,9 +134,7 @@ class XboxJoystick:
     # Read the state of the axes in the joystick
     def read_axes(self):
         self.axes = [round(self.joystick.get_axis(i), 3) for i in range(self.joystick.get_numaxes())] # rounded to 1 decimal point bc the stick axes are never actually 0 (they have an error that starts on the second decimal point of the reading)
-        
-        # print("Pre processing of axes: ", self.to_string_axes())
-        
+                
         # The following lines of code implement a fix for uniform operation of the pygame library between windows and raspberry os
         if (self.os == RASPBERRY_OS):
             var1 = self.axes[3]
@@ -163,8 +161,6 @@ class XboxJoystick:
         # Multiply each final value by the direction of the axes defined in self.axes_direction
         self.axes = [ self.axes[i] * self.axes_direction[i] for i in range(len(self.axes))]
         
-        # print("Post processing of axes: ", self.to_string_axes())
-
     # Read the state of the buttons in the joystick
     def read_buttons(self):
         self.buttons = [self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())]
@@ -202,7 +198,6 @@ class XboxJoystick:
         for button in range(len(self.buttons)):
             if self.buttons[button] != 0:
                 if self.os == WINDOWS_OS:
-                    # print("deliver_buttons")
                     pressed_buttons.append(BUTTONS_DICT_W[button])
                 elif self.os == RASPBERRY_OS:
                     pressed_buttons.append(BUTTONS_DICT_R[button])
@@ -217,7 +212,6 @@ class XboxJoystick:
         pressed_hats = []
         for hat in range(len(self.hats)):
             if ( (self.hats[hat] == 1) or (self.hats[hat] == -1) ):
-                # print("deliver_hats")
                 pressed_hats.append(HATS_DICT[hat])
         
         return pressed_hats
@@ -236,14 +230,10 @@ class XboxJoystick:
     """
     # Listens to the controller's input
     def listen(self):
-        # print("aqui en el thread")
         self.reset_values() # reset the values read from the last call for listen_one()
-        # print(f"Started listening to {self.name}!")
         self.keep_listening = True
         while (self.keep_listening):
-            # print("while")
             # EVENT DETECTION AND PRINT
-            # print(pygame.event.get())
             # Possible joystick actions: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN, JOYBUTTONUP, JOYHATMOTION
             for event in pygame.event.get(): # User did something.
                 if event.type == pygame.JOYBUTTONDOWN:

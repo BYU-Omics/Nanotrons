@@ -14,14 +14,10 @@ class Keyboard:
     """
     # Listens to the controller's input
     def listen(self):
-        # print("aqui en el thread")
         self.reset_values() # reset the values read from the last call for listen_one()
-        # print(f"Started listening to {self.name}!")
         self.keep_listening = True
         while (self.keep_listening):
-            # print("while")
             # EVENT DETECTION AND PRINT
-            # print(pygame.event.get())
             # Possible joystick actions: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN, JOYBUTTONUP, JOYHATMOTION
             for event in pygame.event.get(): # User did something.
                 if event.type == pygame.KEYDOWN:

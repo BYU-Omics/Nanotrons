@@ -85,6 +85,9 @@ SYRINGE_BOTTOM = -190
 SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
 SYRINGE_TOP = -90
 
+from constants import RUNNING_APP_FOR_REAL
+
+
 def interrupt_callback(res):
     sys.stderr.write(res)
 
@@ -98,22 +101,27 @@ class Coordinator:
         operating_system = ""
         os_recognized = os.name
         self.ot_control = OT2_nanotrons_driver()
-        if os_recognized == WINDOWS_OS:
-            logging.info("Operating system: Windows")
-            operating_system = "w"
-            self.myController = XboxJoystick(operating_system)
-        elif os_recognized == LINUX_OS:
-            logging.info("Operating system: Linux")
-            operating_system = "r"
-            if platform.system() == MACBOOK_OS:
-                self.myController = Keyboard(self.ot_control)
-            else:
-                self.myController = XboxJoystick(operating_system)
+        
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
-        self.myProfile = Profile(self.joystick_profile)
+        
+        if os_recognized == WINDOWS_OS:
+            logging.info("Operating system: Windows")
+            operating_system = "w"
+            if RUNNING_APP_FOR_REAL:
+                self.myController = XboxJoystick(operating_system)
+        elif os_recognized == LINUX_OS:
+            logging.info("Operating system: Linux")
+            operating_system = "r"
+            if RUNNING_APP_FOR_REAL:
+                if platform.system() == MACBOOK_OS:
+                    self.myController = Keyboard(self.ot_control)
+                else:
+                    self.myController = XboxJoystick(operating_system)
+        if RUNNING_APP_FOR_REAL:
+            self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
@@ -195,18 +203,27 @@ class Coordinator:
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
         if platform.system() == MACBOOK_OS:
-            self.myController.listen()
-        else: 
-            t1 = threading.Thread(target=self.myController.listen)
-            t1.start()
-            while(t1.is_alive()):
-                self.monitor_joystick()
-                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+            try:
+                self.myController.listen()
+            except AttributeError:
+                print("No controller connected")
+        else:
+            try:  
+                t1 = threading.Thread(target=self.myController.listen)
+                t1.start()
+                while(t1.is_alive()):
+                    self.monitor_joystick()
+                    time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+            except AttributeError:
+                print("No controller connected")
 
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
         """
-        self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
+        try:
+            self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
+        except AttributeError:
+            print("Trying to stop listening controller inputs but no controller connected")
 
     def home_all_motors(self):
         """ This method homes all the motors on the OT2 except for the Syringes
@@ -612,7 +629,6 @@ class Coordinator:
         if plate != None:
             plate_pot_properties = plate.export_plate_properties()
             locations = plate_pot_properties["pot_locations"]
-            # print(locations)
         elif chip != None:
             print(chip.well_locations)
 
@@ -665,7 +681,7 @@ class Coordinator:
         self.ot_control.move({'B': position})
 
     def set_washing_positions(self, clean_water, wash_water, waste_water):
-        """ For every protocol we assume the sicentist will have these three location in which the 
+        """ For every protocol we assume the scientist will have these three location in which the 
             different types of water are places for washing the syringe so that there is no contamination"""
         self.clean_water = clean_water
         self.wash_water = wash_water
@@ -707,9 +723,6 @@ class Coordinator:
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """
     
-    def tc_connect(self):
-        """ Here we connect to thr module"""
-        asyncio.run(self.tc_control.connect(port= self.tc_port))
 
     def open_lid(self):
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
@@ -829,10 +842,13 @@ class Coordinator:
 
     def connect_all(self):
         """This method connects the modules connected to the computer"""
-        self.disconnect_all()
-        self.tc_control._connection = self.tc_control._connect_to_port()
-        self.ot_control.connect_driver()
-        self.td_control.connect(self.ot_control._port)
+        try:
+            self.disconnect_all()
+            self.tc_control._connection = self.tc_control._connect_to_port()
+            self.ot_control.connect_driver()
+            self.td_control.connect(self.ot_control._port)
+        except TypeError:
+            print("Not able to disconnect and connect back to the modules")
 
     def disconnect_all(self):
         """This method disconnects the modules connected to the computer"""

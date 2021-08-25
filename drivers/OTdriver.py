@@ -19,6 +19,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 a
 from opentrons.config.robot_configs import build_config
 from serial.tools import list_ports
 import os
+from constants import RUNNING_APP_FOR_REAL
 
 X_MAX= 418
 X_MIN= 25
@@ -96,7 +97,10 @@ class OT2_nanotrons_driver(SM):
         self.i = MIDDLE_STEP
         self.tc_flag = True
         self.tc_lid_flag = 'Open'
-        self.connect_driver()
+        if RUNNING_APP_FOR_REAL:
+            self.connect_driver()
+        else:
+            print("Not connected to the OT port")
 
 # Functions that help movements
         

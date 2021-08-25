@@ -15,6 +15,7 @@ from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import utils, serial_communication
 from opentrons.drivers.serial_communication import SerialNoResponse
 from serial.tools import list_ports
+from constants import RUNNING_APP_FOR_REAL
 import os
 
 if TYPE_CHECKING:
@@ -97,8 +98,12 @@ class ThermocyclerError(Exception):
 
 class Thermocycler:
     def __init__(self, interrupt_callback):
-        self._port = WINDOWS_TC_PORT
-        self._connection = self._connect_to_port()
+        self._port = None
+        self._connection = None
+        if RUNNING_APP_FOR_REAL:
+            self._connection = self._connect_to_port()
+        else:
+            print("Not connected to the TC port")
         self._update_thread = None
         self._current_temp = None
         self._target_temp = None
