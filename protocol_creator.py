@@ -120,7 +120,7 @@ class ProtocolCreator:
         """           
         path = self.get_path_to_protocols(filename)
         f = open(path, "x")
-        print(f"File created in {path}")
+        return path
 
     def delete_existing_file_in_prot_folder(self, filename: str):
         """This function deletes a file located in the protocols folder 
@@ -617,7 +617,7 @@ class ProtocolCreator:
             # if there is no name given freate a new name.
             new_name = self.create_name_for_new_file(extension='py')
     
-        self.create_new_file(new_name) # create the file on directory
+        path = self.create_new_file(new_name) # create the file on directory
 
         heading = self.get_file_contents("protocol_heading.txt") # Text for heading 
         metadata = self.create_metadata_txt(protocol_name=new_name, author=author, description=description)
@@ -663,12 +663,31 @@ class ProtocolCreator:
             for line in block:
                 content += line
         self.write_contents_to_file(new_name, content)
-        if list_of_commands != None:
-            self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=list_of_commands)
-        print(f"File {new_name} created in directory")
+        if labware_name != None:
+            if list_of_commands != None:
+                if self.check_that_commands_match_labware(list_of_commands = list_of_commands, chips = chips, plates = plates):
+                    self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=list_of_commands)
+            else:
+                self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=['# WARNING: No commands were given.'])
+        else:
+            self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=['# WARNING: Not able to write commands to the protocol.'])
+        print(f"File '{new_name}' written to '{path.strip(new_name)}'")
         return new_name
 
     # ------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
+
+    def check_that_commands_match_labware(list_of_commands: list = None, chips: list = None, plates: list  = None) -> bool:
+        """Thif function will received the labware that the user is trying to use along with the commands, then
+           it checks that the commands are using the labware that it has been added to the protocol and returns
+           a boolean 
+
+        Args:
+            list_of_commands (list, optional): [description]. Defaults to None.
+
+        Returns:
+            [bool]: This is a boolean indicating that the labware and commands match or not
+        """        
+        return True
 
     def get_list_of_commands_from_file(self, filename: str) -> list:
         """This function reads a file and it gets the commands that it has into a list to be processed for another function
@@ -879,7 +898,7 @@ def tets_creation_of_file():
     clean = "custom('A3')"
 
     # CREATE A PROTOCOL WITH ALL PARAMETERS SPECIFIED 
-    if False:
+    if True:
         name_of_file = creator.create_protocol_file(labware_name=labware, 
                                                     list_of_commands=list_of_commands, 
                                                     voided_plates=plates_to_void_depth,
@@ -899,8 +918,15 @@ def tets_creation_of_file():
                                                     description=description,
                                                     filename=name_of_file)
 
-    if True:
+    if False:
         name_of_file = creator.create_protocol_file()
+
+    if False:
+        name_of_file = creator.create_protocol_file(list_of_commands=list_of_commands, 
+                                                    voided_plates=plates_to_void_depth,
+                                                    author=author,
+                                                    description=description,
+                                                    filename=name_of_file)
 
 
 
