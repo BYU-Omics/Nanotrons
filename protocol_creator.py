@@ -370,9 +370,9 @@ class ProtocolCreator:
         elif cmd == SET_WASHING_POSITIONS_CMD:
             cmd_text += f"{cmd}({clean_water}, {wash_water}, {waste_water})"
         elif cmd == START_WASH_CMD:
-            cmd_text += f"{cmd}"
+            cmd_text += f"{cmd}()"
         elif cmd == MID_WASH_CMD:
-            cmd_text += f"{cmd}"
+            cmd_text += f"{cmd}()"
         elif cmd == AIR_GAP_CMD:
             cmd_text += f"{cmd}({left_over}, {cushion_1}, {cushion_2})"
         return cmd_text
@@ -610,6 +610,7 @@ class ProtocolCreator:
             str: the name of the new file created 
         """                                   
         current_time =  datetime.datetime.now()
+        flag_for_checking = True
         # Set the name for the file to write. 
         if filename != None:
             new_name = filename + f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}:{current_time.minute}:{current_time.second}" + ".py"
@@ -668,15 +669,19 @@ class ProtocolCreator:
                 if self.check_that_commands_match_labware(list_of_commands = list_of_commands, chips = chips, plates = plates):
                     self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=list_of_commands)
             else:
+                flag_for_checking = False
                 self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=['# WARNING: No commands were given.'])
         else:
+            flag_for_checking = False
             self.add_list_of_commands_to_protocol_file(filename=new_name, list_of_cmds=['# WARNING: Not able to write commands to the protocol.'])
+        if flag_for_checking == False:
+            print("Something went wrong while writting the file. Check 'WARNINGS' messages before running.")
         print(f"File '{new_name}' written to '{path.strip(new_name)}'")
         return new_name
 
     # ------PROTOCOL COMMAND'S LIST HANDLING SECTION----------   
 
-    def check_that_commands_match_labware(list_of_commands: list = None, chips: list = None, plates: list  = None) -> bool:
+    def check_that_commands_match_labware(self, list_of_commands: list = None, chips: list = None, plates: list  = None) -> bool:
         """Thif function will received the labware that the user is trying to use along with the commands, then
            it checks that the commands are using the labware that it has been added to the protocol and returns
            a boolean 
@@ -686,8 +691,23 @@ class ProtocolCreator:
 
         Returns:
             [bool]: This is a boolean indicating that the labware and commands match or not
-        """        
-        return True
+        """       
+        chips_that_match = [] 
+        plates_that_match = [] 
+        matched = None
+        for command in list_of_commands:
+            for chip in chips:
+                if chip in command and chip not in chips_that_match:
+                    chips_that_match.append(chip)
+            for plate in plates:
+                if plate in command and plate not in plates_that_match:
+                    plates_that_match.append(plate)
+        if set(chips_that_match) == set(chips) and set(plates_that_match) == set(plates):
+            matched = True
+        else: 
+            print("The calibrated items do not match the commands to execute.")
+            matched = False
+        return matched
 
     def get_list_of_commands_from_file(self, filename: str) -> list:
         """This function reads a file and it gets the commands that it has into a list to be processed for another function
@@ -879,20 +899,22 @@ class ProtocolCreator:
 def tets_creation_of_file():
     creator = ProtocolCreator()
 
-    cmd = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
-    cmd2 = "myProtocol.aspirate_from(volume = 5000, source = corning_384('A2'))"
+    cmd_1 = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
+    cmd_2 = "myProtocol.aspirate_from(volume = 5000, source = corning_384('A2'))"
     cmd_3 = "myProtocol.set_block_temp(4, 0)"
     cmd_4 = "myProtocol.close_lid()"
     cmd_5 = "myProtocol.set_lid_temp(39)"
     cmd_6 = "myProtocol.set_block_temp(37, 15)"
     cmd_7 = "myProtocol.deactivate_lid()"
-    list_of_commands = [cmd, cmd2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
+    cmd_8 = "myProtocol.aspirate_from(volume = 10, source = micropots_3('A1'))"
+    cmd_9 = "myProtocol.aspirate_from(volume = 5000, source = custom_small('A2'))"
+    list_of_commands = [cmd_1, cmd_2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7, cmd_8, cmd_9]
 
     name_of_file = "Testing_matching"
     author = 'Alejandro Brozalez'
     description = 'I am testing how this protocol creator works.'
     labware = "Fluorescein_test.json"
-    plates_to_void_depth = None
+    plates_to_void_depth = ['custom']
     waste = "custom('A1')"
     wash = "custom('A2')"
     clean = "custom('A3')"
@@ -1003,6 +1025,21 @@ def tests_csv():
     # creator.create_protocol_voided_depth_for_labware(labware, plates_to_void_depth)
     # creator.convert_cmd_list_to_csv(list_of_commands)
     
+def tests_matching_of_labware_with_commands():
+    creator = ProtocolCreator()
+    cmd_1 = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
+    cmd_2 = "myProtocol.aspirate_from(volume = 5000, source = corning_384('A2'))"
+    cmd_3 = "myProtocol.set_block_temp(4, 0)"
+    cmd_4 = "myProtocol.close_lid()"
+    cmd_5 = "myProtocol.set_lid_temp(39)"
+    cmd_6 = "myProtocol.set_block_temp(37, 15)"
+    cmd_7 = "myProtocol.deactivate_lid()"
+    cmd_8 = "myProtocol.aspirate_from(volume = 10, source = micropots_3('A1'))"
+    list_of_commands = [cmd_1, cmd_2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7, cmd_8]
+    plates_names = ['custom', 'corning_384']
+    chips_name = ['micropots_3']
+    print(creator.check_that_commands_match_labware(list_of_commands=list_of_commands, chips=chips_name, plates=plates_names))
+
 def test():
     tets_creation_of_file()
     # tests_adding_lists_of_commands()
@@ -1010,6 +1047,7 @@ def test():
     # tests_handling_commands()
     # tests_voiding_depth_of_plates()
     # tests_csv()
+    # tests_matching_of_labware_with_commands()
 
 if __name__ == "__main__":
     test()
