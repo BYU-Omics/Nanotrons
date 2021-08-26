@@ -3,20 +3,12 @@
         This protocol has been created with the class protocol_creator.
         If this file is edited it must need to be renamed modifiying the date of edition.        
 """
-
-#---------------------------IMPORT THE USED LIBRARIES-------------------------------
-
-import sys
-CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
+import sys 
 
 try:
     from api import *
 except ImportError:
-    CURRENT_DIRECTORY
+    sys.path.append(sys.path[0] + '\\..') # current directory
     from api import *
 
-#---------------------------CREATE A PROTOCOL OBJECT--------------------------------
-
-myProtocol = Api() 
-
-#---------------------------END OF HEADING------------------------------------------
+myProtocol = Api() # creates a protocol object using the Api

@@ -51,10 +51,9 @@ TAKE_PICTURE = 'take_picture'
 VOID_PLATE_DEPTH_CMD = 'void_plate_depth'
 PLATE_DEPTH = "Plate's depth"
 TEXT_FOR_VOID_DEPTH_PLATES = "# If the depth has been voided for any of the plates, this is specified here:\n\n"
-NO_PLATES_DEPTH_VOIDED_TXT = "# No plates depth have been voided for this protocol\n"
+NO_PLATES_DEPTH_VOIDED_TXT = "# WARNING: Dispensing and aspirating from bottom of ALL plates.\n" 
 MY_PROTOCOL_TXT = "myProtocol."
-CONFIGURATION_TXT = "# ------------START OF PROTOCOL CONFIGURATION--------------------------------\n\n"
-CALIBRATION_ORDER_TXT = "# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------\n\n"
+CALIBRATION_ORDER_TXT = "# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------\n\n"
 PRE_PROTOCOL_SETUP_TXT = "# -----------PREPROTOCOL SETUP-------------------\n\n"
 END_OF_PROTOCOL_TXT = '# --------------END OF PROTOCOL--------------\n'
 CMD = 'cmd'
@@ -172,7 +171,7 @@ class ProtocolCreator:
         Returns:
             str: the name for the new file to create. 
         """           
-        protocol = "protocol"
+        protocol = "My Protocol"
         current_time =  datetime.datetime.now()
         counter = 0
         if extension == 'py':
@@ -180,7 +179,7 @@ class ProtocolCreator:
         elif extension == 'csv':
             extension = ".csv"
         date_and_time = f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}:{current_time.minute}:{current_time.second}"
-        new_file_name = protocol + '_' + date_and_time + extension
+        new_file_name = protocol + date_and_time + extension
         path = self.get_path_to_protocols(new_file_name)
         while Path(path).is_file():
             counter += 1
@@ -212,7 +211,6 @@ class ProtocolCreator:
         chips = data['chips']
         plates = data['plates']
         content.append(CALIBRATION_ORDER_TXT)
-        content.append(f"# Labware file loaded: {labware_filename}\n\n")
         content.append(f"chips, plates = myProtocol.load_labware_setup('{labware_filename}')\n\n" 
 )
         chip_count = 0
@@ -426,7 +424,7 @@ class ProtocolCreator:
         Returns:
             list: [description]
         """                                  
-        txt = [CONFIGURATION_TXT]
+        txt = ['\n\n']
         if metadata:
             # if a dictionary with thte information is given
             protocol_name = metadata['protocolName']
@@ -440,9 +438,9 @@ class ProtocolCreator:
         txt.append(metadata_txt)
         return txt
 
-    def create_washing_wells_config_txt(self, waste_water_well: str, 
-                                              wash_water_well: str, 
-                                              clean_water_well: str) -> list:
+    def create_washing_wells_config_txt(self, waste_water_well: str = None, 
+                                              wash_water_well: str = None, 
+                                              clean_water_well: str= None) -> list:
         """Puts together the text that indicates which locations from the labware set up will be used as 
             the waste, wash and clean water so that the syringe can be washed on the start and in the midwash
 
@@ -453,25 +451,29 @@ class ProtocolCreator:
 
         Returns:
             list: returns the content to be written to the protocol heading
-        """                                              
-        waste_water = waste_water_well # custom('A1')
-        wash_water = wash_water_well # custom('A2')
-        clean_water = clean_water_well # custom('A3')
+        """               
 
-        waste_water_txt = f"waste_water = {waste_water}\n"
-        wash_water_txt = f"wash_water = {wash_water}\n"
-        clean_water_txt = f"clean_water = {clean_water}\n\n"
+        if waste_water_well and wash_water_well and clean_water_well:
+            waste_water = waste_water_well # custom('A1')
+            wash_water = wash_water_well # custom('A2')
+            clean_water = clean_water_well # custom('A3')
 
-        cmd_set = self.create_command_txt(cmd = SET_WASHING_POSITIONS_CMD, 
-                                          clean_water=clean_water, 
-                                          waste_water=waste_water, 
-                                          wash_water=wash_water) 
-        cmd_start = self.create_command_txt(cmd = START_WASH_CMD)
-        content = ["# Designated wells for washing tip\n", waste_water_txt, 
-                                                           wash_water_txt, 
-                                                           clean_water_txt, 
-                                                           cmd_set, "\n\n" , 
-                                                           cmd_start, "\n"]
+            waste_water_txt = f"waste_water = {waste_water}\n"
+            wash_water_txt = f"wash_water = {wash_water}\n"
+            clean_water_txt = f"clean_water = {clean_water}\n\n"
+
+            cmd_set = self.create_command_txt(cmd = SET_WASHING_POSITIONS_CMD, 
+                                            clean_water=clean_water, 
+                                            waste_water=waste_water, 
+                                            wash_water=wash_water) 
+            cmd_start = self.create_command_txt(cmd = START_WASH_CMD)
+            content = ["# Designated wells for washing tip\n", waste_water_txt, 
+                                                            wash_water_txt, 
+                                                            clean_water_txt, 
+                                                            cmd_set, "\n\n" , 
+                                                            cmd_start, "\n"]
+        else:
+            content = ["# WARNING: No washing configurations have been set. ", "\n"]
         return content
         
     # ------PROTOCOL FILE HANDLING SECTION----------
@@ -580,12 +582,12 @@ class ProtocolCreator:
         for command in reversed(list_of_cmds):
             self.add_cmd_to_protocol_file(filename=filename, cmd=command) 
                 
-    def create_protocol_file(self, labware_name, 
+    def create_protocol_file(self, labware_name = None, 
                                    filename: str = None, 
                                    voided_plates: list = None, 
                                    list_of_commands: list = None, 
-                                   author: str = '', 
-                                   description: str = '',
+                                   author: str = 'User name', 
+                                   description: str = 'Missing information',
                                    waste_water_well: str = '',
                                    wash_water_well: str = '',
                                    clean_water_well: str = '') -> str:
@@ -618,17 +620,24 @@ class ProtocolCreator:
         self.create_new_file(new_name) # create the file on directory
 
         heading = self.get_file_contents("protocol_heading.txt") # Text for heading 
-        start_of_protocol_config_txt = [CONFIGURATION_TXT]
         metadata = self.create_metadata_txt(protocol_name=new_name, author=author, description=description)
-        labware, chips, plates = self.create_protocol_labware_txt(labware_filename=labware_name) # Text for the labware used (chips and plates loaded)
-        labware_location = self.create_protocol_labware_location_txt(chips, plates)
+        if labware_name != None:
+            labware, chips, plates = self.create_protocol_labware_txt(labware_filename=labware_name) # Text for the labware used (chips and plates loaded)
+            labware_location = self.create_protocol_labware_location_txt(chips, plates)
+            if voided_plates != None:
+                voided_plate_txt = self.create_protocol_voided_depth_for_labware(labware_name, voided_plates)
+            else:
+                voided_plate_txt = [NO_PLATES_DEPTH_VOIDED_TXT]
+        else:
+            labware_name = '# WARNING: No labware name has been given\n'
+            labware = '# WARNING: Not able to set labware\n'
+            labware_location = '# WARNING: Not able to retrieve labware location\n'
+            voided_plate_txt = [NO_PLATES_DEPTH_VOIDED_TXT]
+
+        
         start_of_protocol_txt = [START_OF_PROTOCOL_TEXT] # Start adding text to a list to build the final text
         pre_protocol_setup_txt = [PRE_PROTOCOL_SETUP_TXT]
         
-        if voided_plates != None:
-            voided_plate_txt = self.create_protocol_voided_depth_for_labware(labware_name, voided_plates)
-        else:
-            voided_plate_txt = [NO_PLATES_DEPTH_VOIDED_TXT]
         washing_config_txt = self.create_washing_wells_config_txt(waste_water_well=waste_water_well, 
                                                                   wash_water_well=wash_water_well, 
                                                                   clean_water_well=clean_water_well)
@@ -636,10 +645,8 @@ class ProtocolCreator:
         newline = ["\n"]
         
         txt = [heading, 
-               start_of_protocol_config_txt, 
                metadata, 
                labware, 
-               newline, 
                newline, 
                voided_plate_txt, 
                newline, 
@@ -871,16 +878,30 @@ def tets_creation_of_file():
     wash = "custom('A2')"
     clean = "custom('A3')"
 
-    # creator.create_protocol_file(labware_name=labware, voided_plates=plates_to_void_depth, list_of_commands=list_of_commands)
-    name_of_file = creator.create_protocol_file(labware_name=labware, 
-                                                list_of_commands=list_of_commands, 
-                                                voided_plates=plates_to_void_depth,
-                                                author=author,
-                                                description=description,
-                                                waste_water_well=waste,
-                                                wash_water_well=wash,
-                                                clean_water_well=clean,
-                                                filename=name_of_file)
+    # CREATE A PROTOCOL WITH ALL PARAMETERS SPECIFIED 
+    if False:
+        name_of_file = creator.create_protocol_file(labware_name=labware, 
+                                                    list_of_commands=list_of_commands, 
+                                                    voided_plates=plates_to_void_depth,
+                                                    author=author,
+                                                    description=description,
+                                                    waste_water_well=waste,
+                                                    wash_water_well=wash,
+                                                    clean_water_well=clean,
+                                                    filename=name_of_file)
+
+    # CREATE A PROTOCOL WITHOUT WASHING SETUP
+    if False:
+        name_of_file = creator.create_protocol_file(labware_name=labware, 
+                                                    list_of_commands=list_of_commands, 
+                                                    voided_plates=plates_to_void_depth,
+                                                    author=author,
+                                                    description=description,
+                                                    filename=name_of_file)
+
+    if True:
+        name_of_file = creator.create_protocol_file()
+
 
 
 def tests_adding_lists_of_commands():
