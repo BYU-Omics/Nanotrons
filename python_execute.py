@@ -36,10 +36,7 @@ class Py_Execute:
 
     def execute_python_protocol(self):
         first_arg = self.set_get_path()
-        second_arg = self.calibration_file_name
-        third_arg = self.syringe_model
-        cmd = 'python' + ' ' + first_arg + ' ' + second_arg + ' ' + third_arg
-        # print(f"cmd: {cmd}")
+        cmd = 'python' + ' ' + first_arg
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         if err == None:

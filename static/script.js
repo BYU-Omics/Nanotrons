@@ -2,13 +2,7 @@ var socket = io.connect('http://127.0.0.1:5000');
 
 var run_protocol_button = document.getElementById("run_protocol");
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
-var calibrationOptions = document.getElementById("calibration"); // Dropdown list that shows the available models
-var syringeOptions = document.getElementById("syringe"); // Dropdown list that shows the available models
-
-
 var display_protocol_button = document.getElementById("display_protocol");
-var display_calibration_button = document.getElementById("display_calibration");
-var display_syringe_button = document.getElementById("display_syringe");
 
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
@@ -146,36 +140,6 @@ function option_select_protocol(){
     }
     else { // if you select the instructions from the list
         display_protocol_button.disabled = true; // disable button
-    }
-}
-
-// this runs each time you select an option from the script list
-function option_select_labware_calibration(){
-    // This either blocks or unblocks the submit button
-    var selected_calibration = calibrationOptions.options[ calibrationOptions.selectedIndex ].value;
-    calibration_to_display = selected_calibration; // set variable to the selected value
-    console.log(selected_calibration);
-    socket.emit("set_labware_calibration", selected_calibration)
-    if ( selected_calibration != "- Select a calibration -" ) { // if you select something from the list
-        display_calibration_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_calibration_button.disabled = true; // disable button
-    }
-}
-
-// this runs each time you select an option from the script list
-function option_select_syringe(){
-    // This either blocks or unblocks the submit button
-    var selected_syringe = syringeOptions.options[ syringeOptions.selectedIndex ].value;
-    syringe_to_display = selected_syringe; // set variable to the selected value
-    console.log(selected_syringe);
-    socket.emit("set_labware_syringe", selected_syringe)
-    if ( selected_syringe != "- Select a syringe -" ) { // if you select something from the list
-        display_syringe_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_syringe_button.disabled = true; // disable button
     }
 }
 

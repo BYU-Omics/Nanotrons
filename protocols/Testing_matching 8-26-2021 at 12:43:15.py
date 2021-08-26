@@ -7,7 +7,6 @@
 #---------------------------IMPORT THE USED LIBRARIES-------------------------------
 
 import sys
-LABWARE = sys.argv[1]
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 
 try:
@@ -20,18 +19,12 @@ except ImportError:
 
 myProtocol = Api() 
 
-#-------------------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
-            # This is done from the executer, it is specified on the GUI.
-            # Chips and plates are loaded in the order they were calibrated.""" 
-
-chips, plates = myProtocol.load_labware_setup(LABWARE)
-
 #---------------------------END OF HEADING------------------------------------------# ------------START OF PROTOCOL CONFIGURATION--------------------------------
 
 # ------------START OF PROTOCOL CONFIGURATION--------------------------------
 
 metadata = {
-	'protocolName': 'Testing_matching 8-25-2021 at 16:25:54.py', 
+	'protocolName': 'Testing_matching 8-26-2021 at 12:43:15.py', 
 	'author': 'Alejandro Brozalez', 
 	'description': 'I am testing how this protocol creator works.' 
 }
@@ -39,6 +32,8 @@ metadata = {
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
 
 # Labware file loaded: Fluorescein_test.json
+
+chips, plates = myProtocol.load_labware_setup('Fluorescein_test.json')
 
 micropots_3 = chips[0] 
 corning_384 = plates[0] 

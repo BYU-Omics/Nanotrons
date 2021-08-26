@@ -204,7 +204,7 @@ class ProtocolCreator:
 
         Returns:
             list: text as a list of the contents to put in the protocol
-        """        
+        """  
         path = self.get_path_to_labware(labware_filename)
         content = []
         with open(path) as f:
@@ -213,6 +213,8 @@ class ProtocolCreator:
         plates = data['plates']
         content.append(CALIBRATION_ORDER_TXT)
         content.append(f"# Labware file loaded: {labware_filename}\n\n")
+        content.append(f"chips, plates = myProtocol.load_labware_setup('{labware_filename}')\n\n" 
+)
         chip_count = 0
         plate_count = 0
         copy_plate = 2
