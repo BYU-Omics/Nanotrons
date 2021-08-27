@@ -899,7 +899,7 @@ class ProtocolCreator:
 def tets_creation_of_file():
     creator = ProtocolCreator()
 
-    cmd_1 = "myProtocol.aspirate_from(volume = 10, source = custom('A1'))"
+    cmd_1 = "myProtocol.aspirate_from(volume = 1000, source = custom('A1'))"
     cmd_2 = "myProtocol.aspirate_from(volume = 5000, source = corning_384('A2'))"
     cmd_3 = "myProtocol.set_block_temp(4, 0)"
     cmd_4 = "myProtocol.close_lid()"

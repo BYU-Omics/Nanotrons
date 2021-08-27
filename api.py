@@ -7,7 +7,6 @@ from coordinator import *
 import sys
 import requests
 
-LABWARE = sys.argv[1]
 # If we're not in the top level
 # And we're trying to call the file directly
 # add the submodules to $PATH

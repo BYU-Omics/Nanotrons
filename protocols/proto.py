@@ -9,7 +9,6 @@
 #-----------IMPORT THE USED PAKAGES---------------------------------------
 
 import sys
-LABWARE = sys.argv[1]
 CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
 
 try:
@@ -24,7 +23,7 @@ myProtocol = Api()
 
 # ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
 
-chips, plates = myProtocol.load_labware_setup(LABWARE)
+chips, plates = myProtocol.load_labware_setup("Recording.json")
 
 # ------------END OF HEADING-------------------------------------------------
 
@@ -33,7 +32,6 @@ chips, plates = myProtocol.load_labware_setup(LABWARE)
 # Labware file loaded: Test_for_protocols.json
 
 micropots_3 = chips[0].get_location_by_nickname 
-corning_384 = plates[0].get_location_by_nickname 
 custom = plates[1].get_location_by_nickname 
 
 # -----------PREPROTOCOL SETUP-------------------
@@ -102,18 +100,9 @@ myProtocol.dispense_to(200, micropots_3('C6'))
 myProtocol.dispense_to(200, micropots_3('C7'))
 myProtocol.dispense_to(200, micropots_3('C8'))
 
-for number in range(0, 11):
-    myProtocol.take_picture(micropots_3('B2'))
-    myProtocol.take_picture(micropots_3('B5'))
-    myProtocol.take_picture(micropots_3('B8'))
+myProtocol.take_picture(clean_water)
 
-    myProtocol.close_lid()
-
-    myProtocol.set_block_temp(37, 60)
-
-    myProtocol.set_block_temp(4, 0)
-
-    myProtocol.open_lid()
+myProtocol.set_tempdeck_temp(4, 10)
 
 #--------------END OF PROTOCOL--------------
 
