@@ -8,6 +8,34 @@ home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
 });
 
+function displaySettings() {
+      
+    var mySettings = document.getElementById("displaySettings");
+      
+    //var linesCombined = document.
+    var mybr = document.createElement('br');
+    var dots = document.createTextNode("............................................");
+
+    
+
+    mySettings.appendChild(mybr);
+    mySettings.appendChild(dots);
+    mySettings.appendChild(mybr);
+
+//     ............................................
+// screen_info
+// ............................................
+
+// Step size S set to:          4.5
+// Nanoliters to pick up:       0
+// Step size XYZ set to:        10
+// Pipette controlling:         Left
+// X: 0   Y: 0   Z: 0  S_B:  0 S_C:  0
+
+// ............................................
+    
+}
+
 function showPicture() {
     var src = "/static/xbox.jpeg";
     var img = document.getElementById('smallpic')
