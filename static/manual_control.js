@@ -124,6 +124,10 @@ function check_tempdeck_status() {
     socket.emit("check_tempdeck_status")
 }
 
+function get_tempdeck_temp() {
+    socket.emit("get_tempdeck_temp")
+}
+
 function take_picture() {
     socket.emit("take_picture", "Manual Control Pictures")
 }
@@ -136,26 +140,20 @@ socket.on("get_block_temp", function(temp) {
     temp.innerHTML = btemp;
 });
 
-let tdtemp = 0;
 socket.on("get_tempdeck_temp", function(temp) {
     console.log(temp)
-    tdtemp = temp;  
-    var temp = document.getElementById("tdT")
-    temp.innerHTML = tdtemp;
+    var temp1 = document.getElementById("tdT")
+    temp1.innerHTML = temp;
 });
 
-// let tdstatus = 0;
 socket.on("check_tempdeck_status", function(status) {
     console.log(status)
-    // tdstatus = status;  
     var status1 = document.getElementById("tdS")
     status1.innerHTML = status;
 });
 
-let ltemp = 0;
 socket.on("get_lid_temp", function(temp) {
     console.log(temp)
-    ltemp = temp;  
-    var temp = document.getElementById("lidT")
-    temp.innerHTML = ltemp;
+    var temp1 = document.getElementById("lidT")
+    temp1.innerHTML = temp;
 });
