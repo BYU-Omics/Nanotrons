@@ -26,6 +26,8 @@ class Py_Execute:
         self.calibration_file_name = name
 
     def set_file_name(self, name):
+        if ' ' in name:
+            print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
         self.filename = name
 
     def get_file_name(self):
@@ -35,8 +37,12 @@ class Py_Execute:
         self.syringe_model = name
 
     def execute_python_protocol(self):
-        first_arg = self.set_get_path()
+        if self.set_get_path():
+            first_arg = self.set_get_path()
+        else:
+            sys.exit()
         cmd = 'python' + ' ' + first_arg 
+        print("path: ", cmd)
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         if err == None:
@@ -45,13 +51,18 @@ class Py_Execute:
             print(err)
             if out != None:
                 print(out)
+
     def set_get_path(self):
         path = sys.path
         if os.name == LINUX_OS:
             relative_path = path[0] + RELATIVE_PATH_TO_PROTOCOLS_L
         elif os.name == WINDOWS_OS:
             relative_path = RELATIVE_PATH_TO_PROTOCOLS_W
-        self.path_to_file =  relative_path + self.filename 
+        if self.filename == "- Select a Protocol -":
+            print("No protocol selected")
+            return None
+        else:
+            self.path_to_file =  relative_path + self.filename 
         return self.path_to_file
 
     def pause_execution(self):

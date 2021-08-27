@@ -11,13 +11,11 @@
         <h1>Protocol Execution</h1>
         <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
         <br>
-        <br>
-        <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="PAUSE PROTOCOL" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
-        <input title="CONTINUE PROTOCOL" id="continue_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
-        
-        <br>
+        <h3>Before running the protocol make sure that:</h3>
+        <h5>- The name of the protocol does not contain spaces</h5>
+        <h5>- The name of the protocol is a '.py' </h5>
+        <h5>- The labware '.json' file is the right calibration</h5>
+
         <label for="protocols">Protocols</label>
         <select id="protocols" name="protocols" onclick="option_select_protocol()">
             <option value="default" selected>- Select Protocols to Display -</option>
@@ -28,12 +26,12 @@
         
         <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
     
-        <br>  
-
-        <input type="file" webkitdirectory directory multiple/>
         <br>
+        <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="PAUSE PROTOCOL" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
+        <input title="CONTINUE PROTOCOL" id="continue_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
+        <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
         <br>
-
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
 

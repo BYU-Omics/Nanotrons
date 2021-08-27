@@ -670,8 +670,11 @@ def connect_all():
 def run_protocol(protocol_name):
     if RUNNING_APP_FOR_REAL:
         coordinator.disconnect_all() # First we disconnect all the modules
-    executer.set_file_name(protocol_name) # Then we add the calibration to use
-    executer.execute_python_protocol() # Then we execute an external file: the protocol.py
+    if ' ' in protocol_name:
+        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    else:
+        executer.set_file_name(protocol_name) # Then we add the calibration to use
+        executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 
 @socketio.on("get_available_protocols")
 def get_available_protocols():
@@ -685,7 +688,10 @@ def get_available_protocols():
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
-    executer.set_file_name(protocol_name) # Then we add the calibration to use
+    if ' ' in protocol_name:
+        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    else:
+        executer.set_file_name(protocol_name) # Then we add the calibration to use
 
 @socketio.on("display_contents")
 def display_contents():

@@ -178,7 +178,7 @@ class ProtocolCreator:
             extension = ".py"
         elif extension == 'csv':
             extension = ".csv"
-        date_and_time = f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}"
+        date_and_time = f"_{current_time.month}-{current_time.day}-{current_time.year}_at_{current_time.hour}.{current_time.minute}.{current_time.second}"
         new_file_name = protocol + date_and_time + extension
         path = self.get_path_to_protocols(new_file_name)
         while Path(path).is_file():
@@ -613,7 +613,7 @@ class ProtocolCreator:
         flag_for_checking = True
         # Set the name for the file to write. 
         if filename != None:
-            new_name = filename + f" {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}" + ".py"
+            new_name = filename + f"_{current_time.month}-{current_time.day}-{current_time.year}_at_{current_time.hour}.{current_time.minute}.{current_time.second}" + ".py"
         else:
             # if there is no name given freate a new name.
             new_name = self.create_name_for_new_file(extension='py')

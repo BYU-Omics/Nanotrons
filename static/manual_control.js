@@ -144,12 +144,12 @@ socket.on("get_tempdeck_temp", function(temp) {
     temp.innerHTML = tdtemp;
 });
 
-let tdstatus = 0;
+// let tdstatus = 0;
 socket.on("check_tempdeck_status", function(status) {
     console.log(status)
-    tdstatus = status;  
-    var status = document.getElementById("tdS")
-    status.innerHTML = tdstatus;
+    // tdstatus = status;  
+    var status1 = document.getElementById("tdS")
+    status1.innerHTML = status;
 });
 
 let ltemp = 0;
