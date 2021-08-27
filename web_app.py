@@ -9,7 +9,7 @@ import cv2
 import os
 import time
 from flask import request
-from flask import Flask, render_template, url_for, Response, flash, request, redirect
+from flask import Flask, render_template, url_for, Response, flash, request, redirect, send_from_directory
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from video_stream import VideoStream
@@ -85,8 +85,11 @@ if RUNNING_APP_FOR_REAL:
         myCamera = VideoStream(CAMERA_PORT_MACBOOK)
         my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT_MACBOOK)
     else: 
-        myCamera = VideoStream(CAMERA_PORT)
+        myCamera = VideoStream(CAMERA_PORT) 
         my_Pippete_Camera = VideoStream(PIPPETE_CAMERA_PORT)
+else:
+    myCamera = None
+    my_Pippete_Camera = None
 sending_syringe = Flag()
 done_calibration_flag = Flag()
 componentToCalibrate = []
@@ -193,8 +196,8 @@ def upload_new_model():
                 return redirect(request.url)                
     return render_template("upload_new_model.html")
 
-def gen_1(camera):
-    while RUNNING_APP_FOR_REAL:
+def gen_1(camera: VideoStream):
+    while True:
         if camera.stopped:
             break
         frame = camera.read()
@@ -202,12 +205,11 @@ def gen_1(camera):
         # font = cv2.FONT_HERSHEY_SIMPLEX
         # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
         ret, jpeg = cv2.imencode('.jpg', cam)
-        if jpeg is not None:
+        if jpeg is not None: #jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
         else:
             print("Frame is none")
-        
 
 def gen_2(camera):
     img_counter = 0
@@ -238,17 +240,40 @@ def gen_2(camera):
             cv2.imwrite(directory + img_name, frame)
             print(f"{img_name} written!")
             img_counter += 1
-            coordinator.set_picture_flag(False)
+            coordinator.set_picture_flag(False)       
+
+
+def cam_not_working():
+    while True:
+        frame = cv2.imread('static/camera_not_working.jpg')
+        scale_percent = 30 # percent of original size
+        width = int(frame.shape[1] * scale_percent / 100)
+        height = int(frame.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        
+        # resize image
+        frame = cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n') 
 
 @app.route('/video_1_feed')
 def video_1_feed():
-    return Response(gen_1(myCamera.start()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    if myCamera != None:
+        return Response(gen_1(myCamera.start()),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    else:
+        return Response(cam_not_working(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_2_feed')
 def video_2_feed():
-    return Response(gen_2(my_Pippete_Camera.start()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    if my_Pippete_Camera != None:
+        return Response(gen_2(my_Pippete_Camera.start()),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    else:
+        return Response(cam_not_working(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def text_coordinates():
     x, y, z = coordinator.get_current_coordinates() 
@@ -643,10 +668,13 @@ def connect_all():
 #------------------WORKING WITH A PROTOCOL.PY SECTION--------------------
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
-    # if RUNNING_APP_FOR_REAL:
-    coordinator.disconnect_all() # First we disconnect all the modules
-    executer.set_file_name(protocol_name) # Then we add the calibration to use
-    executer.execute_python_protocol() # Then we execute an external file: the protocol.py
+    if RUNNING_APP_FOR_REAL:
+        coordinator.disconnect_all() # First we disconnect all the modules
+    if ' ' in protocol_name:
+        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    else:
+        executer.set_file_name(protocol_name) # Then we add the calibration to use
+        executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 
 @socketio.on("get_available_protocols")
 def get_available_protocols():
@@ -660,11 +688,13 @@ def get_available_protocols():
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
-    executer.set_file_name(protocol_name) # Then we add the calibration to use
+    if ' ' in protocol_name:
+        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    else:
+        executer.set_file_name(protocol_name) # Then we add the calibration to use
 
 @socketio.on("display_contents")
 def display_contents():
-    print("display_contents")
     list_of_lines = executer.display_contents()
     socketio.emit("protocol_python_data", list_of_lines)
 
@@ -717,16 +747,6 @@ def set_labware_syringes(syringes_file_name):
 @socketio.on("run_batch")
 def run_batch():
     print("socket run batch success")
-
-@socketio.on("hard_stop")
-def hard_stop():
-    # print("hard_stop")
-    coordinator.hard_stop()
-
-@socketio.on("stop_load")
-def stop_load():
-    # print("stop_load")
-    coordinator.hard_stop()
 
 @socketio.on("pause_batch")
 def pause_batch():

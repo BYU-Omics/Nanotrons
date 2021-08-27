@@ -2,13 +2,7 @@ var socket = io.connect('http://127.0.0.1:5000');
 
 var run_protocol_button = document.getElementById("run_protocol");
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
-var calibrationOptions = document.getElementById("calibration"); // Dropdown list that shows the available models
-var syringeOptions = document.getElementById("syringe"); // Dropdown list that shows the available models
-
-
 var display_protocol_button = document.getElementById("display_protocol");
-var display_calibration_button = document.getElementById("display_calibration");
-var display_syringe_button = document.getElementById("display_syringe");
 
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
@@ -24,8 +18,6 @@ var SPEtime = document.getElementById("SPEtime");
 
 var contents = ""
 var protocols = {}
-var calibrations = {}
-var syringes = {}
 var script_to_display = "error" // save as error until over written
 var protocol_to_display = "error"
 var calibration_to_display = "error"
@@ -37,8 +29,7 @@ var python_data = ""
 // asks python to send the list of scripts
 
 socket.emit("get_available_protocols")
-socket.emit("get_available_calibrations")
-socket.emit("get_available_syringes")
+console.log("emited: get_available_protocols")
 // socket.emit("give_me_protocol_python")
 
 // listens for the list of available scripts
@@ -149,36 +140,6 @@ function option_select_protocol(){
     }
 }
 
-// this runs each time you select an option from the script list
-function option_select_labware_calibration(){
-    // This either blocks or unblocks the submit button
-    var selected_calibration = calibrationOptions.options[ calibrationOptions.selectedIndex ].value;
-    calibration_to_display = selected_calibration; // set variable to the selected value
-    console.log(selected_calibration);
-    socket.emit("set_labware_calibration", selected_calibration)
-    if ( selected_calibration != "- Select a calibration -" ) { // if you select something from the list
-        display_calibration_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_calibration_button.disabled = true; // disable button
-    }
-}
-
-// this runs each time you select an option from the script list
-function option_select_syringe(){
-    // This either blocks or unblocks the submit button
-    var selected_syringe = syringeOptions.options[ syringeOptions.selectedIndex ].value;
-    syringe_to_display = selected_syringe; // set variable to the selected value
-    console.log(selected_syringe);
-    socket.emit("set_labware_syringe", selected_syringe)
-    if ( selected_syringe != "- Select a syringe -" ) { // if you select something from the list
-        display_syringe_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_syringe_button.disabled = true; // disable button
-    }
-}
-
 // this runs when you click the display script button
 display_protocol_button.addEventListener("click", function() {
     // clear_protocol_Table() // clear out the old table data
@@ -195,8 +156,7 @@ socket.on('protocol_python_data', function(python_lines_list) {
     text_area_left = '<textarea id="w3review" name="w3review" rows="4" cols="50">'
     text_area_right = '</textarea>'
     text = "<br>" + text_area_left
-    for (let i = 36; i < python_data.length; i++) {
-        console.log(python_data[i][0])
+    for (let i = 0; i < python_data.length; i++) {
         if (python_data[i][0] == '#') {
             text +=  python_data[i] ;
         } else {
@@ -204,11 +164,7 @@ socket.on('protocol_python_data', function(python_lines_list) {
             text += python_data[i] ;
         }
     }
-    content.innerHTML = text + text_area_right + "<br>"
-    // console.log(text)
-    
-    
-    // make_and_display_protocol_table()
+    content.innerHTML = text + text_area_right + "<br>"    
 });  
 
 function display_contents() {
@@ -252,16 +208,6 @@ stop_button_protocol.addEventListener("click", function() {
 
 continue_button_protocol.addEventListener("click", function() {
     socket.emit("continue_protocol")
-});
-
-// the stop load button in HTML. Calls the stop_load function
-stopLoad_button.addEventListener("click", function() {
-    socket.emit("stop_load");
-});
-
-// the hard stop button in HTML. Calls the hardstop function
-hardStop_button.addEventListener("click", function() {
-    socket.emit("hard_stop");
 });
 
 // allows you to upload a new script that you can display
@@ -327,7 +273,7 @@ function addTable() {
     var tableBody = document.createElement('TBODY');
     table.appendChild(tableBody);
       
-    for (var i=0; i<3; i++){
+    for (var i = 0; i < 3; i++){
        var tr = document.createElement('TR');
        tableBody.appendChild(tr);
        

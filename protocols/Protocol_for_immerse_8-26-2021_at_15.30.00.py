@@ -1,60 +1,50 @@
 """
-    Template for writing protocols. 
-
     Instructions: 
-        'aspirate_from' assumes nanoliters
-        'dispense_to' 
+        This protocol has been created with the class protocol_creator.
+        If this file is edited it must need to be renamed modifiying the date of edition.        
 """
-
-#-----------IMPORT THE USED PAKAGES---------------------------------------
-
-import sys
-LABWARE = sys.argv[1]
-CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
+import sys 
 
 try:
     from api import *
 except ImportError:
-    CURRENT_DIRECTORY
+    sys.path.append(sys.path[0] + '\\..') # current directory
     from api import *
 
-# ----------CREATE A PROTOCOL OBJECT--------------------------------------
+myProtocol = Api() # creates a protocol object using the Api
 
-myProtocol = Api() 
+metadata = {
+	'protocolName': 'Testing_matching 8-26-2021 at 15:23:9.py', 
+	'author': 'Alejandro Brozalez', 
+	'description': 'I am testing how this protocol creator works.' 
+}
 
-# ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
+# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup(LABWARE)
+chips, plates = myProtocol.load_labware_setup('Recording.json')
 
-# ------------END OF HEADING-------------------------------------------------
+micropots_3 = chips[0] 
+custom = plates[0] 
 
-# ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED-----------
+# If the depth has been voided for any of the plates, this is specified here:
 
-# Labware file loaded: Test_for_protocols.json
-
-micropots_3 = chips[0].get_location_by_nickname 
-corning_384 = plates[0].get_location_by_nickname 
-custom = plates[1].get_location_by_nickname 
+myProtocol.void_plate_depth(plate = custom, void = True)
 
 # -----------PREPROTOCOL SETUP-------------------
 
-# Designater wells for washing tip
+micropots_3 = micropots_3.get_location_by_nickname 
+custom = custom.get_location_by_nickname 
 
+# Designated wells for washing tip
 waste_water = custom('A1')
 wash_water = custom('A2')
 clean_water = custom('A3')
 
-myProtocol.set_washing_positions(clean_water=clean_water, wash_water=wash_water, waste_water=waste_water)
-
-# If there are any depth voided they are listed here
-
-myProtocol.void_plate_depth(plates[1], True)
+myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
 myProtocol.start_wash()
 
-#----------START OF PROTOCOL----------------------------------------
-
-myProtocol.set_block_temp(4, 0)
+# ------------START OF PROTOCOL---------------------------------
 
 myProtocol.aspirate_from(1000, clean_water)
 
@@ -102,18 +92,7 @@ myProtocol.dispense_to(200, micropots_3('C6'))
 myProtocol.dispense_to(200, micropots_3('C7'))
 myProtocol.dispense_to(200, micropots_3('C8'))
 
-for number in range(0, 11):
-    myProtocol.take_picture(micropots_3('B2'))
-    myProtocol.take_picture(micropots_3('B5'))
-    myProtocol.take_picture(micropots_3('B8'))
-
-    myProtocol.close_lid()
-
-    myProtocol.set_block_temp(37, 60)
-
-    myProtocol.set_block_temp(4, 0)
-
-    myProtocol.open_lid()
+myProtocol.take_picture(clean_water)
 
 #--------------END OF PROTOCOL--------------
 

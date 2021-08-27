@@ -1,31 +1,14 @@
 """
-    Template for writing protocols. 
-
     Instructions: 
-        'aspirate_from' assumes nanoliters
-        'dispense_to' 
+        This protocol has been created with the class protocol_creator.
+        If this file is edited it must need to be renamed modifiying the date of edition.        
 """
-
-#---------------------------IMPORT THE USED LIBRARIES-------------------------------
-
-import sys
-LABWARE = sys.argv[1]
-CURRENT_DIRECTORY = sys.path.append(sys.path[0] + '\\..')
+import sys 
 
 try:
     from api import *
 except ImportError:
-    CURRENT_DIRECTORY
+    sys.path.append(sys.path[0] + '\\..') # current directory
     from api import *
 
-#---------------------------CREATE A PROTOCOL OBJECT--------------------------------
-
-myProtocol = Api() 
-
-#-------------------IMPORT THE CALIBRATION FOR THIS PROTOCOL: 
-            # This is done from the executer, it is specified on the GUI.
-            # Chips and plates are loaded in the order they were calibrated.""" 
-
-chips, plates = myProtocol.load_labware_setup(LABWARE)
-
-#---------------------------END OF HEADING------------------------------------------
+myProtocol = Api() # creates a protocol object using the Api
