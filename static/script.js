@@ -18,8 +18,6 @@ var SPEtime = document.getElementById("SPEtime");
 
 var contents = ""
 var protocols = {}
-var calibrations = {}
-var syringes = {}
 var script_to_display = "error" // save as error until over written
 var protocol_to_display = "error"
 var calibration_to_display = "error"
@@ -31,8 +29,7 @@ var python_data = ""
 // asks python to send the list of scripts
 
 socket.emit("get_available_protocols")
-socket.emit("get_available_calibrations")
-socket.emit("get_available_syringes")
+console.log("emited: get_available_protocols")
 // socket.emit("give_me_protocol_python")
 
 // listens for the list of available scripts
@@ -160,7 +157,6 @@ socket.on('protocol_python_data', function(python_lines_list) {
     text_area_right = '</textarea>'
     text = "<br>" + text_area_left
     for (let i = 0; i < python_data.length; i++) {
-        console.log(python_data[i][0])
         if (python_data[i][0] == '#') {
             text +=  python_data[i] ;
         } else {
@@ -212,16 +208,6 @@ stop_button_protocol.addEventListener("click", function() {
 
 continue_button_protocol.addEventListener("click", function() {
     socket.emit("continue_protocol")
-});
-
-// the stop load button in HTML. Calls the stop_load function
-stopLoad_button.addEventListener("click", function() {
-    socket.emit("stop_load");
-});
-
-// the hard stop button in HTML. Calls the hardstop function
-hardStop_button.addEventListener("click", function() {
-    socket.emit("hard_stop");
 });
 
 // allows you to upload a new script that you can display
@@ -287,7 +273,7 @@ function addTable() {
     var tableBody = document.createElement('TBODY');
     table.appendChild(tableBody);
       
-    for (var i=0; i<3; i++){
+    for (var i = 0; i < 3; i++){
        var tr = document.createElement('TR');
        tableBody.appendChild(tr);
        

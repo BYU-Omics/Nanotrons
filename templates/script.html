@@ -25,94 +25,21 @@
         <br>
         <button type="button" disabled="disabled" id="display_protocol" onclick="display_contents()">Display Protocol</button>
         <br>
-
-        <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
         
-        <br>        
+        <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
+    
+        <br>  
+
+        <input type="file" webkitdirectory directory multiple/>
         <br>
+        <br>
+
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
 
-        <br>
-        <br>
-        <br>
-        
-        <b><p style="display:inline">Name: </p></b>
-        <p id="script_name" style="display:inline"></p>
-        <br>
-        <b><p style="display:inline">Description: </p></b>
-        <p id="script_description" style="display:inline"></p>
-        <br>
-        <b><p style="display:inline">gradientTime: </p></b>
-        <p id="gradientTime" style="display:inline"></p>
-        <br>
-        <b><p style="display:inline">SPEtime: </p></b>
-        <p id="SPEtime" style="display:inline"></p>
-        <br>
-        <br>
-        <br>
-
-        <body onload="load()">
-            <div id="myScriptTableData">
-            <b>Current data in the system ...</b>
-            <table id="myScriptTableData"  border="1" cellpadding="2">
-                <tr>
-                    <td>&nbsp;</td>
-                    <td><b>Command</b></td>
-                    <td><b>Parameters</b></td>
-                </tr>
-            </table>
-            &nbsp;
-            </div>
-
-            <div id="myProtocolTableData">
-            <b>Current data in the system ...</b>
-            <table id="myProtocolTableData"  border="1" cellpadding="2">
-                <tr>
-                    <td>&nbsp;</td>
-                    <td><b>Command</b></td>
-                    <td><b>Parameters</b></td>
-                </tr>
-            </table>
-            &nbsp;
-            </div>
-
-            <div id="myform">
-                <b>Simple form with name and age ...</b>
-                <table>
-                    <tr>
-                        <td>Name:</td>
-                        <td><input type="text" id="command"></td>
-                    </tr>
-                    <tr>
-                        <td>Age:</td>
-                        <td><input type="text" id="parameters">
-                        <input type="button" id="add" value="Add" onclick="Javascript:addRow()"></td>
-                    </tr>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div id="myDynamicTable">
-            <input type="button" id="create" value="Click here" onclick="Javascript:addTable()">
-            to create a Table and add some data using JavaScript
-            </div>
         </body>
 
-
-        
-        
-        
-        
-        
-        
-        
         <script src="/static/script.js"></script>
-
-
 
     </body>
 
