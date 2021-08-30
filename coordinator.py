@@ -165,6 +165,11 @@ class Coordinator:
         settingsDic["nL"] = self.ot_control.get_nL()
         settingsDic["xyz step"] = self.ot_control.get_step_size_xyz_motor()
         settingsDic['pipette'] = self.ot_control.get_side()
+        settingsDic['x'] = self.ot_control.position['X']
+        settingsDic['y'] = self.ot_control.position['Y']
+        settingsDic['z'] = self.ot_control.position['Z']
+        settingsDic['b'] = self.ot_control.position['B']
+        settingsDic['c'] = self.ot_control.position['C']
         return settingsDic
 
     def monitor_joystick(self):

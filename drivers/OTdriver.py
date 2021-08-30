@@ -509,17 +509,6 @@ class OT2_nanotrons_driver(SM):
     def nothing(self, argument = 1):
         pass
 
-    def screen_info(self, dummyarg):
-        print("............................................")
-        print("")
-        print(f"Step size S set to:          {self.s_step_size}") 
-        print(f"Nanoliters to pick up:       {self.nL}")
-        print(f"Step size XYZ set to:        {self.xyz_step_size}")
-        print(f"Pipette controlling:         {self.side}")
-        print(f"X: {self.position['X']}   Y: {self.position['Y']}   Z: {self.position['Z']}  S_B:  {self._position['B']} S_C:  {self._position['C']}")
-        print("")
-        print("............................................")
-
     def find_port(self):
         """
         This allows the class to connect to a port when called, this makes the calling chain cleaner. 

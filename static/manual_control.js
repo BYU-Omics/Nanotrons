@@ -10,8 +10,6 @@ home_button.addEventListener("click", function() {
 
 function displaySettings() {
     socket.emit("get_syringe_settings")
-// HAILEY ITS RIGHT HERE OVER HERE hAILEY HAILEYA HEIAY AOGIHAEIHGASHGASDHG;LHDSGHAS;DGJHA'SGXZLSRAGN
-
 }
 
 function showPicture() {
@@ -185,22 +183,24 @@ socket.on("get_syringe_settings", function(givenSetting){
     htmlSetting.innerHTML += givenSetting["xzy step"]
     htmlSetting.innerHTML += mybr;
 
-    htmlSetting.innerHTML += "Pipette controlling:"
+    htmlSetting.innerHTML += "Pipette controlling: "
     htmlSetting.innerHTML += givenSetting['pipette']
+    htmlSetting.innerHTML += mybr;
 
-    // htmlSetting.innerHTML += "X: "
-    // htmlSetting.innerHTML += 
+    htmlSetting.innerHTML += "X: "
+    htmlSetting.innerHTML += givenSetting['x']
 
-    // htmlSetting.innerHTML += "Y: "
-    // htmlSetting.innerHTML += 
+    htmlSetting.innerHTML += "  Y: "
+    htmlSetting.innerHTML += givenSetting['y']
 
-    // htmlSetting.innerHTML += "Z: "
-    // htmlSetting.innerHTML += 
+    htmlSetting.innerHTML += "  Z: "
+    htmlSetting.innerHTML += givenSetting['z']
+    htmlSetting.innerHTML += mybr;
 
-    // htmlSetting.innerHTML += 
-    // htmlSetting.innerHTML += 
-
-    
+    htmlSetting.innerHTML += "  SC_B: "
+    htmlSetting.innerHTML += givenSetting['b']
+    htmlSetting.innerHTML += "  SC_C: "
+    htmlSetting.innerHTML += givenSetting['c']  
 });
 //     ............................................
 // screen_info
