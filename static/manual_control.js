@@ -1,8 +1,14 @@
 var socket = io.connect('http://127.0.0.1:5000');
 var home_button = document.getElementById("back_home");
+var load_labware = document.getElementById("load_labware");
+
 
 socket.emit("start_manual_control_window");
 socket.emit("give_me_coordinates");
+
+home_button.addEventListener("click", function() {
+    socket.emit("stop_manual_control_window");
+});
 
 home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");

@@ -19,8 +19,8 @@
 
 .btn-1 {
 
-    width: 202px;
-    height: 100px;
+    width: 101px;
+    height: 50px;
     border: darkslategray;
     color: dimgrey;
     background-color: gray;
@@ -33,7 +33,7 @@
 
 .btn-2 {
 
-    width: 300px;
+    width: 100px;
     height: 20px;
     border: darkslategray;
     color: dimgrey;

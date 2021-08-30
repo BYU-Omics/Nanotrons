@@ -388,13 +388,20 @@ def set_lid_temperature(temp):
 
 @socketio.on("get_lid_temp")
 def get_lid_temp():
-    temp = coordinator.tc_control.get_lid_temp()
-    socketio.emit("get_lid_temp", temp)
+    try:
+        temp = coordinator.tc_control.get_lid_temp()
+        socketio.emit("get_lid_temp", temp)
+    except AttributeError:
+        socketio.emit("get_lid_temp", "Not connected")
+
     
 @socketio.on("get_block_temp")
 def get_block_temp():
-    temp = coordinator.tc_control.get_block_temp()
-    socketio.emit("get_block_temp", temp)
+    try:
+        temp = coordinator.tc_control.get_block_temp()
+        socketio.emit("get_block_temp", temp)
+    except AttributeError:
+        socketio.emit("get_block_temp", "Not connected")
     
 @socketio.on("lid_position")
 def lid_position():
@@ -426,16 +433,22 @@ def deactivate_tempdeck():
 @socketio.on("get_tempdeck_temp")
 def get_tempdeck_temp():
     print("get_tempdeck_temp")
-    temp = coordinator.get_tempdeck_temp()
-    socketio.emit("get_tempdeck_temp", temp)
+    if RUNNING_APP_FOR_REAL:
+        temp = coordinator.get_tempdeck_temp()
+        socketio.emit("get_tempdeck_temp", temp)
+    else:
+        socketio.emit("get_tempdeck_temp", "Not connected")
 
 @socketio.on("check_tempdeck_status")
 def check_tempdeck_status():
     print("check_tempdeck_status")
-    coordinator.check_tempdeck_status()
-    status = coordinator.check_tempdeck_status()
-    socketio.emit("check_tempdeck_status", status)
-
+    if RUNNING_APP_FOR_REAL:
+        coordinator.check_tempdeck_status()
+        status = coordinator.check_tempdeck_status()
+        socketio.emit("check_tempdeck_status", status)
+    else:
+        socketio.emit("check_tempdeck_status", "Not connected")
+    
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
