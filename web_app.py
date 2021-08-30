@@ -202,9 +202,14 @@ def gen_1(camera: VideoStream):
             break
         frame = camera.read()
         cam = cv2.flip(frame, -1)#its flipped because the camera veiwing all of OT2 is upside down
+        scale_percent = 65 # percent of original size
+        width = int(frame.shape[1] * scale_percent / 100)
+        height = int(frame.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(cam, dim)
         # font = cv2.FONT_HERSHEY_SIMPLEX
         # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
-        ret, jpeg = cv2.imencode('.jpg', cam)
+        ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None: #jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
@@ -221,7 +226,12 @@ def gen_2(camera):
         cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
         cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
         
-        ret, jpeg = cv2.imencode('.jpg', img_with_rect)
+        scale_percent = 65 # percent of original size
+        width = int(frame.shape[1] * scale_percent / 100)
+        height = int(frame.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img_with_rect, dim)
+        ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
