@@ -11,13 +11,17 @@
     </head>
 
     <body>
+        <script type="text/javascript">
+            window.onload = function(){ 
+                            alert("Please make sure that the OT2 is properly homed before controlling them");
+                            }
+            </script>
         <h1>Manual Control</h1>
         <br>
         <button id="back_home" onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
         <button id="load_labware" onclick="window.location.href='http://127.0.0.1:5000/load_labware_setup';">LOAD LABWARE</button>
         <button onclick="screen_info()">Screen Info</button>
         <hr/>
-        <p>Please make sure that the <b>OT2</b> is properly homed before controlling them</p>
 
         <h3>OT2 Control</h3>
         <p>Homing</p>
@@ -34,43 +38,40 @@
         <button onclick="close_lid()">Close Lid</button>
         <button onclick="deactivate_all()">Deactivate All</button>
         <br>
-        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="15" height="15">
-        <label for="btemp">(4-99):</label>
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="btemp">(4-99°C):</label>
         <input type="number" id="btemp" name="btemp" min="4" max="99">
-        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="15" height="15">
+        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="25" height="25">
         <label for="htime">[min]:</label>
         <input type="number" id="htime" name="htime" min="0.1" max="99">
         <button onclick="set_temperature()">SET</button>
         <button onclick="deactivate_block()">Deactivate Block</button>
-        <button class="btn-2" onclick="get_block_temp()">Check T</button>
+        <button class="btn-2" onclick="get_block_temp()">Temperature</button>
         <span id="blockT"> </span>
         <br>
-        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="15" height="15">
-        <label for="ltemp">(37-110):</label>
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="ltemp">(37-110°C):</label>
         <input type="number" id="ltemp" name="ltemp" min="37" max="110">
         <button onclick="set_lid_temperature()">SET</button>
         <button onclick="deactivate_lid()">Deactivate Lid</button>
-        <button class="btn-2" onclick="get_lid_temp()">Check T</button>
+        <button class="btn-2" onclick="get_lid_temp()">Temperature</button>
         <span id="lidT"> </span>
 
 
         <h3>Temperature Deck</h3>
-        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="15" height="15">
-        <label for="tdtemp">Temperature:</label>
-        <input type="number" id="tdtemp" name="tdtemp" min="4" max="99">
-        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="15" height="15">
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="tdtemp">(4-95°C):</label>
+        <input type="number" id="tdtemp" name="tdtemp" min="4" max="95">
+        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="25" height="25">
         <label for="thtime">[min]:</label>
         <input type="number" id="thtime" name="thtime" min="0.1" max="99">
         <button onclick="set_tempdeck_temp()">Set TempDeck Temperature </button>
         <button onclick="deactivate_tempdeck()">Deactivate Tempdeck</button>
-        <button class="btn-2" onclick="get_tempdeck_temp()">Check T</button>
+        <button class="btn-2" onclick="get_tempdeck_temp()">Temperature</button>
         <span id="tdT"> </span>
-        <button class="btn-2" onclick="check_tempdeck_status()">Check status</button>
+        <button class="btn-2" onclick="check_tempdeck_status()">Status</button>
         <span id="tdS"> </span>
 
-
-        
-        
         <br>
         <br>
         <img id="bg" src="{{ url_for('video_1_feed') }}"> 

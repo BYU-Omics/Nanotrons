@@ -89,7 +89,7 @@ myProtocol.dispense_to(10, corning_384('E4'))
 
 myProtocol.mid_wash()
 
-myProtocol.aspirate_from(50, custom_small('E1'))
+myProtocol.aspirate_from(50, custom_small('D1'))
 
 myProtocol.dispense_to(10, corning_384('A5'))
 myProtocol.dispense_to(10, corning_384('B5'))

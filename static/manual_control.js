@@ -138,6 +138,10 @@ function take_picture() {
     socket.emit("take_picture", "Manual Control Pictures")
 }
 
+function alert_for_calibration() {
+    alert("Please make sure that the OT2 is properly homed before controlling them");
+  }
+
 let btemp = 0;
 socket.on("get_block_temp", function(temp) {
     console.log(temp)
