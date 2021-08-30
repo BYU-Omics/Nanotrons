@@ -133,7 +133,7 @@ class Coordinator:
         self.clean_water = None
         self.wash_water = None
         self.waste_water = None
-        self.amount_wanted = None
+        self.amount_wanted = 0
 
         self.syringe_bottom_coordinate =  SYRINGE_BOTTOM 
         self.syringe_sweet_spot_coordinate =  SYRINGE_SWEET_SPOT 
@@ -857,7 +857,7 @@ class Coordinator:
         self.td_control.disconnect()
 
     def end_of_protocol(self):
-        self.go_to_deck_slot('12')
+        self.go_to_deck_slot('3')
         self.disconnect_all()
 
 def test():

@@ -21,7 +21,7 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('Fluo_test_30-08.json')
+chips, plates = myProtocol.load_labware_setup('Fluo_test_2.json')
 
 corning_384 = plates[0] 
 custom = plates[1] 
@@ -34,9 +34,9 @@ myProtocol.void_plate_depth(plate = custom_small, void = True)
 
 # -----------PREPROTOCOL SETUP-------------------
 
-corning_384 = corning_384.get_location_by_nickname 
-custom = custom.get_location_by_nickname 
-custom_small = custom_small.get_location_by_nickname 
+corning_384 = corning_384.pot_position_for_protocol 
+custom = custom.pot_position_for_protocol 
+custom_small = custom_small.pot_position_for_protocol 
 
 # Designated wells for washing tip
 waste_water = custom('A1')
@@ -51,11 +51,11 @@ myProtocol.start_wash()
 
 myProtocol.aspirate_from(500, custom_small('A1'))
 
-myProtocol.dispense_to(100, corning_384('B1'))
-myProtocol.dispense_to(100, corning_384('C1'))
-myProtocol.dispense_to(100, corning_384('D1'))
-myProtocol.dispense_to(100, corning_384('E1'))
-myProtocol.dispense_to(100, corning_384('A1'))
+myProtocol.dispense_to(100, corning_384('A12'))
+myProtocol.dispense_to(100, corning_384('B12'))
+myProtocol.dispense_to(100, corning_384('C12'))
+myProtocol.dispense_to(100, corning_384('D12'))
+myProtocol.dispense_to(100, corning_384('E12'))
 
 myProtocol.mid_wash()
 
@@ -91,11 +91,11 @@ myProtocol.mid_wash()
 
 myProtocol.aspirate_from(50, custom_small('D1'))
 
-myProtocol.dispense_to(10, corning_384('A5'))
-myProtocol.dispense_to(10, corning_384('B5'))
-myProtocol.dispense_to(10, corning_384('C5'))
-myProtocol.dispense_to(10, corning_384('D5'))
-myProtocol.dispense_to(10, corning_384('E5'))
+myProtocol.dispense_to(5, corning_384('A13'))
+myProtocol.dispense_to(5, corning_384('B13'))
+myProtocol.dispense_to(5, corning_384('C13'))
+myProtocol.dispense_to(5, corning_384('D13'))
+myProtocol.dispense_to(5, corning_384('E13'))
 
 myProtocol.mid_wash()
 

@@ -257,9 +257,9 @@ class ProtocolCreator:
         """        
         content = []
         for chip in chip_names_list:
-            content.append(f"{chip} = {chip}.get_location_by_nickname \n")
+            content.append(f"{chip} = {chip}.pot_position_for_protocol \n")
         for plate in plate_names_list:
-            content.append(f"{plate} = {plate}.get_location_by_nickname \n")
+            content.append(f"{plate} = {plate}.pot_position_for_protocol \n")
         return content
 
     def create_protocol_voided_depth_for_labware(self, labware_filename: str, list_of_voided_plates: list = None) -> list:
