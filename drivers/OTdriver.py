@@ -306,7 +306,9 @@ class OT2_nanotrons_driver(SM):
         self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
 # Getters and Setters 
-
+    def get_side(self):
+        return self.side;
+        
     def get_x_motor_index(self):
         return 'X'
 
@@ -351,6 +353,9 @@ class OT2_nanotrons_driver(SM):
 
     def get_motor_max_speed(self):
         return MAX_SPEED
+    
+    def get_nL(self):
+        return self.nL
 
     def set_tc_flag(self, is_tc_mounted: bool):
         self.tc_flag = is_tc_mounted

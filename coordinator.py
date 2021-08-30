@@ -33,9 +33,6 @@ COORDINATOR CLASS
         This section provides current values for dynamic variables and states such as the current X,Y,Z coordinate of the motors, and current gear, and 
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
 
-    VII. Hi I'm Hailey
-    
-    VII. Hi my name is alejandro
 """
 
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
@@ -162,6 +159,14 @@ class Coordinator:
         The only method that should be called on an instance of the Application class is manual_control(). The
         rest of the methods are supporting functions for the operation of manual_control()
     """
+    def get_syringe_settings(self):
+        settingsDic = {}
+        settingsDic["s step"] = self.ot_control.get_step_size_syringe_motor()
+        settingsDic["nL"] = self.ot_control.get_nL()
+        settingsDic["xyz step"] = self.ot_control.get_step_size_xyz_motor()
+        settingsDic['pipette'] = self.ot_control.get_side()
+        return settingsDic
+
     def monitor_joystick(self):
         """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
         """
@@ -239,7 +244,9 @@ class Coordinator:
         """ This method goes through a list of predefined steps  """
        
         self.ot_control.half_step_size_XYZ("") # "" is the dummy argument
-    
+
+
+
     """
     INSTANTANEOUS COMMANDS SECTION
         This section contains code that can send instantaneous commands to the motors to go to
@@ -877,5 +884,3 @@ def test():
 
 if __name__ == "__main__":
     test()
-
-

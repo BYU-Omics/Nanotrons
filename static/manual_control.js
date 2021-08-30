@@ -9,31 +9,9 @@ home_button.addEventListener("click", function() {
 });
 
 function displaySettings() {
-      
-    var mySettings = document.getElementById("displaySettings");
-      
-    //var linesCombined = document.
-    var mybr = document.createElement('br');
-    var dots = document.createTextNode("............................................");
+    socket.emit("get_syringe_settings")
+// HAILEY ITS RIGHT HERE OVER HERE hAILEY HAILEYA HEIAY AOGIHAEIHGASHGASDHG;LHDSGHAS;DGJHA'SGXZLSRAGN
 
-    
-
-    mySettings.appendChild(mybr);
-    mySettings.appendChild(dots);
-    mySettings.appendChild(mybr);
-
-//     ............................................
-// screen_info
-// ............................................
-
-// Step size S set to:          4.5
-// Nanoliters to pick up:       0
-// Step size XYZ set to:        10
-// Pipette controlling:         Left
-// X: 0   Y: 0   Z: 0  S_B:  0 S_C:  0
-
-// ............................................
-    
 }
 
 function showPicture() {
@@ -187,3 +165,51 @@ socket.on("get_lid_temp", function(temp) {
     var temp = document.getElementById("lidT")
     temp.innerHTML = ltemp;
 });
+
+
+socket.on("get_syringe_settings", function(givenSetting){
+   
+    console.log("getting syringe settings");
+    var  htmlSetting = document.getElementById("syringe_settings")
+    var mybr = "<br />";
+
+    htmlSetting.innerHTML = "Step size S set to: "; 
+    htmlSetting.innerHTML += givenSetting["s step"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Nanoliters to pick up: ";
+    htmlSetting.innerHTML += givenSetting["nL"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Step size XYZ set to: "
+    htmlSetting.innerHTML += givenSetting["xzy step"]
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Pipette controlling:"
+    htmlSetting.innerHTML += givenSetting['pipette']
+
+    // htmlSetting.innerHTML += "X: "
+    // htmlSetting.innerHTML += 
+
+    // htmlSetting.innerHTML += "Y: "
+    // htmlSetting.innerHTML += 
+
+    // htmlSetting.innerHTML += "Z: "
+    // htmlSetting.innerHTML += 
+
+    // htmlSetting.innerHTML += 
+    // htmlSetting.innerHTML += 
+
+    
+});
+//     ............................................
+// screen_info
+// ............................................
+
+// Step size S set to:          4.5
+// Nanoliters to pick up:       0
+// Step size XYZ set to:        10
+// Pipette controlling:         Left
+// X: 0   Y: 0   Z: 0  S_B:  0 S_C:  0
+
+// ............................................
