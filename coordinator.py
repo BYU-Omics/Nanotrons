@@ -77,9 +77,11 @@ PLATE_DEPTH = "Plate's depth"
 AIR_GAP_NL_AMOUNT = 50
 AIR_GAP_ASPIRATING_Z_STEP_DISTANCE = 25
 
+
 STANDARD_LEFT_OVER = 200
 STANDARD_CUSHION_1 = 200
 STANDARD_CUSHION_2 = 300
+AMOUNT_WANTED_DEFAULT = 1000
 
 SYRINGE_BOTTOM = -190
 SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
@@ -133,7 +135,7 @@ class Coordinator:
         self.clean_water = None
         self.wash_water = None
         self.waste_water = None
-        self.amount_wanted = 0
+        self.amount_wanted = AMOUNT_WANTED_DEFAULT
 
         self.syringe_bottom_coordinate =  SYRINGE_BOTTOM 
         self.syringe_sweet_spot_coordinate =  SYRINGE_SWEET_SPOT 
@@ -686,6 +688,10 @@ class Coordinator:
         self.clean_water = clean_water
         self.wash_water = wash_water
         self.waste_water = waste_water
+    
+    def set_amount_wanted(self, volume):
+        print(f"Amount wanted to celan for midwash: {volume}")
+        self.amount_wanted = volume
 
     def start_wash(self):
         """ This is the function that allows the robot to get rid of the contamination on the syringe, 

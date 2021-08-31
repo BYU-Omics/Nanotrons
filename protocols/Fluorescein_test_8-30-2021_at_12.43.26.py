@@ -21,11 +21,12 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('Fluo_test_2.json')
+chips, plates = myProtocol.load_labware_setup('Fluo_test_08-30.json')
 
-corning_384 = plates[0] 
-custom = plates[1] 
-custom_small = plates[2] 
+
+custom = plates[0] 
+custom_small = plates[1] 
+corning_384 = plates[2]
 
 # If the depth has been voided for any of the plates, this is specified here:
 
@@ -51,51 +52,51 @@ myProtocol.start_wash()
 
 myProtocol.aspirate_from(500, custom_small('A1'))
 
-myProtocol.dispense_to(100, corning_384('A12'))
-myProtocol.dispense_to(100, corning_384('B12'))
-myProtocol.dispense_to(100, corning_384('C12'))
-myProtocol.dispense_to(100, corning_384('D12'))
-myProtocol.dispense_to(100, corning_384('E12'))
+myProtocol.dispense_to(100, corning_384('B14'))
+myProtocol.dispense_to(100, corning_384('C14'))
+myProtocol.dispense_to(100, corning_384('D14'))
+myProtocol.dispense_to(100, corning_384('A14'))
+myProtocol.dispense_to(100, corning_384('E14'))
 
 myProtocol.mid_wash()
 
 myProtocol.aspirate_from(250, custom_small('B1'))
 
-myProtocol.dispense_to(50, corning_384('A2'))
-myProtocol.dispense_to(50, corning_384('B2'))
-myProtocol.dispense_to(50, corning_384('C2'))
-myProtocol.dispense_to(50, corning_384('D2'))
-myProtocol.dispense_to(50, corning_384('E2'))
+myProtocol.dispense_to(50, corning_384('A15'))
+myProtocol.dispense_to(50, corning_384('B15'))
+myProtocol.dispense_to(50, corning_384('C15'))
+myProtocol.dispense_to(50, corning_384('D15'))
+myProtocol.dispense_to(50, corning_384('E15'))
 
 myProtocol.mid_wash()
 
 myProtocol.aspirate_from(100, custom_small('C1'))
 
-myProtocol.dispense_to(20, corning_384('A3'))
-myProtocol.dispense_to(20, corning_384('B3'))
-myProtocol.dispense_to(20, corning_384('C3'))
-myProtocol.dispense_to(20, corning_384('D3'))
-myProtocol.dispense_to(20, corning_384('E3'))
+myProtocol.dispense_to(20, corning_384('A16'))
+myProtocol.dispense_to(20, corning_384('B16'))
+myProtocol.dispense_to(20, corning_384('C16'))
+myProtocol.dispense_to(20, corning_384('D16'))
+myProtocol.dispense_to(20, corning_384('E16'))
 
 myProtocol.mid_wash()
 
 myProtocol.aspirate_from(50, custom_small('D1'))
 
-myProtocol.dispense_to(10, corning_384('A4'))
-myProtocol.dispense_to(10, corning_384('B4'))
-myProtocol.dispense_to(10, corning_384('C4'))
-myProtocol.dispense_to(10, corning_384('D4'))
-myProtocol.dispense_to(10, corning_384('E4'))
+myProtocol.dispense_to(10, corning_384('A17'))
+myProtocol.dispense_to(10, corning_384('B17'))
+myProtocol.dispense_to(10, corning_384('C17'))
+myProtocol.dispense_to(10, corning_384('D17'))
+myProtocol.dispense_to(10, corning_384('E17'))
 
 myProtocol.mid_wash()
 
-myProtocol.aspirate_from(50, custom_small('D1'))
+myProtocol.aspirate_from(25, custom_small('D1'))
 
-myProtocol.dispense_to(5, corning_384('A13'))
-myProtocol.dispense_to(5, corning_384('B13'))
-myProtocol.dispense_to(5, corning_384('C13'))
-myProtocol.dispense_to(5, corning_384('D13'))
-myProtocol.dispense_to(5, corning_384('E13'))
+myProtocol.dispense_to(5, corning_384('A18'))
+myProtocol.dispense_to(5, corning_384('B18'))
+myProtocol.dispense_to(5, corning_384('C18'))
+myProtocol.dispense_to(5, corning_384('D18'))
+myProtocol.dispense_to(5, corning_384('E18'))
 
 myProtocol.mid_wash()
 

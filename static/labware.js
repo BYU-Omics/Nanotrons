@@ -25,7 +25,6 @@ socket.on("here_current_labware", function(labware_dict) {
         node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
         calibrated_plates.appendChild(node); // Add the node to the labware list
     }
-        
 });
 
 delete_button.addEventListener("click", function() {

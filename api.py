@@ -41,6 +41,7 @@ class Api:
         self.amount_wanted = volume
 
     def dispense_to(self, volume, to):
+        self.coordinator.set_amount_wanted(volume)
         self.coordinator.dispense_to(volume, to)
 
     def open_lid(self):
