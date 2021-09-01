@@ -101,8 +101,8 @@ class Coordinator:
         
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
-        self.td_control = TempDeck()
+        # self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
+        # self.td_control = TempDeck()
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
@@ -121,7 +121,7 @@ class Coordinator:
             self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
-        self.deck = Deck()
+        # self.deck = Deck()
         self.user_input = 0
         self.folder_for_pictures = None
         self.picture_flag = False

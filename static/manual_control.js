@@ -180,7 +180,7 @@ socket.on("get_syringe_settings", function(givenSetting){
     htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "Step size XYZ set to: "
-    htmlSetting.innerHTML += givenSetting["xzy step"]
+    htmlSetting.innerHTML += givenSetting["xyz step"]
     htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "Pipette controlling: "

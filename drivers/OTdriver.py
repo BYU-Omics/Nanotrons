@@ -328,7 +328,8 @@ class OT2_nanotrons_driver(SM):
         self.s_step_size = new_step_size
 
     def get_step_size_xyz_motor(self):
-        return self.xyz_step_size
+        print(self.xyz_step_size)
+        return (self.xyz_step_size)
 
     def get_step_size_syringe_motor(self):
         return self.s_step_size
