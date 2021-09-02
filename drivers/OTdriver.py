@@ -62,7 +62,7 @@ C_MAX_SPEED = 40
 HIGH_SPEED = 300
 MAX_SPEED = 400
 
-MIDDLE_STEP = 5
+MIDDLE_STEP = 7
 HALF = 0.5
 XYZ = 'X Y Z'
 
@@ -328,7 +328,6 @@ class OT2_nanotrons_driver(SM):
         self.s_step_size = new_step_size
 
     def get_step_size_xyz_motor(self):
-        print(self.xyz_step_size)
         return (self.xyz_step_size)
 
     def get_step_size_syringe_motor(self):

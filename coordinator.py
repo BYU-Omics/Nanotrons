@@ -197,6 +197,8 @@ class Coordinator:
             for button in buttons:
                 if button == "START":
                     self.user_input = input("Enter volume to aspirate in nanoliters: ")
+                    self.ot_control.set_nL(self.user_input)
+                    self.volume_to_displacement_converter(self.user_input)
                 method_name = self.myProfile.get_button_function(button).__name__
                 method = getattr(self.ot_control, method_name, False)
                 if not method:
@@ -357,7 +359,6 @@ class Coordinator:
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
-
         # Extract syringe radius
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         diameter = syringe_parameters["inner_diameter"] # This parameter has units of mm
