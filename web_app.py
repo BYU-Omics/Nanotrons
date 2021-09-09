@@ -562,7 +562,7 @@ def save_labware_setup(output_file_name):
 def load_labware_setup(input_file_name):
     print(f"Loading labware set up from: {input_file_name}")
     if input_file_name == None or input_file_name == "None set":
-        print("WARNING: No filename set yet. ")
+        print(f"WARNING: Filename set to: {input_file_name} ")
     else:
         coordinator.load_labware_setup(input_file_name)
 
