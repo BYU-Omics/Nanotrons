@@ -39,20 +39,6 @@ socket.on('protocols_available', function(received_protocols) {
     fill_protocol_drop_down() // add the options to the list
 }); 
 
-// listens for the list of available scripts
-socket.on('calibrations_available', function(received_calibrations) {
-    calibrations = received_calibrations; // save list in scripts variable
-    console.log("calibrations received")
-    fill_calibrations_drop_down() // add the options to the list
-}); 
-
-// listens for the list of available scripts
-socket.on('syringes_available', function(received_syringes) {
-    syringes = received_syringes; // save list in scripts variable
-    console.log("syringes received")
-    fill_syringes_drop_down() // add the options to the list
-}); 
-
 socket.on('display_contents', function(file_contents) {
     python_file_contents = file_contents
 });
@@ -146,6 +132,25 @@ display_protocol_button.addEventListener("click", function() {
     console.log("clearing table")
 });
 
+socket.on('protocol_python_calibration_filename', function(name_of_file) {
+    console.log("Name of calibration file in protocol: ", name_of_file)
+    var name = document.getElementById("calibration_file")
+    name.innerHTML = name_of_file
+});  
+
+socket.on('protocol_python_author', function(author) {
+    console.log("Author for protocol: ", author)
+    var author_name = document.getElementById("author")
+    author_name.innerHTML = author
+});  
+
+socket.on('protocol_python_description', function(description) {
+    console.log("Description of protocol: ", description)
+    var description_text = document.getElementById("description")
+    description_text.innerHTML = author
+});  
+
+
 
 // listens for the json data
 socket.on('protocol_python_data', function(python_lines_list) {
@@ -170,7 +175,6 @@ socket.on('protocol_python_data', function(python_lines_list) {
 function display_contents() {
     socket.emit("display_contents")
 }
-
 
 // fills in the table with script commands
 function make_and_display_protocol_table(){

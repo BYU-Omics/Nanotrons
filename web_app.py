@@ -713,13 +713,25 @@ def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
     if ' ' in protocol_name:
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    elif '.py' not in protocol_name:
+        print("WARNING: Trying to set the filename to a not allowed extension. ")
     else:
         executer.set_file_name(protocol_name) # Then we add the calibration to use
+    name_of_calibration_file = executer.info_from_protocol()[1]
+    author = executer.info_from_protocol()[2]
+    description = executer.info_from_protocol()[3]
+    socketio.emit("protocol_python_calibration_filename", name_of_calibration_file)
+    socketio.emit("protocol_python_author", author)
+    socketio.emit("protocol_python_description", description)
+
 
 @socketio.on("display_contents")
 def display_contents():
-    list_of_lines = executer.display_contents()
-    socketio.emit("protocol_python_data", list_of_lines)
+    try:
+        list_of_contents= executer.info_from_protocol()[0] # 1) list_of_lines 2)Name of calibration file used. 
+        socketio.emit("protocol_python_data", list_of_contents)
+    except TypeError:
+        print(f"WARNING: The filename might be the wrong extension. This error has been raised in display contents. ")
 
 @socketio.on("stop_protocol")
 def stop_protocol():
