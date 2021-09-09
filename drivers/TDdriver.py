@@ -12,7 +12,7 @@ from opentrons.drivers.serial_communication import SerialNoResponse
 from serial.tools import list_ports
 import os
 
-from constants import RUNNING_APP_FOR_REAL
+from constants import RUNNING_APP_FOR_REAL, TEMPDECK_CONNECTED
 
 '''
 - Driver is responsible for providing an interface for the temp-deck
@@ -74,7 +74,7 @@ class TempDeck:
         self._update_thread = None
         self._port = None
         self.find_port()
-        if RUNNING_APP_FOR_REAL:
+        if RUNNING_APP_FOR_REAL and TEMPDECK_CONNECTED:
             self.connect(self._port)
         else:
             print("Not connected to the TD port")

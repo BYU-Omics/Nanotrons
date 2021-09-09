@@ -16,6 +16,9 @@ var protocol_description = document.getElementById("protocol_description");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
+var calibrated_plates = document.getElementById("calibrated_plates");
+var delete_form = document.getElementById("delete_form");
+
 var contents = ""
 var protocols = {}
 var script_to_display = "error" // save as error until over written
@@ -30,6 +33,7 @@ var python_data = ""
 
 socket.emit("get_available_protocols")
 console.log("emited: get_available_protocols")
+socket.emit("give_me_current_labware");
 // socket.emit("give_me_protocol_python")
 
 // listens for the list of available scripts
@@ -136,6 +140,7 @@ socket.on('protocol_python_calibration_filename', function(name_of_file) {
     console.log("Name of calibration file in protocol: ", name_of_file)
     var name = document.getElementById("calibration_file")
     name.innerHTML = name_of_file
+    socket.emit("load_labware_setup", name_of_file);
 });  
 
 socket.on('protocol_python_author', function(author) {
@@ -147,10 +152,8 @@ socket.on('protocol_python_author', function(author) {
 socket.on('protocol_python_description', function(description) {
     console.log("Description of protocol: ", description)
     var description_text = document.getElementById("description")
-    description_text.innerHTML = author
+    description_text.innerHTML = description
 });  
-
-
 
 // listens for the json data
 socket.on('protocol_python_data', function(python_lines_list) {
@@ -294,3 +297,21 @@ function addTable() {
 function load() {
     console.log("Page load finished");
 }
+
+socket.on("here_current_labware", function(labware_dict) {
+    console.log(labware_dict);
+
+    // Update the list of chips
+    for (var i = 0; i < labware_dict["chips"].length; i++){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
+        calibrated_chips.appendChild(node); // Add the node to the labware list
+    }
+
+    // Update the list of plates
+    for (var i = 0; i < labware_dict["plates"].length; i++){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
+        calibrated_plates.appendChild(node); // Add the node to the labware list
+    }
+});

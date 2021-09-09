@@ -88,20 +88,31 @@ class Py_Execute:
 
     def info_from_protocol(self) -> list:
         try:
-            with open(self.set_get_path(), 'r') as f:
-                contents = f.readlines()
-                for line in contents:
-                    if "load_labware_setup" in line:
-                        labware_calibration: str = line[45:]
-                        labware_calibration_file_name = labware_calibration.replace('(','').replace(')','').replace("'", "") # To get only the name as a string
-                    if "author" in line:
-                        author: str = line[12:]
-                        author = author.replace("'", '').replace(",", '')
-                    if "description" in line:
-                        description: str = line[22:]
-                        description = description.replace("'", '').replace(",", '')
+            if self.filename == None or self.filename == "- Select a Protocol -":
+                print("No file has been selected")
+                contents = "None set"
+                labware_calibration_file_name = "None set"
+                author = "None set"
+                description = "None set"
                 return [contents, labware_calibration_file_name, author, description]
+            else:
+                with open(self.set_get_path(), 'r') as f:
+                    contents = f.readlines()
+                    for line in contents:
+                        if "load_labware_setup" in line:
+                            labware_calibration: str = line[45:]
+                            labware_calibration_file_name = labware_calibration.replace('(','').replace(')','').replace("'", "").replace("\n", "") # To get only the name as a string
+                        if "author" in line:
+                            author: str = line[12:]
+                            author = author.replace("'", '').replace(",", '')
+                        if "description" in line:
+                            description: str = line[15:]
+                            description = description.replace("'", '').replace(",", '')
+                    return [contents, labware_calibration_file_name, author, description]
         except TypeError:
+            return None
+        except FileNotFoundError:
+            print("File was not found on folder")
             return None
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)

@@ -33,6 +33,22 @@
         <label for="description"> – Description: </label>
         <span id="description"></span>
         <br>
+        <h3> Calibrated Plates </h3>
+        <ol id="calibrated_plates"></ol>
+
+        <br>
+        <form id="delete_form" hidden="true">
+
+            <label for="Container1">Chip</label>
+            <input type="radio" id="Container1" name="command" value="c">
+            
+            <label for="Container2">Reagent Plate</label>
+            <input type="radio" id="Container2" name="command" value="p"> <br>
+
+            <label for="Container#"> Component Index </label>
+            <input id="Container#" name="command"><br>
+        </form>
+
         <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
         
     

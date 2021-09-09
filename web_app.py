@@ -560,7 +560,11 @@ def save_labware_setup(output_file_name):
 
 @socketio.on("load_labware_setup")
 def load_labware_setup(input_file_name):
-    coordinator.load_labware_setup(input_file_name)
+    print(f"Loading labware set up from: {input_file_name}")
+    if input_file_name == None or input_file_name == "None set":
+        print("WARNING: No filename set yet. ")
+    else:
+        coordinator.load_labware_setup(input_file_name)
 
 @socketio.on("available_saved_labware_files")
 def available_saved_labware():
@@ -732,6 +736,9 @@ def display_contents():
         socketio.emit("protocol_python_data", list_of_contents)
     except TypeError:
         print(f"WARNING: The filename might be the wrong extension. This error has been raised in display contents. ")
+    except FileNotFoundError:
+        print("WARNING: File not found on folder. ")
+
 
 @socketio.on("stop_protocol")
 def stop_protocol():
