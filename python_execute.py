@@ -87,6 +87,9 @@ class Py_Execute:
         subprocess.Popen.terminate(self=self.p)
 
     def info_from_protocol(self) -> list:
+        labware_calibration_file_name = "None set"
+        author = "None set"
+        description = "None set"
         try:
             if self.filename == None or self.filename == "- Select a Protocol -":
                 print("No file has been selected")
@@ -99,9 +102,6 @@ class Py_Execute:
                 with open(self.set_get_path(), 'r') as f:
                     contents = f.readlines()
                     for line in contents:
-                        labware_calibration_file_name = "None set"
-                        author = "None set"
-                        description = "None set"
                         if "load_labware_setup" in line:
                             labware_calibration: str = line[45:]
                             labware_calibration_file_name = labware_calibration.replace('(','').replace(')','').replace("'", "").replace("\n", "") # To get only the name as a string

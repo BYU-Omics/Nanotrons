@@ -16,8 +16,8 @@ var protocol_description = document.getElementById("protocol_description");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
+var calibrated_chips = document.getElementById("calibrated_chips");
 var calibrated_plates = document.getElementById("calibrated_plates");
-var delete_form = document.getElementById("delete_form");
 
 var contents = ""
 var protocols = {}
@@ -29,11 +29,11 @@ var syringe_to_display = "error"
 var json_data = "" // will hold the json data from the script
 var python_data = ""
 
+var list_of_plates_in_html = []
 // asks python to send the list of scripts
 
 socket.emit("get_available_protocols")
 console.log("emited: get_available_protocols")
-socket.emit("give_me_current_labware");
 // socket.emit("give_me_protocol_python")
 
 // listens for the list of available scripts
@@ -120,13 +120,14 @@ function option_select_protocol(){
     // This either blocks or unblocks the submit button
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
-    console.log(selected_protocol);
+    console.log(selected_protocol)
     socket.emit("set_protocol_filename", protocol_to_display)
     if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
         display_protocol_button.disabled = false; // enable the button
     }
     else { // if you select the instructions from the list
         display_protocol_button.disabled = true; // disable button
+    socket.emit("give_me_current_labware")
     }
 }
 
@@ -136,12 +137,12 @@ display_protocol_button.addEventListener("click", function() {
     console.log("clearing table")
 });
 
-socket.on('protocol_python_calibration_filename', function(name_of_file) {
-    console.log("Name of calibration file in protocol: ", name_of_file)
-    var name = document.getElementById("calibration_file")
-    name.innerHTML = name_of_file
-    socket.emit("load_labware_setup", name_of_file);
-});  
+socket.on('protocol_python_labware', function(file_name){
+    console.log("Labware for protocol: ", file_name)
+    var labware_name_file = document.getElementById("calibration_file")
+    labware_name_file.innerHTML = file_name
+    // socket.emit("delete_current_labware")
+});
 
 socket.on('protocol_python_author', function(author) {
     console.log("Author for protocol: ", author)

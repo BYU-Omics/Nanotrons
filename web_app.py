@@ -548,6 +548,12 @@ def get_current_labware():
     labware = coordinator.get_current_labware()
     socketio.emit("here_current_labware", labware)
 
+
+@socketio.on("delete_current_labware")
+def delete_current_labware():
+    coordinator.myLabware.chip_list.clear()
+    coordinator.myLabware.plate_list.clear()
+
 @socketio.on("delete_labware")
 def delete_labware(command):
     labware_type = command[LABWARE_COMPONENT_INDEX]
@@ -563,7 +569,7 @@ def load_labware_setup(input_file_name):
     print(f"Loading labware set up from: {input_file_name}")
     if input_file_name == None or input_file_name == "None set":
         print(f"WARNING: Filename set to: {input_file_name} ")
-    else:
+    elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
         coordinator.load_labware_setup(input_file_name)
 
 @socketio.on("available_saved_labware_files")
@@ -724,10 +730,14 @@ def set_protocol_filename(protocol_name):
     name_of_calibration_file = executer.info_from_protocol()[1]
     author = executer.info_from_protocol()[2]
     description = executer.info_from_protocol()[3]
-    socketio.emit("protocol_python_calibration_filename", name_of_calibration_file)
+    if name_of_calibration_file == None or name_of_calibration_file == 'None set':
+        pass
+    else:
+        print(f"Loading labware")
+        coordinator.load_labware_setup(name_of_calibration_file)
+    socketio.emit("protocol_python_labware", name_of_calibration_file)
     socketio.emit("protocol_python_author", author)
     socketio.emit("protocol_python_description", description)
-
 
 @socketio.on("display_contents")
 def display_contents():
@@ -738,7 +748,6 @@ def display_contents():
         print(f"WARNING: The filename might be the wrong extension. This error has been raised in display contents. ")
     except FileNotFoundError:
         print("WARNING: File not found on folder. ")
-
 
 @socketio.on("stop_protocol")
 def stop_protocol():

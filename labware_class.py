@@ -34,14 +34,25 @@ class Labware_class:
         self.chip_list.append(new_chip)
 
     def remove_chip(self, chip_index):
+        print(f"Chips: {self.chip_list}")
         self.chip_list.pop(chip_index)
+
 
     def add_plate(self, new_plate):
         # add new_plate to the list of chips
         self.plate_list.append(new_plate)
 
     def remove_plate(self, plate_index):
+        print(f"Plates: {self.plate_list}")
         self.plate_list.pop(plate_index)
+
+    def reset_chip_list(self):
+        print(f"Reseting the chips\n Chips: {self.chip_list}")
+        self.chip_list.clear()
+    
+    def reset_plate_list(self):
+        print(f"Reseting the plates\n Plates: {self.plate_list}")
+        self.plate_list.clear()
 
     def set_syringe_model(self, model_name):
         self.syringe_model = model_name
@@ -62,8 +73,8 @@ class Labware_class:
     def get_plate_models(self):
         models = []
         for plate in self.plate_list:
-            models.append(plate.get_model_name())
-        
+                models.append(plate.get_model_name())
+        print(f"Models: {models}")
         return models
 
     def get_current_labware(self):
@@ -163,7 +174,6 @@ class Labware_class:
     def dictionary_to_labware(self, labware_dictionary):        
         chips_list = labware_dictionary["chips"] # This is a list of dictionaries, each of which containes prooperties for a given chip
         plates_list = labware_dictionary["plates"] # This is a list of dictionaries, each of which containes prooperties for a given plate
-
         # Iterate through chips_list and create a Chip object out of each dictionary
         for chip_properties in chips_list:
             new_chip = Chip(chip_properties=chip_properties)
