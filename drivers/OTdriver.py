@@ -321,27 +321,11 @@ class OT2_nanotrons_driver(SM):
     def get_syringe_motor_index(self):
         return 'S'
 
-    def set_step_size_xyz_motor(self, new_step_size):
-        self.xyz_step_size = new_step_size
-
-    def set_step_size_syringe_motor(self, new_step_size):
-        self.s_step_size = new_step_size
-
     def get_step_size_xyz_motor(self):
-        print(self.xyz_step_size)
         return (self.xyz_step_size)
 
     def get_step_size_syringe_motor(self):
         return self.s_step_size
-
-    def set_step_speed_xyz_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
-
-    def set_step_speed_syringe_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
-
-    def set_nL(self, nL):
-        self.nL = nL
 
     def get_step_speed_xyz_motor(self):
         return self.xyz_step_speed
@@ -357,6 +341,21 @@ class OT2_nanotrons_driver(SM):
     
     def get_nL(self):
         return self.nL
+
+    def set_step_size_xyz_motor(self, new_step_size):
+        self.xyz_step_size = new_step_size
+
+    def set_step_size_syringe_motor(self, new_step_size):
+        self.s_step_size = new_step_size
+
+    def set_step_speed_xyz_motor(self, new_step_speed):
+        self.s_step_speed = new_step_speed
+
+    def set_step_speed_syringe_motor(self, new_step_speed):
+        self.s_step_speed = new_step_speed
+
+    def set_nL(self, nL):
+        self.nL = nL
 
     def set_tc_flag(self, is_tc_mounted: bool):
         self.tc_flag = is_tc_mounted
