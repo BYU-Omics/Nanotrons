@@ -8,6 +8,10 @@ home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
 });
 
+function displaySettings() {
+    socket.emit("get_syringe_settings")
+}
+
 function showPicture() {
     var src = "/static/xbox.jpeg";
     var img = document.getElementById('smallpic')
@@ -157,3 +161,53 @@ socket.on("get_lid_temp", function(temp) {
     var temp1 = document.getElementById("lidT")
     temp1.innerHTML = temp;
 });
+
+
+socket.on("get_syringe_settings", function(givenSetting){
+   
+    console.log("getting syringe settings");
+    var  htmlSetting = document.getElementById("syringe_settings")
+    var mybr = "<br />";
+
+    htmlSetting.innerHTML = "Step size S set to: "; 
+    htmlSetting.innerHTML += givenSetting["s step"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Nanoliters to pick up: ";
+    htmlSetting.innerHTML += givenSetting["nL"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Step size XYZ set to: "
+    htmlSetting.innerHTML += givenSetting["xyz step"]
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Pipette controlling: "
+    htmlSetting.innerHTML += givenSetting['pipette']
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "X: "
+    htmlSetting.innerHTML += givenSetting['x']
+
+    htmlSetting.innerHTML += "  Y: "
+    htmlSetting.innerHTML += givenSetting['y']
+
+    htmlSetting.innerHTML += "  Z: "
+    htmlSetting.innerHTML += givenSetting['z']
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "  SC_B: "
+    htmlSetting.innerHTML += givenSetting['b']
+    htmlSetting.innerHTML += "  SC_C: "
+    htmlSetting.innerHTML += givenSetting['c']  
+});
+//     ............................................
+// screen_info
+// ............................................
+
+// Step size S set to:          4.5
+// Nanoliters to pick up:       0
+// Step size XYZ set to:        10
+// Pipette controlling:         Left
+// X: 0   Y: 0   Z: 0  S_B:  0 S_C:  0
+
+// ............................................

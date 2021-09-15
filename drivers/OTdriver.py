@@ -62,7 +62,7 @@ C_MAX_SPEED = 40
 HIGH_SPEED = 300
 MAX_SPEED = 400
 
-MIDDLE_STEP = 5
+MIDDLE_STEP = 7
 HALF = 0.5
 XYZ = 'X Y Z'
 
@@ -306,7 +306,9 @@ class OT2_nanotrons_driver(SM):
         self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
 
 # Getters and Setters 
-
+    def get_side(self):
+        return self.side;
+        
     def get_x_motor_index(self):
         return 'X'
 
@@ -319,26 +321,11 @@ class OT2_nanotrons_driver(SM):
     def get_syringe_motor_index(self):
         return 'S'
 
-    def set_step_size_xyz_motor(self, new_step_size):
-        self.xyz_step_size = new_step_size
-
-    def set_step_size_syringe_motor(self, new_step_size):
-        self.s_step_size = new_step_size
-
     def get_step_size_xyz_motor(self):
-        return self.xyz_step_size
+        return (self.xyz_step_size)
 
     def get_step_size_syringe_motor(self):
         return self.s_step_size
-
-    def set_step_speed_xyz_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
-
-    def set_step_speed_syringe_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
-
-    def set_nL(self, nL):
-        self.nL = nL
 
     def get_step_speed_xyz_motor(self):
         return self.xyz_step_speed
@@ -351,6 +338,24 @@ class OT2_nanotrons_driver(SM):
 
     def get_motor_max_speed(self):
         return MAX_SPEED
+    
+    def get_nL(self):
+        return self.nL
+
+    def set_step_size_xyz_motor(self, new_step_size):
+        self.xyz_step_size = new_step_size
+
+    def set_step_size_syringe_motor(self, new_step_size):
+        self.s_step_size = new_step_size
+
+    def set_step_speed_xyz_motor(self, new_step_speed):
+        self.s_step_speed = new_step_speed
+
+    def set_step_speed_syringe_motor(self, new_step_speed):
+        self.s_step_speed = new_step_speed
+
+    def set_nL(self, nL):
+        self.nL = nL
 
     def set_tc_flag(self, is_tc_mounted: bool):
         self.tc_flag = is_tc_mounted
@@ -503,7 +508,7 @@ class OT2_nanotrons_driver(SM):
 
     def nothing(self, argument = 1):
         pass
-
+    
     def screen_info(self, dummyarg):
         print("............................................")
         print("")

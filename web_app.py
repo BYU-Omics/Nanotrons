@@ -330,10 +330,10 @@ def stop_manual_control_window():
     print("stop_manual_control")
     coordinator.stop_manual_control()
 
-@socketio.on("screen_info")
-def screen_info():
-    print("screen_info")
-    coordinator.ot_control.screen_info(True)
+# @socketio.on("screen_info")
+# def screen_info():
+#     print("screen_info")
+#     coordinator.ot_control.screen_info(True)
 
 @socketio.on("up_step_size")
 def up_step_size():
@@ -350,6 +350,11 @@ def take_picture(folder):
     print("take_picture")
     coordinator.set_folder_for_pictures(folder)
     coordinator.set_picture_flag(True)
+
+@socketio.on("get_syringe_settings")
+def get_syringe_settings():
+    step_s = coordinator.get_syringe_settings()
+    socketio.emit("get_syringe_settings", step_s)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 

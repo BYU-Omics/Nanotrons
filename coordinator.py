@@ -33,9 +33,6 @@ COORDINATOR CLASS
         This section provides current values for dynamic variables and states such as the current X,Y,Z coordinate of the motors, and current gear, and 
         also adjusts values for variables that regulate the feedback sent to the user (like how fast the coordinates are refreshed on the web page).
 
-    VII. Hi I'm Hailey
-    
-    VII. Hi my name is alejandro
 """
 
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
@@ -104,8 +101,8 @@ class Coordinator:
         
         self.myLabware = Labware_class("HAMILTON_175")
         self.joystick_profile = DEFAULT_PROFILE
-        self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
-        self.td_control = TempDeck()
+        # self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
+        # self.td_control = TempDeck()
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
@@ -124,7 +121,7 @@ class Coordinator:
             self.myProfile = Profile(self.joystick_profile)
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
-        self.deck = Deck()
+        # self.deck = Deck()
         self.user_input = 0
         self.folder_for_pictures = None
         self.picture_flag = False
@@ -162,6 +159,19 @@ class Coordinator:
         The only method that should be called on an instance of the Application class is manual_control(). The
         rest of the methods are supporting functions for the operation of manual_control()
     """
+    def get_syringe_settings(self):
+        settingsDic = {}
+        settingsDic["s step"] = self.ot_control.get_step_size_syringe_motor()
+        settingsDic["nL"] = self.ot_control.get_nL()
+        settingsDic["xyz step"] = self.ot_control.get_step_size_xyz_motor()
+        settingsDic['pipette'] = self.ot_control.get_side()
+        settingsDic['x'] = self.ot_control.position['X']
+        settingsDic['y'] = self.ot_control.position['Y']
+        settingsDic['z'] = self.ot_control.position['Z']
+        settingsDic['b'] = self.ot_control.position['B']
+        settingsDic['c'] = self.ot_control.position['C']
+        return settingsDic
+
     def monitor_joystick(self):
         """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
         """
@@ -187,6 +197,8 @@ class Coordinator:
             for button in buttons:
                 if button == "START":
                     self.user_input = input("Enter volume to aspirate in nanoliters: ")
+                    self.ot_control.set_nL(self.user_input)
+                    self.ot_control.set_step_size_syringe_motor(self.volume_to_displacement_converter(int(self.user_input)))
                 method_name = self.myProfile.get_button_function(button).__name__
                 method = getattr(self.ot_control, method_name, False)
                 if not method:
@@ -239,7 +251,9 @@ class Coordinator:
         """ This method goes through a list of predefined steps  """
        
         self.ot_control.half_step_size_XYZ("") # "" is the dummy argument
-    
+
+
+
     """
     INSTANTANEOUS COMMANDS SECTION
         This section contains code that can send instantaneous commands to the motors to go to
@@ -345,7 +359,6 @@ class Coordinator:
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
-
         # Extract syringe radius
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         diameter = syringe_parameters["inner_diameter"] # This parameter has units of mm
@@ -877,5 +890,3 @@ def test():
 
 if __name__ == "__main__":
     test()
-
-
