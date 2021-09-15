@@ -74,6 +74,22 @@
 
         <br>
         <br>
+        <h3>Move to well or pot on loaded labware</h3>
+        <select id="labware_components" onclick="component_model_onclick()">
+            <option value="default" selected>- Select a Labware Component -</option>
+        </select>
+
+        <select id="container_nickname" onclick="component_location_onclick()">
+            <option value="default" selected>- Select a Location -</option>
+        </select>
+
+        <button id="go_button" disabled="disabled" onclick="go_button_listener()">GO</button>
+        
+        
+        <label id="user_feedback"></label><br><br>
+        
+        <br>
+        <br>
         <img id="bg" src="{{ url_for('video_1_feed') }}"> 
         <img id="bg" src="{{ url_for('video_2_feed') }}"> 
         <br>
@@ -97,6 +113,8 @@
         <button class="btn-1" onclick="go_to_deck_slot('2')"> 2 </button>
         <button class="btn-1" onclick="go_to_deck_slot('3')"> 3 </button>
         <br>
+
+
         <script src="static/manual_control.js"></script>
     </body>
 

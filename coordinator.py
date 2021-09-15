@@ -476,6 +476,7 @@ class Coordinator:
         Args:
             input_file_name ([str]): name of desired input file
         """
+        print(f"Coordinator: Loading labware from {input_file_name}")
         self.myLabware.load_labware_from_file(input_file_name)
         chip_list = self.myLabware.chip_list
         plate_list = self.myLabware.plate_list

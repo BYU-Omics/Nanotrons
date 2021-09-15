@@ -469,7 +469,7 @@ class OT2_nanotrons_driver(SM):
 
         current_z_pos = self._position['Z']
         if current_z_pos != z:
-            self.move({'Z': TC_Z_OPEN_LID}, speed= MEDIUM_SPEED)
+            self.move({'Z': Z_MAX}, speed= MEDIUM_SPEED)
         else:
             self.move({'Z': current_z_pos + 30}, speed= MEDIUM_SPEED)
         if(self.check_for_valid_move(y, 'Y', None)):

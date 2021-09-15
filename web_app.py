@@ -121,10 +121,6 @@ def calibrate_component():
 def load_component_calibration():
     return render_template("load_calibration.html")
 
-@app.route('/instantaneous_commands')
-def instant_commands():
-    return render_template("instant_command.html")
-
 @app.route('/labware')
 def labware():
     return render_template("labware.html")
@@ -566,11 +562,13 @@ def save_labware_setup(output_file_name):
 
 @socketio.on("load_labware_setup")
 def load_labware_setup(input_file_name):
-    print(f"Loading labware set up from: {input_file_name}")
+    print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
     if input_file_name == None or input_file_name == "None set":
         print(f"WARNING: Filename set to: {input_file_name} ")
-    elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
-        coordinator.load_labware_setup(input_file_name)
+    # elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
+    else:
+        labware = coordinator.load_labware_setup(input_file_name)
+        print(f"Success. Labware loaded: {labware}")
 
 @socketio.on("available_saved_labware_files")
 def available_saved_labware():
