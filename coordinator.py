@@ -198,7 +198,11 @@ class Coordinator:
                 if button == "START":
                     self.user_input = input("Enter volume to aspirate in nanoliters: ")
                     self.ot_control.set_nL(self.user_input)
+<<<<<<< HEAD
                     self.volume_to_displacement_converter(self.user_input)
+=======
+                    self.ot_control.set_step_size_syringe_motor(self.volume_to_displacement_converter(int(self.user_input)))
+>>>>>>> f5f6d30d88c82713163c21d2a90b8d1680efef25
                 method_name = self.myProfile.get_button_function(button).__name__
                 method = getattr(self.ot_control, method_name, False)
                 if not method:
