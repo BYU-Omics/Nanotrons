@@ -49,6 +49,10 @@ home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
 });
 
+function displaySettings() {
+    socket.emit("get_syringe_settings")
+}
+
 function showPicture() {
     var src = "/static/xbox.jpeg";
     var img = document.getElementById('smallpic')
@@ -203,9 +207,6 @@ socket.on("get_lid_temp", function(temp) {
     temp1.innerHTML = temp;
 });
 
-//INSTATANEOUS COMMANDS
-
-
 //The socket.on event is placed after the testing call for populate_component_models() to make sure the testing happens before actual data is received and processed (otherwise test data would overwrite actual data)
 socket.on("labware_summary", function(labware_summary_received) {
     labware_summary = labware_summary_received;
@@ -355,3 +356,41 @@ function go_button_listener() {
     var feedback = document.getElementById("user_feedback");
     feedback.innerHTML = `Syringe sent to ${component_location} in ${chip_plate_select.value}`;
 }
+
+socket.on("get_syringe_settings", function(givenSetting){
+   
+    console.log("getting syringe settings");
+    var  htmlSetting = document.getElementById("syringe_settings")
+    var mybr = "<br />";
+
+    htmlSetting.innerHTML = "Step size S set to: "; 
+    htmlSetting.innerHTML += givenSetting["s step"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Nanoliters to pick up: ";
+    htmlSetting.innerHTML += givenSetting["nL"];
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Step size XYZ set to: "
+    htmlSetting.innerHTML += givenSetting["xyz step"]
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "Pipette controlling: "
+    htmlSetting.innerHTML += givenSetting['pipette']
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "X: "
+    htmlSetting.innerHTML += givenSetting['x']
+
+    htmlSetting.innerHTML += "  Y: "
+    htmlSetting.innerHTML += givenSetting['y']
+
+    htmlSetting.innerHTML += "  Z: "
+    htmlSetting.innerHTML += givenSetting['z']
+    htmlSetting.innerHTML += mybr;
+
+    htmlSetting.innerHTML += "  SC_B: "
+    htmlSetting.innerHTML += givenSetting['b']
+    htmlSetting.innerHTML += "  SC_C: "
+    htmlSetting.innerHTML += givenSetting['c']  
+});
