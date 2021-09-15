@@ -1,4 +1,6 @@
 RUNNING_APP_FOR_REAL = False
+THERMOCYCLER_CONNECTED = False
+TEMPDECK_CONNECTED = False
 
 WINDOWS_SERIAL_PORT_OT2 = "COM4"  # This is the com port generally used by the motors on Windows, but it could be a different number
 LINUX_SERIAL_PORT_OT2 = "/dev/ttyUSB0"  # This is the com port used by the motors on Linux-based operating systems (including Raspberry OS)

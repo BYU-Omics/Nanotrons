@@ -121,10 +121,6 @@ def calibrate_component():
 def load_component_calibration():
     return render_template("load_calibration.html")
 
-@app.route('/instantaneous_commands')
-def instant_commands():
-    return render_template("instant_command.html")
-
 @app.route('/labware')
 def labware():
     return render_template("labware.html")
@@ -202,9 +198,14 @@ def gen_1(camera: VideoStream):
             break
         frame = camera.read()
         cam = cv2.flip(frame, -1)#its flipped because the camera veiwing all of OT2 is upside down
+        scale_percent = 65 # percent of original size
+        width = int(frame.shape[1] * scale_percent / 100)
+        height = int(frame.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(cam, dim)
         # font = cv2.FONT_HERSHEY_SIMPLEX
         # cv2.putText(frame, "hola amiguitos", (20, 100), font, 1, (255, 255, 255), 2, cv2.LINE_4)
-        ret, jpeg = cv2.imencode('.jpg', cam)
+        ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None: #jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
@@ -221,7 +222,12 @@ def gen_2(camera):
         cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
         cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
         
-        ret, jpeg = cv2.imencode('.jpg', img_with_rect)
+        scale_percent = 65 # percent of original size
+        width = int(frame.shape[1] * scale_percent / 100)
+        height = int(frame.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(img_with_rect, dim)
+        ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
@@ -393,13 +399,20 @@ def set_lid_temperature(temp):
 
 @socketio.on("get_lid_temp")
 def get_lid_temp():
-    temp = coordinator.tc_control.get_lid_temp()
-    socketio.emit("get_lid_temp", temp)
+    try:
+        temp = coordinator.tc_control.get_lid_temp()
+        socketio.emit("get_lid_temp", temp)
+    except AttributeError:
+        socketio.emit("get_lid_temp", "Not connected")
+
     
 @socketio.on("get_block_temp")
 def get_block_temp():
-    temp = coordinator.tc_control.get_block_temp()
-    socketio.emit("get_block_temp", temp)
+    try:
+        temp = coordinator.tc_control.get_block_temp()
+        socketio.emit("get_block_temp", temp)
+    except AttributeError:
+        socketio.emit("get_block_temp", "Not connected")
     
 @socketio.on("lid_position")
 def lid_position():
@@ -431,16 +444,22 @@ def deactivate_tempdeck():
 @socketio.on("get_tempdeck_temp")
 def get_tempdeck_temp():
     print("get_tempdeck_temp")
-    temp = coordinator.get_tempdeck_temp()
-    socketio.emit("get_tempdeck_temp", temp)
+    if RUNNING_APP_FOR_REAL:
+        temp = coordinator.get_tempdeck_temp()
+        socketio.emit("get_tempdeck_temp", temp)
+    else:
+        socketio.emit("get_tempdeck_temp", "Not connected")
 
 @socketio.on("check_tempdeck_status")
 def check_tempdeck_status():
     print("check_tempdeck_status")
-    coordinator.check_tempdeck_status()
-    status = coordinator.check_tempdeck_status()
-    socketio.emit("check_tempdeck_status", status)
-
+    if RUNNING_APP_FOR_REAL:
+        coordinator.check_tempdeck_status()
+        status = coordinator.check_tempdeck_status()
+        socketio.emit("check_tempdeck_status", status)
+    else:
+        socketio.emit("check_tempdeck_status", "Not connected")
+    
 #----------------------------------------------- CALIBRATION EVENTS SECTION
 
 @socketio.on("calibration_parameters")
@@ -530,6 +549,12 @@ def get_current_labware():
     labware = coordinator.get_current_labware()
     socketio.emit("here_current_labware", labware)
 
+
+@socketio.on("delete_current_labware")
+def delete_current_labware():
+    coordinator.myLabware.chip_list.clear()
+    coordinator.myLabware.plate_list.clear()
+
 @socketio.on("delete_labware")
 def delete_labware(command):
     labware_type = command[LABWARE_COMPONENT_INDEX]
@@ -542,7 +567,13 @@ def save_labware_setup(output_file_name):
 
 @socketio.on("load_labware_setup")
 def load_labware_setup(input_file_name):
-    coordinator.load_labware_setup(input_file_name)
+    print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
+    if input_file_name == None or input_file_name == "None set":
+        print(f"WARNING: Filename set to: {input_file_name} ")
+    # elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
+    else:
+        labware = coordinator.load_labware_setup(input_file_name)
+        print(f"Success. Labware loaded: {labware}")
 
 @socketio.on("available_saved_labware_files")
 def available_saved_labware():
@@ -695,13 +726,31 @@ def set_protocol_filename(protocol_name):
     print(f"Filename set to: {protocol_name}")
     if ' ' in protocol_name:
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    elif '.py' not in protocol_name:
+        print("WARNING: Trying to set the filename to a not allowed extension. ")
     else:
         executer.set_file_name(protocol_name) # Then we add the calibration to use
+    name_of_calibration_file = executer.info_from_protocol()[1]
+    author = executer.info_from_protocol()[2]
+    description = executer.info_from_protocol()[3]
+    if name_of_calibration_file == None or name_of_calibration_file == 'None set':
+        pass
+    else:
+        print(f"Loading labware")
+        coordinator.load_labware_setup(name_of_calibration_file)
+    socketio.emit("protocol_python_labware", name_of_calibration_file)
+    socketio.emit("protocol_python_author", author)
+    socketio.emit("protocol_python_description", description)
 
 @socketio.on("display_contents")
 def display_contents():
-    list_of_lines = executer.display_contents()
-    socketio.emit("protocol_python_data", list_of_lines)
+    try:
+        list_of_contents= executer.info_from_protocol()[0] # 1) list_of_lines 2)Name of calibration file used. 
+        socketio.emit("protocol_python_data", list_of_contents)
+    except TypeError:
+        print(f"WARNING: The filename might be the wrong extension. This error has been raised in display contents. ")
+    except FileNotFoundError:
+        print("WARNING: File not found on folder. ")
 
 @socketio.on("stop_protocol")
 def stop_protocol():

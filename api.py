@@ -27,7 +27,7 @@ class Api:
     def start_wash(self):
         self.coordinator.start_wash()
 
-    def mid_wash(self, left_over = None, cushion_1 = None, cushion_2 = None):
+    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
         self.coordinator.mid_wash(left_over, cushion_1, cushion_2)
 
     def air_gap(self):
@@ -41,6 +41,7 @@ class Api:
         self.amount_wanted = volume
 
     def dispense_to(self, volume, to):
+        self.coordinator.set_amount_wanted(volume)
         self.coordinator.dispense_to(volume, to)
 
     def open_lid(self):

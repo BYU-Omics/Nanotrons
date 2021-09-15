@@ -20,11 +20,31 @@
         <select id="protocols" name="protocols" onclick="option_select_protocol()">
             <option value="default" selected>- Select Protocols to Display -</option>
         </select>
-        <br>
+
         <button type="button" disabled="disabled" id="display_protocol" onclick="display_contents()">Display Protocol</button>
         <br>
+        <br>
+        <label for="calibration_file"> – Name of calibration file in protocol: </label>
+        <span id="calibration_file"></span>
+        <br>
+        <label for="author"> – Author: </label>
+        <span id="author"></span>
+        <br>
+        <label for="description"> – Description: </label>
+        <span id="description"></span>
         
+        <h3> Calibrated Chips </h3>
+        <ol id="calibrated_chips"></ol>
+
+        <br>
+
+        <h3> Calibrated Plates </h3>
+        <ol id="calibrated_plates"></ol>
+
+        <br>
+
         <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
+        
     
         <br>
         <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />

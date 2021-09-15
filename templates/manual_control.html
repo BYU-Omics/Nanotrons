@@ -11,69 +11,90 @@
     </head>
 
     <body>
+        <script type="text/javascript">
+            window.onload = function(){ 
+                            alert("Please make sure that the OT2 is properly homed before controlling them");
+                            }
+            </script>
         <h1>Manual Control</h1>
         <br>
         <button id="back_home" onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
-        <button type="button" id="take_picture" onclick="take_picture()">Take Picture</button>
-        <hr/>
-        <p>Please make sure that the <b>OT2</b> and <b>Thermocycler</b> are properly homed before controlling them</p>
-        
+        <button id="load_labware" onclick="window.location.href='http://127.0.0.1:5000/load_labware_setup';">LOAD LABWARE</button>
         <button onclick="screen_info()">Screen Info</button>
+        <hr/>
+
+        <h3>OT2 Control</h3>
+        <p>Homing</p>
+        <button onclick="home_all_motors()">All axes</button>
+        <br>
+        <button onclick="home_Z()">LPippete</button>
+        <button onclick="home_A()">RPipette</button>
+        <br>
+        <button onclick="home_B()">LSyringe</button>
+        <button onclick="home_C()">RSyringe</button>
+
+        <h3>Thermocycler</h3>
         <button onclick="open_lid()">Open Lid</button>
         <button onclick="close_lid()">Close Lid</button>
-        <button onclick="deactivate_lid()">Deactivate Lid</button>
-        <button onclick="deactivate_block()">Deactivate Block</button>
         <button onclick="deactivate_all()">Deactivate All</button>
-        <button onclick="home_all_motors()">Home all motors</button>
-        <hr/>
-        <button onclick="deactivate_tempdeck()">Deactivate Tempdeck</button>
-        <hr/>
-        <button onclick="home_Z()">Home Left Pippete</button>
-        <button onclick="home_A()">Home Right Pipette</button>
-        <hr/>
-        <button onclick="home_B()">Home Left Syringe</button>
-        <button onclick="home_C()">Home Right Syringe</button>
-        
-       
-        <hr/>
-        <label for="btemp">Set Block Temperature to(4-99):</label>
+        <br>
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="btemp">(4-99°C):</label>
         <input type="number" id="btemp" name="btemp" min="4" max="99">
-        <label for="htime">Hold Time[min]:</label>
+        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="25" height="25">
+        <label for="htime">[min]:</label>
         <input type="number" id="htime" name="htime" min="0.1" max="99">
-        <button onclick="set_temperature()">Set Temperature </button>
-        <hr/>
-        <label for="ltemp">Set Lid Temperature to(37-110):</label>
-        <input type="number" id="ltemp" name="ltemp" min="37" max="110">
-        <button onclick="set_lid_temperature()">Set Lid Temperature </button>
-        <hr/>
-        <button class="btn-2" onclick="get_lid_temp()">Press to obtain the Lid temperature</button>
-        <span id="lidT"> </span>
-        <hr/>
-        <button class="btn-2" onclick="get_block_temp()">Press to obtain the Block temperature</button>
+        <button onclick="set_temperature()">SET</button>
+        <button onclick="deactivate_block()">Deactivate Block</button>
+        <button class="btn-2" onclick="get_block_temp()">Temperature</button>
         <span id="blockT"> </span>
-        <hr/>
+        <br>
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="ltemp">(37-110°C):</label>
+        <input type="number" id="ltemp" name="ltemp" min="37" max="110">
+        <button onclick="set_lid_temperature()">SET</button>
+        <button onclick="deactivate_lid()">Deactivate Lid</button>
+        <button class="btn-2" onclick="get_lid_temp()">Temperature</button>
+        <span id="lidT"> </span>
 
-        <hr/>
-        <label for="tdtemp">Set TempDeck Temperature to():</label>
-        <input type="number" id="tdtemp" name="tdtemp" min="4" max="99">
-        <label for="thtime">Hold Time[min]:</label>
+
+        <h3>Temperature Deck</h3>
+        <img id="bg" src="{{ url_for('static',filename='thermometer-objects.gif') }}" width="25" height="25">
+        <label for="tdtemp">(4-95°C):</label>
+        <input type="number" id="tdtemp" name="tdtemp" min="4" max="95">
+        <img id="bg" src="{{ url_for('static',filename='PngItem_1526969.png') }}" width="25" height="25">
+        <label for="thtime">[min]:</label>
         <input type="number" id="thtime" name="thtime" min="0.1" max="99">
         <button onclick="set_tempdeck_temp()">Set TempDeck Temperature </button>
-        <hr/>
-        <button class="btn-2" onclick="get_tempdeck_temp()">Press to obtain the TempDeck temperature</button>
+        <button onclick="deactivate_tempdeck()">Deactivate Tempdeck</button>
+        <button class="btn-2" onclick="get_tempdeck_temp()">Temperature</button>
         <span id="tdT"> </span>
-        <hr/>
-        <hr/>
-        <button class="btn-2" onclick="check_tempdeck_status()">Press to obtain the TempDeck status</button>
+        <button class="btn-2" onclick="check_tempdeck_status()">Status</button>
         <span id="tdS"> </span>
-        <hr/>
 
-       
+        <br>
+        <br>
+        <h3>Move to well or pot on loaded labware</h3>
+        <select id="labware_components" onclick="component_model_onclick()">
+            <option value="default" selected>- Select a Labware Component -</option>
+        </select>
 
+        <select id="container_nickname" onclick="component_location_onclick()">
+            <option value="default" selected>- Select a Location -</option>
+        </select>
+
+        <button id="go_button" disabled="disabled" onclick="go_button_listener()">GO</button>
         
-        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
-        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
         
+        <label id="user_feedback"></label><br><br>
+        
+        <br>
+        <br>
+        <img id="bg" src="{{ url_for('video_1_feed') }}"> 
+        <img id="bg" src="{{ url_for('video_2_feed') }}"> 
+        <br>
+        <button type="button" id="take_picture" onclick="take_picture()">Take Picture</button>
+        <br>
         <br>
         <button class="btn-1" onclick="go_to_deck_slot('10')">10</button>
         <button class="btn-1" onclick="go_to_deck_slot('11')">11</button>
@@ -92,6 +113,8 @@
         <button class="btn-1" onclick="go_to_deck_slot('2')"> 2 </button>
         <button class="btn-1" onclick="go_to_deck_slot('3')"> 3 </button>
         <br>
+
+
         <script src="static/manual_control.js"></script>
 
         <div id="displaySettings">

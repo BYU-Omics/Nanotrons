@@ -34,8 +34,8 @@ chips, plates = myProtocol.load_labware_setup(LABWARE)
 
 metadata = {
     'protocolName': 'Nanotrons Test',
-    'author': '',
-    'description': ''
+    'author': 'Alejandro Brozalez',
+    'description': 'Testing robot'
 }
 
 # Labware file loaded: Test_for_protocols.json

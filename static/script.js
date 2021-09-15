@@ -16,6 +16,9 @@ var protocol_description = document.getElementById("protocol_description");
 var gradientTime = document.getElementById("gradientTime");
 var SPEtime = document.getElementById("SPEtime");
 
+var calibrated_chips = document.getElementById("calibrated_chips");
+var calibrated_plates = document.getElementById("calibrated_plates");
+
 var contents = ""
 var protocols = {}
 var script_to_display = "error" // save as error until over written
@@ -26,6 +29,7 @@ var syringe_to_display = "error"
 var json_data = "" // will hold the json data from the script
 var python_data = ""
 
+var list_of_plates_in_html = []
 // asks python to send the list of scripts
 
 socket.emit("get_available_protocols")
@@ -37,20 +41,6 @@ socket.on('protocols_available', function(received_protocols) {
     protocols = received_protocols; // save list in scripts variable
     console.log("protocol received")
     fill_protocol_drop_down() // add the options to the list
-}); 
-
-// listens for the list of available scripts
-socket.on('calibrations_available', function(received_calibrations) {
-    calibrations = received_calibrations; // save list in scripts variable
-    console.log("calibrations received")
-    fill_calibrations_drop_down() // add the options to the list
-}); 
-
-// listens for the list of available scripts
-socket.on('syringes_available', function(received_syringes) {
-    syringes = received_syringes; // save list in scripts variable
-    console.log("syringes received")
-    fill_syringes_drop_down() // add the options to the list
 }); 
 
 socket.on('display_contents', function(file_contents) {
@@ -130,13 +120,14 @@ function option_select_protocol(){
     // This either blocks or unblocks the submit button
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
-    console.log(selected_protocol);
+    console.log(selected_protocol)
     socket.emit("set_protocol_filename", protocol_to_display)
     if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
         display_protocol_button.disabled = false; // enable the button
     }
     else { // if you select the instructions from the list
         display_protocol_button.disabled = true; // disable button
+    socket.emit("give_me_current_labware")
     }
 }
 
@@ -146,6 +137,24 @@ display_protocol_button.addEventListener("click", function() {
     console.log("clearing table")
 });
 
+socket.on('protocol_python_labware', function(file_name){
+    console.log("Labware for protocol: ", file_name)
+    var labware_name_file = document.getElementById("calibration_file")
+    labware_name_file.innerHTML = file_name
+    // socket.emit("delete_current_labware")
+});
+
+socket.on('protocol_python_author', function(author) {
+    console.log("Author for protocol: ", author)
+    var author_name = document.getElementById("author")
+    author_name.innerHTML = author
+});  
+
+socket.on('protocol_python_description', function(description) {
+    console.log("Description of protocol: ", description)
+    var description_text = document.getElementById("description")
+    description_text.innerHTML = description
+});  
 
 // listens for the json data
 socket.on('protocol_python_data', function(python_lines_list) {
@@ -170,7 +179,6 @@ socket.on('protocol_python_data', function(python_lines_list) {
 function display_contents() {
     socket.emit("display_contents")
 }
-
 
 // fills in the table with script commands
 function make_and_display_protocol_table(){
@@ -290,3 +298,21 @@ function addTable() {
 function load() {
     console.log("Page load finished");
 }
+
+socket.on("here_current_labware", function(labware_dict) {
+    console.log(labware_dict);
+
+    // Update the list of chips
+    for (var i = 0; i < labware_dict["chips"].length; i++){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
+        calibrated_chips.appendChild(node); // Add the node to the labware list
+    }
+
+    // Update the list of plates
+    for (var i = 0; i < labware_dict["plates"].length; i++){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
+        calibrated_plates.appendChild(node); // Add the node to the labware list
+    }
+});

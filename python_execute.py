@@ -15,20 +15,30 @@ WINDOWS_OS = 'nt'
 
 class Py_Execute:
     def __init__(self):
-        self.filename: str = 'Protocol.py'
+        self.filename: str = None
         self.calibration_file_name: str = 'calibration.json'
         self.syringe_model: str = 'HAMILTON_175'
         self.p = None
         self.path_to_file = None
 
-    def set_calibration_file_name(self, name):
+    def set_calibration_file_name(self, name: str = None):
         print(f"Calibration filename: {name}")
-        self.calibration_file_name = name
+        if ".json" not in name:
+            print("Not a valid filename for the protocol calibration file, please use a file with the 'json' extension")
+        elif name == None:
+            print("The file name has not been selected properly. ")
+        else:
+            self.calibration_file_name = name
 
-    def set_file_name(self, name):
+    def set_file_name(self, name: str = None):
         if ' ' in name:
             print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
-        self.filename = name
+        elif ".py" not in name:
+            print("WARNING: Please select a filename with the 'py' extension")
+        elif name == None:
+            print("WARNING: The file name for protocol has not been properly set.")
+        else:
+            self.filename = name
 
     def get_file_name(self):
         return self.filename
@@ -42,7 +52,6 @@ class Py_Execute:
         else:
             sys.exit()
         cmd = 'python' + ' ' + first_arg 
-        print("path: ", cmd)
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         if err == None:
@@ -77,10 +86,37 @@ class Py_Execute:
         print("Terminate protocol")
         subprocess.Popen.terminate(self=self.p)
 
-    def display_contents(self):
-        with open(self.set_get_path(), 'r') as f:
-            contents = f.readlines()
-            return contents
+    def info_from_protocol(self) -> list:
+        labware_calibration_file_name = "None set"
+        author = "None set"
+        description = "None set"
+        try:
+            if self.filename == None or self.filename == "- Select a Protocol -":
+                print("No file has been selected")
+                contents = "None set"
+                labware_calibration_file_name = "None set"
+                author = "None set"
+                description = "None set"
+                return [contents, labware_calibration_file_name, author, description]
+            else:
+                with open(self.set_get_path(), 'r') as f:
+                    contents = f.readlines()
+                    for line in contents:
+                        if "load_labware_setup" in line:
+                            labware_calibration: str = line[45:]
+                            labware_calibration_file_name = labware_calibration.replace('(','').replace(')','').replace("'", "").replace("\n", "") # To get only the name as a string
+                        if "author" in line:
+                            author: str = line[12:]
+                            author = author.replace("'", '').replace(",", '')
+                        if "description" in line:
+                            description: str = line[15:]
+                            description = description.replace("'", '').replace(",", '')
+                    return [contents, labware_calibration_file_name, author, description]
+        except TypeError:
+            return None
+        except FileNotFoundError:
+            print("File was not found on folder")
+            return None
     # def continue_execution(self):
     #     os.kill(self.p.pid, signal.SIGCONT)
 
