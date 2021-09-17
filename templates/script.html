@@ -10,6 +10,7 @@
         <link rel= "stylesheet" type= "text/css" href= "/static/styles/script.css">
         <h1>Protocol Execution</h1>
         <button onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
+        <button onclick="window.location.href='http://127.0.0.1:5000/batch';">Create Protocol</button>
         <br>
         <h3>Before running the protocol make sure that:</h3>
         <h5>- The name of the protocol does not contain spaces</h5>
@@ -52,8 +53,9 @@
         <input title="CONTINUE PROTOCOL" id="continue_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
         <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
         <br>
-        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
-        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
+        <img id="bg" src="{{ url_for('video_1_feed') }}"> 
+        <img id="bg" src="{{ url_for('video_2_feed') }}"> 
+        <br><br>
 
         </body>
 
