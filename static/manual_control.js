@@ -156,7 +156,6 @@ function set_tempdeck_temp() {
     socket.emit("set_tempdeck_temp", [tdtemp.value, thtime.value]);
 }
 
-
 function deactivate_block() {
     socket.emit("deactivate_block");
 }
@@ -174,7 +173,7 @@ function get_tempdeck_temp() {
 }
 
 function take_picture() {
-    socket.emit("take_picture", "Manual Control Pictures")
+    socket.emit("take_picture", "ManualCtrlPics")
 }
 
 function alert_for_calibration() {

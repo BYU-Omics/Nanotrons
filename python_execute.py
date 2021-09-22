@@ -15,7 +15,7 @@ WINDOWS_OS = 'nt'
 
 class Py_Execute:
     def __init__(self):
-        self.filename: str = None
+        self.filename: str = 'no_name.py'
         self.calibration_file_name: str = 'calibration.json'
         self.syringe_model: str = 'HAMILTON_175'
         self.p = None

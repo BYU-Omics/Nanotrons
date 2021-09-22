@@ -235,14 +235,16 @@ def gen_2(camera):
             print("Frame is none")
         if coordinator.get_picture_flag() == True:
             folder = coordinator.get_folder_for_pictures()
-            print(f"Writing picture to {folder}")
             if folder:
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W + folder + '\\'
             else:
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
+            
+            print(f"Writing picture to: \nDirectory:       '{directory}'")
             current_time =  datetime.datetime.now()
             protocol_name = executer.get_file_name().strip(".py")
-            img_name = f"{protocol_name} {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
+            img_name = f"{protocol_name}_{current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
+            print(f"Name of picture:         '{img_name}'")
             cv2.imwrite(directory + img_name, frame)
             print(f"{img_name} written!")
             img_counter += 1

@@ -144,13 +144,14 @@ class Coordinator:
                             datefmt="%H:%M:%S")
 
     def set_picture_flag(self, value: bool):
-        # print(f"Setting picture flag to: {value}")
+        print(f"Setting picture flag to: {value}")
         self.picture_flag = value
 
     def get_picture_flag(self) -> bool:
         return self.picture_flag
 
     def set_folder_for_pictures(self, folder: str):
+        print(f"Folder set to: {folder}")
         self.folder_for_pictures = folder
 
     def get_folder_for_pictures(self) -> str:
@@ -747,7 +748,7 @@ class Coordinator:
     def open_lid(self):
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is opened"""
-        self.go_to_deck_slot('3') # for avoiding collitions
+        self.go_to_deck_slot('5') # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
