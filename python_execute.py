@@ -76,16 +76,26 @@ class Py_Execute:
 
     def pause_execution(self):
         print("Pausing execution")
-        os.kill(self.p.pid, signal)
+        if os.name == LINUX_OS:
+            os.kill(self.p.pid, signal.SIGSTOP)
+        elif os.name == WINDOWS_OS:
+            os.kill(self.p.pid, signal.SIGINT)
+        
 
     def continue_execution(self):
         print("Continuing execution")
-        os.kill(self.p.pid, signal.SIGCONT)
+        if os.name == LINUX_OS:
+            os.kill(self.p.pid, signal.SIGCONT)
+        elif os.name == WINDOWS_OS:
+            print("Trying to find a way to continue an execution on windows.")
 
     def stop_execution(self):
         print("Terminate protocol")
-        subprocess.Popen.terminate(self=self.p)
-
+        if os.name == LINUX_OS:
+            subprocess.Popen.terminate(self=self.p)
+        elif os.name == WINDOWS_OS:
+            pass
+            
     def info_from_protocol(self) -> list:
         labware_calibration_file_name = "None set"
         author = "None set"

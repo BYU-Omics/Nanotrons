@@ -706,11 +706,13 @@ def connect_all():
 #------------------WORKING WITH A PROTOCOL.PY SECTION--------------------
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
+    print("run protocol message received")
     if RUNNING_APP_FOR_REAL:
         coordinator.disconnect_all() # First we disconnect all the modules
     if ' ' in protocol_name:
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     else:
+        print("Running protocol")
         executer.set_file_name(protocol_name) # Then we add the calibration to use
         executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 

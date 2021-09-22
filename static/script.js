@@ -202,6 +202,7 @@ function make_and_display_protocol_table(){
 }
 
 run_protocol_button.addEventListener("click", function() {
+    console.log("Run protocol button pressed")
     socket.emit("run_protocol", protocol_to_display);
 });
 
