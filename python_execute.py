@@ -76,7 +76,7 @@ class Py_Execute:
 
     def pause_execution(self):
         print("Pausing execution")
-        os.kill(self.p.pid, signal.SIGSTOP)
+        os.kill(self.p.pid, signal)
 
     def continue_execution(self):
         print("Continuing execution")
@@ -91,7 +91,7 @@ class Py_Execute:
         author = "None set"
         description = "None set"
         try:
-            if self.filename == None or self.filename == "- Select a Protocol -":
+            if self.filename == 'no_name.py' or self.filename == "- Select a Protocol -":
                 print("No file has been selected")
                 contents = "None set"
                 labware_calibration_file_name = "None set"

@@ -15,7 +15,7 @@ volume
     the same. 
 
 """
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 as SM
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 as SM, SmoothieError
 from opentrons.config.robot_configs import build_config
 from serial.tools import list_ports
 import os
@@ -60,7 +60,7 @@ B_MAX_SPEED = 40
 C_MAX_SPEED = 40
 
 HIGH_SPEED = 300
-MAX_SPEED = 400
+MAX_SPEED = 130
 
 MIDDLE_STEP = 7
 HALF = 0.5
@@ -475,8 +475,10 @@ class OT2_nanotrons_driver(SM):
         current_z_pos = self._position['Z']
         if current_z_pos != z:
             self.move({'Z': Z_MAX}, speed= MEDIUM_SPEED)
-        else:
+        elif current_z_pos == z and (current_z_pos + 30) < Z_MAX:
             self.move({'Z': current_z_pos + 30}, speed= MEDIUM_SPEED)
+        else:
+            self.move({'Z': current_z_pos}, speed= MEDIUM_SPEED)
         if(self.check_for_valid_move(y, 'Y', None)):
             # First move the Y axis so that it does not collapse with the thermocycler
             self.move({'Y': y}, speed= MEDIUM_SPEED)
@@ -501,7 +503,10 @@ class OT2_nanotrons_driver(SM):
     
     def home_all(self, dummyarg):
         # print("Example:  'X Y Z A B C' or 'all' ")
-        self.home('X Y Z A')
+        try:
+            self.home('X Y Z A')
+        except SmoothieError:
+            self.home('A') # Home the syringe
         
     def stop_motor(self, device = 'XYZABC'):
         self.disengage_axis(device)

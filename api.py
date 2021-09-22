@@ -84,3 +84,6 @@ class Api:
         if source != None:
             self.coordinator.go_to_position_to_take_picture(source)
         requests.post(WEB_ADDRESS, json=self.protocol_flags)
+
+    def set_pictures_folder(self,  folder: str = 'protocol_pics'):
+        self.coordinator.set_folder_for_pictures(folder)

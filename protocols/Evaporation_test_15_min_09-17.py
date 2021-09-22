@@ -14,7 +14,7 @@ except ImportError:
 myProtocol = Api() # creates a protocol object using the Api
 
 metadata = {
-	'protocolName': 'Evaporation test', 
+	'protocolName': 'Evaporation_test', 
 	'author': 'Nathaniel Axtel', 
 	'description': 'This is the evaporation test that takes a pictue every 15 min' 
 }
@@ -33,60 +33,64 @@ custom = plates[0].pot_position_for_protocol
 
 # -----------PREPROTOCOL SETUP-------------------
 
+pictures_folder = metadata['protocolName']
+myProtocol.set_pictures_folder('protocol_pics')
 # Designated wells for washing tip
 waste_water = custom('A1')
 wash_water = custom('A2')
 clean_water = custom('A3')
 
 myProtocol.set_washing_positions(clean_water, wash_water, waste_water)
-# myProtocol.start_wash()
+myProtocol.start_wash()
 
 # ------------START OF PROTOCOL---------------------------------
 
 chip_list = [micropots_3_top, micropots_3_btm]
 
-# for chip in chip_list:
 
-#     # myProtocol.aspirate_from(1800, custom('A3'))
+# myProtocol.take_picture(waste_water)
+# myProtocol.open_lid()
 
-#     # myProtocol.dispense_to(200, chip('A1'))
-#     # myProtocol.dispense_to(200, chip('A2'))
-#     # myProtocol.dispense_to(200, chip('A3'))
-#     # myProtocol.dispense_to(200, chip('A4'))
-#     # myProtocol.dispense_to(200, chip('A5'))
-#     # myProtocol.dispense_to(200, chip('A6'))
-#     # myProtocol.dispense_to(200, chip('A7'))
-#     # myProtocol.dispense_to(200, chip('A8'))
-#     # myProtocol.dispense_to(200, chip('A9'))
+for chip in chip_list:
 
-#     # myProtocol.aspirate_from(1800, custom('A3'))
+    myProtocol.aspirate_from(1800, custom('A3'))
 
-#     # myProtocol.dispense_to(200, chip('B1'))
-#     # myProtocol.dispense_to(200, chip('B2'))
-#     # myProtocol.dispense_to(200, chip('B3'))
-#     # myProtocol.dispense_to(200, chip('B4'))
-#     # myProtocol.dispense_to(200, chip('B5'))
-#     # myProtocol.dispense_to(200, chip('B6'))
-#     # myProtocol.dispense_to(200, chip('B7'))
-#     # myProtocol.dispense_to(200, chip('B8'))
-#     # myProtocol.dispense_to(200, chip('B9'))
+    myProtocol.dispense_to(200, chip('A1'))
+    myProtocol.dispense_to(200, chip('A2'))
+    myProtocol.dispense_to(200, chip('A3'))
+    myProtocol.dispense_to(200, chip('A4'))
+    myProtocol.dispense_to(200, chip('A5'))
+    myProtocol.dispense_to(200, chip('A6'))
+    myProtocol.dispense_to(200, chip('A7'))
+    myProtocol.dispense_to(200, chip('A8'))
+    myProtocol.dispense_to(200, chip('A9'))
 
-#     # myProtocol.aspirate_from(1800, custom('A3'))
+    myProtocol.aspirate_from(1800, custom('A3'))
 
-#     # myProtocol.dispense_to(200, chip('C1'))
-#     # myProtocol.dispense_to(200, chip('C2'))
-#     # myProtocol.dispense_to(200, chip('C3'))
-#     # myProtocol.dispense_to(200, chip('C4'))
-#     # myProtocol.dispense_to(200, chip('C5'))
-#     # myProtocol.dispense_to(200, chip('C6'))
-#     # myProtocol.dispense_to(200, chip('C7'))
-#     # myProtocol.dispense_to(200, chip('C8'))
-#     # myProtocol.dispense_to(200, chip('C9'))
+    myProtocol.dispense_to(200, chip('B1'))
+    myProtocol.dispense_to(200, chip('B2'))
+    myProtocol.dispense_to(200, chip('B3'))
+    myProtocol.dispense_to(200, chip('B4'))
+    myProtocol.dispense_to(200, chip('B5'))
+    myProtocol.dispense_to(200, chip('B6'))
+    myProtocol.dispense_to(200, chip('B7'))
+    myProtocol.dispense_to(200, chip('B8'))
+    myProtocol.dispense_to(200, chip('B9'))
 
-myProtocol.set_block_temp(4, 0)
+    myProtocol.aspirate_from(1800, custom('A3'))
+
+    myProtocol.dispense_to(200, chip('C1'))
+    myProtocol.dispense_to(200, chip('C2'))
+    myProtocol.dispense_to(200, chip('C3'))
+    myProtocol.dispense_to(200, chip('C4'))
+    myProtocol.dispense_to(200, chip('C5'))
+    myProtocol.dispense_to(200, chip('C6'))
+    myProtocol.dispense_to(200, chip('C7'))
+    myProtocol.dispense_to(200, chip('C8'))
+    myProtocol.dispense_to(200, chip('C9'))
 
 for number in range(0, 54):
-    
+
     myProtocol.open_lid()
 
     myProtocol.take_picture(micropots_3_top('B2'))
@@ -99,11 +103,7 @@ for number in range(0, 54):
 
     myProtocol.close_lid()
 
-    # myProtocol.set_lid_temp(39)
-
     myProtocol.set_block_temp(37, 15)
-
-    # myProtocol.deactivate_lid()
 
     myProtocol.set_block_temp(4, 0)
 

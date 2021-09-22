@@ -748,7 +748,8 @@ class Coordinator:
     def open_lid(self):
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is opened"""
-        self.go_to_deck_slot('5') # for avoiding collitions
+        if self.ot_control.tc_lid_flag != 'open':
+            self.go_to_deck_slot('5') # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
