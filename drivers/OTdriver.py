@@ -248,7 +248,7 @@ class OT2_nanotrons_driver(SM):
             pass
 
     def plunger_L_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
-        # print(f"Size aspirating:{size}")
+        print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
         b_pos: float = self._position['B'] # stores the current position
@@ -257,7 +257,7 @@ class OT2_nanotrons_driver(SM):
             self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
 
     def plunger_L_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
-        # print(f"Size aspirating:{size}")
+        print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
         b_pos: float = self._position['B'] # stores the current position
