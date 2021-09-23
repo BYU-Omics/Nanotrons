@@ -21,7 +21,7 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('Evap_test_09-17.json')
+chips, plates = myProtocol.load_labware_setup('Evap_Test_09-23.json')
 
 micropots_3_top = chips[0].get_location_by_nickname
 micropots_3_btm = chips[1].get_location_by_nickname
@@ -50,6 +50,8 @@ chip_list = [micropots_3_top, micropots_3_btm]
 
 # myProtocol.take_picture(waste_water)
 # myProtocol.open_lid()
+
+myProtocol.set_block_temp(4, 0)
 
 for chip in chip_list:
 
