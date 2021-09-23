@@ -3,6 +3,7 @@ import os
 import sys
 import signal
 import asyncio
+import psutil
 # from opentrons import api
 # from coordinator import *
 
@@ -79,7 +80,7 @@ class Py_Execute:
         if os.name == LINUX_OS:
             os.kill(self.p.pid, signal.SIGSTOP)
         elif os.name == WINDOWS_OS:
-            os.kill(self.p.pid, signal.SIGINT)
+            self.p.kill()
         
 
     def continue_execution(self):
@@ -87,6 +88,8 @@ class Py_Execute:
         if os.name == LINUX_OS:
             os.kill(self.p.pid, signal.SIGCONT)
         elif os.name == WINDOWS_OS:
+            psProcess = psutil.Process(self.p.pid)
+            psProcess.resume()
             print("Trying to find a way to continue an execution on windows.")
 
     def stop_execution(self):

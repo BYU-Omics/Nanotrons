@@ -125,7 +125,7 @@ class Coordinator:
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
-        self.folder_for_pictures = None
+        self.folder_for_pictures = 'default_folder'
         self.picture_flag = False
 
         # variables for protocols. 
@@ -151,10 +151,11 @@ class Coordinator:
         return self.picture_flag
 
     def set_folder_for_pictures(self, folder: str):
-        print(f"Folder set to: {folder}")
+        print(f"COOR: Folder set to: {folder}")
         self.folder_for_pictures = folder
 
     def get_folder_for_pictures(self) -> str:
+        print(f"Getting the folder for pictures: {self.folder_for_pictures}")
         return self.folder_for_pictures
         
     """

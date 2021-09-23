@@ -35,8 +35,8 @@ RELATIVE_PATH_TO_LABWARE_L = './saved_labware/'
 RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
 RELATIVE_PATH_TO_SYRINGES_L = './models/syringes/'
 RELATIVE_PATH_TO_PICTURES_W = 'pictures\\'
-RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'Protocol Pictures\\'
-RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'Manual Control Pictures\\'
+RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'protocol_pics\\'
+RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'ManualCtrlPics\\'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 MACBOOK_OS = 'Darwin'
@@ -157,7 +157,7 @@ def system_settings():
 def PostData():
     data = request.get_json(force=True)
     coordinator.set_picture_flag(bool(data['take_pic']))
-    coordinator.set_folder_for_pictures(bool(data['folder']))
+    coordinator.set_folder_for_pictures(data['protocol_folder'])
     
 # This method checks to see if the filename ends with an allowed extension
 def allowed_file(filename):
@@ -239,7 +239,6 @@ def gen_2(camera):
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W + folder + '\\'
             else:
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
-            
             print(f"Writing picture to: \nDirectory:       '{directory}'")
             current_time =  datetime.datetime.now()
             protocol_name = executer.get_file_name().strip(".py")

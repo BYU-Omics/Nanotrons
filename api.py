@@ -18,7 +18,7 @@ class Api:
     def __init__(self):
         self.coordinator = Coordinator()
         self.current_labware_depth = None
-        self.folder_for_this_protocol = ''
+        self.folder_for_this_protocol = 'default_folder'
         self.protocol_flags = {'take_pic': 'True', 'folder': 'Protocol Pictures', 'protocol_folder': f'{self.folder_for_this_protocol}'}
 
     def set_washing_positions(self, clean_water, wash_water, waste_water):
@@ -83,7 +83,9 @@ class Api:
     def take_picture(self, source = None):
         if source != None:
             self.coordinator.go_to_position_to_take_picture(source)
+        print(f"Sending {self.protocol_flags['protocol_folder']} folder to webapp")
         requests.post(WEB_ADDRESS, json=self.protocol_flags)
 
     def set_pictures_folder(self,  folder: str = 'protocol_pics'):
-        self.coordinator.set_folder_for_pictures(folder)
+        print(f"API: Folder for pics set to: {folder} ")
+        self.protocol_flags["protocol_folder"] = self.folder_for_this_protocol = folder
