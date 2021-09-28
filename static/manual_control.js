@@ -150,12 +150,17 @@ function go_to_deck_slot(slot) {
     socket.emit("go_to_deck_slot", slot);
 }
 
+socket.on("rename_deck_slot", function(slotInt) {
+    var someButton = document.getElementById(slotInt);
+    // someButton.innerHTML("Hello World");
+    someButton.innerText("Hello world");
+});
+
 function set_tempdeck_temp() {
     let tdtemp = document.getElementById("tdtemp");
     let thtime = document.getElementById("thtime");
     socket.emit("set_tempdeck_temp", [tdtemp.value, thtime.value]);
 }
-
 
 function deactivate_block() {
     socket.emit("deactivate_block");
