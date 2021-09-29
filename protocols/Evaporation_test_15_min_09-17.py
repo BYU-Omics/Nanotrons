@@ -51,7 +51,7 @@ chip_list = [micropots_3_top, micropots_3_btm]
 # myProtocol.take_picture(waste_water)
 # myProtocol.open_lid()
 
-myProtocol.set_block_temp(4, 0)
+myProtocol.set_block_temp(4, 4)
 
 for chip in chip_list:
 
@@ -107,7 +107,7 @@ for number in range(0, 54):
 
     myProtocol.set_block_temp(37, 15)
 
-    myProtocol.set_block_temp(4, 0)
+    myProtocol.set_block_temp(4, 4)
 
 #--------------END OF PROTOCOL--------------
 
