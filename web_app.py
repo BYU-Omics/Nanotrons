@@ -550,7 +550,6 @@ def get_current_labware():
     labware = coordinator.get_current_labware()
     socketio.emit("here_current_labware", labware)
 
-
 @socketio.on("delete_current_labware")
 def delete_current_labware():
     coordinator.myLabware.chip_list.clear()
@@ -571,7 +570,6 @@ def load_labware_setup(input_file_name):
     print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
     if input_file_name == None or input_file_name == "None set":
         print(f"WARNING: Filename set to: {input_file_name} ")
-    # elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
     else:
         labware = coordinator.load_labware_setup(input_file_name)
         print(f"Success. Labware loaded: {labware}")
@@ -739,6 +737,8 @@ def set_protocol_filename(protocol_name):
     if name_of_calibration_file == None or name_of_calibration_file == 'None set':
         pass
     else:
+        coordinator.myLabware.chip_list.clear()
+        coordinator.myLabware.plate_list.clear()
         print(f"Loading labware")
         coordinator.load_labware_setup(name_of_calibration_file)
     socketio.emit("protocol_python_labware", name_of_calibration_file)

@@ -101,7 +101,7 @@ class Coordinator:
         os_recognized = os.name
         self.ot_control = OT2_nanotrons_driver()
         
-        self.myLabware = Labware_class("HAMILTON_175")
+        self.myLabware = Labware_class()
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()

@@ -4,6 +4,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <style>
+            table {
+              font-family: arial, sans-serif;
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            td, th {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+            
+            tr:nth-child(even) {
+              background-color: #dddddd;
+            }
+        </style>
     </head>
 
     <body>
@@ -23,35 +40,50 @@
         </select>
 
         <button type="button" disabled="disabled" id="display_protocol" onclick="display_contents()">Display Protocol</button>
-        <br>
-        <br>
-        <label for="calibration_file"> – Name of calibration file in protocol: </label>
-        <span id="calibration_file"></span>
-        <br>
-        <label for="author"> – Author: </label>
-        <span id="author"></span>
-        <br>
-        <label for="description"> – Description: </label>
-        <span id="description"></span>
+        <button type="button" disabled="disabled" id="display_labware" onclick="display_labware()">Display Labware</button>
+
+        <table>
+            <tr>
+              <th>Labware file</th>
+              <th id="calibration_file"></th>
+            </tr>
+            <tr>
+              <th>Author</th>
+              <th id="author"></th>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <th id="description"></th>
+            </tr>
+        </table>
+        <table>
+            <tr>
+              <th>Chips</th>
+              <th>Plates</th>
+              <th>Location</th>
+            </tr>
+            <tr>
+              <th id="calibrated_chips"></th>
+              <th id="calibrated_plates"></th>
+              <th>Locations</th>
+            </tr>
+        </table>
+        <!-- <label for="calibrated_chips"> – Chips: </label>
         
-        <h3> Calibrated Chips </h3>
-        <ol id="calibrated_chips"></ol>
-
         <br>
-
-        <h3> Calibrated Plates </h3>
+        
         <ol id="calibrated_plates"></ol>
 
-        <br>
+        <br> -->
 
         <span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
         
     
         <br>
-        <input title="RUN PROTOCOL" id="run_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="PAUSE PROTOCOL" id="pause_protocol" type="image" class="pic" src="{{ url_for('static',filename='pause.jpeg') }}" />
-        <input title="CONTINUE PROTOCOL" id="continue_protocol" type="image" class="pic" src="{{ url_for('static',filename='play_button.png') }}" />
-        <input title="STOP PROTOCOL" id="stop_protocol" type="image" class="pic" src="{{ url_for('static',filename='stopLoad.png') }}" />
+        <button title="RUN PROTOCOL" id="run_protocol" >RUN PROTOCOL</button>
+        <button title="PAUSE" id="pause_protocol" >PAUSE</button>
+        <button title="CONTINUE" id="continue_protocol" >CONTINUE</button>
+        <button title="STOP" id="stop_protocol" >STOP</button>
         <br>
         <img id="bg" src="{{ url_for('video_1_feed') }}"> 
         <img id="bg" src="{{ url_for('video_2_feed') }}"> 

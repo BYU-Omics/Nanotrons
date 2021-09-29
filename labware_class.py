@@ -21,10 +21,10 @@ WINDOWS_OS = 'nt'
 JSON_EXTENTION = '.json'
 
 class Labware_class:
-    def __init__(self, sm):
+    def __init__(self):
         self.chip_list = []
         self.plate_list = []
-        self.syringe_model = sm
+        self.syringe_model = []
 
     """
     SETTERS SECTION
