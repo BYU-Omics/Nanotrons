@@ -547,6 +547,13 @@ def get_labware_models():
 @socketio.on("give_me_current_labware")
 def get_current_labware():
     labware = coordinator.get_current_labware()
+    new_key = list(labware)
+    
+    # for i in range (0, len(new_key)):
+    #   new_key = list(labware)  
+    #   index_key = new_key[i]
+    #     print(index_key)
+    # print(labware["chip"])
     socketio.emit("here_current_labware", labware)
 
 
@@ -674,6 +681,10 @@ def get_labware_summary():
 def go_to_deck_slot(slot):
     print(f"Move to slot {slot}")
     coordinator.go_to_deck_slot(slot)
+
+@socketio.on("rename_deck_slot")
+def rename_deck_slot():
+    print("The button has been pressed")
 
 @socketio.on("home_all_motors")
 def home_all_motors():

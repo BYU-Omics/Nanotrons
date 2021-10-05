@@ -64,16 +64,21 @@ class Labware_class:
         return self.syringe_model
     
     def get_chip_models(self):
-        models = []
+        models = dict()
         for chip in self.chip_list:
-            models.append(chip.get_model_name())
+            models[chip.get_model_name()] = chip.get_location_by_index(0)
         
         return models
     
     def get_plate_models(self):
-        models = []
+        # models = []
+        # for plate in self.plate_list:
+        #         models.append(plate.get_model_name())
+        
+        models = dict()
         for plate in self.plate_list:
-                models.append(plate.get_model_name())
+            models[plate.get_model_name()] = plate.get_location_by_index(0)
+        
         print(f"Models: {models}")
         return models
 

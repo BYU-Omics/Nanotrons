@@ -121,14 +121,16 @@ function option_select_protocol(){
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
     console.log(selected_protocol)
-    socket.emit("set_protocol_filename", protocol_to_display)
-    if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
-        display_protocol_button.disabled = false; // enable the button
-    }
-    else { // if you select the instructions from the list
-        display_protocol_button.disabled = true; // disable button
+    // socket.emit("set_protocol_filename", protocol_to_display)
+    // if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
+    //     display_protocol_button.disabled = false; // enable the button
+    // }
+    // else { // if you select the instructions from the list
+    //     display_protocol_button.disabled = true; // disable button
+    // socket.emit("give_me_current_labware")
+    // }
+    display_protocol_button.disabled = true; // disable button
     socket.emit("give_me_current_labware")
-    }
 }
 
 // this runs when you click the display script button
