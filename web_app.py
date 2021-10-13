@@ -106,11 +106,11 @@ app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template("home.html")
+    return render_template("home_wix.html")
 
 @app.route('/manual_control')
 def manual_control():
-    return render_template("manual_control.html")
+    return render_template("manual_control_wix.html")
 
 @app.route('/calibrate_component')
 def calibrate_component():
@@ -141,7 +141,7 @@ def save_labware_setup():
 def load_labware_setup():
     return render_template("load_labware_setup.html")
 
-@app.route('/script')
+@app.route('/protocol')
 def script():
     return render_template("script.html")
 

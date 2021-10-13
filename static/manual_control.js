@@ -1,4 +1,4 @@
-var socket = io.connect('http://127.0.0.1:5000');
+var socket = io.connect('http://127.0.0.1:5000/');
 var home_button = document.getElementById("back_home");
 var load_labware = document.getElementById("load_labware");
 
@@ -34,12 +34,11 @@ var labware_summary = {
     ]
 };
 
-populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
-
-
 socket.emit("start_manual_control_window");
 socket.emit("give_me_coordinates");
 socket.emit("get_labware_summary");
+
+populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
 
 home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
