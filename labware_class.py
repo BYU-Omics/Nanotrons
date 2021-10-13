@@ -66,8 +66,7 @@ class Labware_class:
     def get_chip_models(self):
         models = dict()
         for chip in self.chip_list:
-            models[chip.get_model_name()] = chip.get_location_by_index(0)
-        
+            models[chip.get_model_name()] = chip.get_location_by_index(0)        
         return models
     
     def get_plate_models(self):
