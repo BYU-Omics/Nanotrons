@@ -1,5 +1,5 @@
 var socket = io.connect('http://127.0.0.1:5000/');
-var home_button = document.getElementById("back_home");
+var home_button = document.getElementById("DrpDwnMn0-5s30label");
 var load_labware = document.getElementById("load_labware");
 
 //INSTATANEOUS COMMANDS
@@ -70,6 +70,10 @@ function screen_info() {
 
 function close_lid() {
     socket.emit("close_lid");
+}
+
+function open_close_lid() {
+    socket.emit("open_close_lid");
 }
 
 function deactivate_all() {
@@ -172,6 +176,7 @@ function get_tempdeck_temp() {
 }
 
 function take_picture() {
+    console.log("Take picture")
     socket.emit("take_picture", "ManualCtrlPics")
 }
 
@@ -356,22 +361,22 @@ function go_button_listener() {
 }
 
 socket.on("get_syringe_settings", function(givenSetting){
-   
     console.log("getting syringe settings");
     var  htmlSetting = document.getElementById("syringe_settings")
     var mybr = "<br />";
 
-    htmlSetting.innerHTML = "Step size S set to: "; 
+    htmlSetting.innerHTML = "Step size:  S: "; 
     htmlSetting.innerHTML += givenSetting["s step"];
+
+    htmlSetting.innerHTML += "   XYZ: "
+    htmlSetting.innerHTML += givenSetting["xyz step"]
     htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "Nanoliters to pick up: ";
     htmlSetting.innerHTML += givenSetting["nL"];
     htmlSetting.innerHTML += mybr;
 
-    htmlSetting.innerHTML += "Step size XYZ set to: "
-    htmlSetting.innerHTML += givenSetting["xyz step"]
-    htmlSetting.innerHTML += mybr;
+
 
     htmlSetting.innerHTML += "Pipette controlling: "
     htmlSetting.innerHTML += givenSetting['pipette']
@@ -385,10 +390,10 @@ socket.on("get_syringe_settings", function(givenSetting){
 
     htmlSetting.innerHTML += "  Z: "
     htmlSetting.innerHTML += givenSetting['z']
-    htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "  SC_B: "
     htmlSetting.innerHTML += givenSetting['b']
+    
     htmlSetting.innerHTML += "  SC_C: "
     htmlSetting.innerHTML += givenSetting['c']  
 });

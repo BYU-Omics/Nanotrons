@@ -65,6 +65,7 @@ LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 DEFAULT_PROFILE = "default_profile.json"
+PIPPETE_POSITION_WHEN_MOVING_TC_LID = '5'
 FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
@@ -750,16 +751,29 @@ class Coordinator:
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is opened"""
         if self.ot_control.tc_lid_flag != 'open':
-            self.go_to_deck_slot('5') # for avoiding collitions
+            self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
     def close_lid(self):
         """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is closed"""
-        self.go_to_deck_slot('3') # for avoiding collitions
+        self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
         asyncio.run(self.tc_control.close())
         self.ot_control.set_tc_lid_flag('closed')
+
+    def open_close_lid(self):
+        """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is closed"""
+
+        self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
+        if self.ot_control.tc_lid_flag == 'open':
+            asyncio.run(self.tc_control.close())
+            self.ot_control.set_tc_lid_flag('closed')
+        else:
+            asyncio.run(self.tc_control.open())
+            self.ot_control.set_tc_lid_flag('open')
+
 
     def deactivate_all(self):
         """ This function deactivates both, the lid and the block of the thermocycler"""

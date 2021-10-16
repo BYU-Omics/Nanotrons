@@ -110,7 +110,7 @@ def home():
 
 @app.route('/manual_control')
 def manual_control():
-    return render_template("manual_control_wix.html")
+    return render_template("manual_control.html")
 
 @app.route('/calibrate_component')
 def calibrate_component():
@@ -362,6 +362,7 @@ def take_picture(folder):
 def get_syringe_settings():
     step_s = coordinator.get_syringe_settings()
     socketio.emit("get_syringe_settings", step_s)
+    print(step_s)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
@@ -373,6 +374,11 @@ def open_lid():
 @socketio.on("close_lid")
 def close_lid():
     print("close_lid")
+    coordinator.close_lid()
+
+@socketio.on("open_close_lid")
+def open_close_lid():
+    print("open_close_lid")
     coordinator.close_lid()
 
 @socketio.on("deactivate_all")
@@ -392,10 +398,12 @@ def deactivate_block():
 
 @socketio.on("set_temperature")
 def set_temperature(elements):
+    print(f"set block temp {elements[TEMP]}C for {elements[HOLD_TIME]}")
     coordinator.set_block_temp(elements[TEMP], elements[HOLD_TIME])
 
 @socketio.on("set_lid_temperature")
 def set_lid_temperature(temp):
+    print(f"set lid temp {temp}")
     coordinator.set_lid_temp(temp)
 
 @socketio.on("get_lid_temp")
@@ -676,22 +684,27 @@ def go_to_deck_slot(slot):
 
 @socketio.on("home_all_motors")
 def home_all_motors():
+    print("home All")
     coordinator.ot_control.home()
 
 @socketio.on("home_Z")
 def home_Z():
+    print("home Z")
     coordinator.ot_control.home('Z')
 
 @socketio.on("home_A")
 def home_A():
+    print("home A")
     coordinator.ot_control.home('A')
 
 @socketio.on("home_B")
 def home_B():
+    print("home B")
     coordinator.ot_control.home('B')
 
 @socketio.on("home_C")
 def home_C():
+    print("home C")
     coordinator.ot_control.home('C')
 
 @socketio.on("connect_all")
