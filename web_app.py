@@ -110,7 +110,7 @@ def home():
 
 @app.route('/manual_control')
 def manual_control():
-    return render_template("manual_control.html")
+    return render_template("manual_control_wix_2.html")
 
 @app.route('/calibrate_component')
 def calibrate_component():
@@ -379,7 +379,7 @@ def close_lid():
 @socketio.on("open_close_lid")
 def open_close_lid():
     print("open_close_lid")
-    coordinator.close_lid()
+    coordinator.open_close_lid()
 
 @socketio.on("deactivate_all")
 def deactivate_all():
@@ -681,6 +681,16 @@ def get_labware_summary():
 def go_to_deck_slot(slot):
     print(f"Move to slot {slot}")
     coordinator.go_to_deck_slot(slot)
+
+@socketio.on("home_X")
+def home_X():
+    print("home X")
+    coordinator.ot_control.home('X')
+
+@socketio.on("home_Y")
+def home_Y():
+    print("home Y")
+    coordinator.ot_control.home('Y')
 
 @socketio.on("home_all_motors")
 def home_all_motors():
