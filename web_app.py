@@ -219,6 +219,7 @@ def gen_2(camera):
             break
         frame = camera.read()
         img_with_rect = frame.copy()
+
         cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
         cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
         
@@ -226,7 +227,10 @@ def gen_2(camera):
         width = int(frame.shape[1] * scale_percent / 100)
         height = int(frame.shape[0] * scale_percent / 100)
         dim = (width, height)
-        resized = cv2.resize(img_with_rect, dim)
+        if coordinator.get_toggle_flag() == True:
+            resized = cv2.resize(img_with_rect, dim)
+        else:
+            resized = cv2.resize(frame, dim)
         ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None:
             yield (b'--frame\r\n'
@@ -720,6 +724,14 @@ def home_C():
 @socketio.on("connect_all")
 def connect_all():
     coordinator.connect_all()
+
+    
+@socketio.on("toggle_focus")
+def toggle_focus():
+    if coordinator.get_toggle_flag():
+        coordinator.set_toggle_flag(False) 
+    else:
+        coordinator.set_toggle_flag(True) 
 
 #----------------------------------------------- HIGH LEVEL SCRIPT FUNCTIONS -----------------------------
 

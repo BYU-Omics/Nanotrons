@@ -182,7 +182,11 @@ function take_picture() {
 
 function alert_for_calibration() {
     alert("Please make sure that the OT2 is properly homed before controlling them");
-  }
+}
+
+function toggle_focus() {
+    socket.emit("toggle_focus");
+}
 
 let btemp = 0;
 socket.on("get_block_temp", function(temp) {

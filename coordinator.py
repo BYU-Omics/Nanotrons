@@ -128,6 +128,7 @@ class Coordinator:
         self.user_input = 0
         self.folder_for_pictures = 'default_folder'
         self.picture_flag = False
+        self.toggle_flag = False
 
         # variables for protocols. 
         self.clean_water = None
@@ -150,6 +151,13 @@ class Coordinator:
 
     def get_picture_flag(self) -> bool:
         return self.picture_flag
+
+    def set_toggle_flag(self, value: bool):
+        print(f"Setting toggle flag to: {value}")
+        self.toggle_flag = value
+
+    def get_toggle_flag(self) -> bool:
+        return self.toggle_flag
 
     def set_folder_for_pictures(self, folder: str):
         print(f"COOR: Folder set to: {folder}")
