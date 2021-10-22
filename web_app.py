@@ -560,6 +560,54 @@ def get_labware_models():
 @socketio.on("give_me_current_labware")
 def get_current_labware():
     labware = coordinator.get_current_labware()
+    new_key = list(labware) #to iterate thorugh the keys chips, plates, and syringes
+    
+    for i in range (len(new_key)-1): #length minus one so that we do not run syringes. It throws an error when making the syring into a list and we don't need it anyways
+        second_key = list(labware[new_key[i]]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
+
+        for j in range(0, len(second_key)):
+            coordinates = labware[new_key[i]][second_key[j]]    
+            #print(f"VAR COORDINATES: {coordinates}") # used to test if coordinates were correct
+            if coordinates[0] < 116.67:
+                if coordinates[1] < 123.25:
+                    labware[new_key[i]][second_key[j]] = 1
+                    print("FINAL SLOT: 1")
+                elif coordinates[1] < 221.5:
+                    labware[new_key[i]][second_key[j]] = 4
+                    print("FINAL SLOT: 4")
+                elif coordinates[1] < 319.5:
+                    labware[new_key[i]][second_key[j]] = 7
+                    print("FINAL SLOT: 7")
+                else:
+                    labware[new_key[i]][second_key[j]] = 10
+                    print("FINAL SLOT: 10")
+            elif coordinates[0] < 228.33:
+                if coordinates[1] < 123.25:
+                    labware[new_key[i]][second_key[j]] = 2
+                    print("FINAL SLOT: 2")
+                elif coordinates[1] < 221.5:
+                    labware[new_key[i]][second_key[j]] = 5
+                    print("FINAL SLOT: 5")
+                elif coordinates[1] < 319.5:
+                    labware[new_key[i]][second_key[j]] = 8
+                    print("FINAL SLOT: 8")
+                else:
+                    labware[new_key[i]][second_key[j]] = 11
+                    print("FINAL SLOT: 11")
+            else:
+                if coordinates[1] < 123.25:
+                    labware[new_key[i]][second_key[j]] = 3
+                    print("FINAL SLOT: 3")
+                elif coordinates[1] < 221.5:
+                    labware[new_key[i]][second_key[j]] = 6
+                    print("FINAL SLOT: 6")
+                elif coordinates[1] < 319.5:
+                    labware[new_key[i]][second_key[j]] = 9
+                    print("FINAL SLOT: 9")
+                else:
+                    labware[new_key[i]][second_key[j]] = 12
+                    print("FINAL SLOT: 12")
+            
     socketio.emit("here_current_labware", labware)
 
 @socketio.on("delete_current_labware")
@@ -685,6 +733,10 @@ def get_labware_summary():
 def go_to_deck_slot(slot):
     print(f"Move to slot {slot}")
     coordinator.go_to_deck_slot(slot)
+
+@socketio.on("rename_deck_slot")
+def rename_deck_slot():
+    print("The button has been pressed")
 
 @socketio.on("home_X")
 def home_X():

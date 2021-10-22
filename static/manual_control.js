@@ -49,7 +49,8 @@ home_button.addEventListener("click", function() {
 });
 
 function displaySettings() {
-    socket.emit("get_syringe_settings")
+    console.log("We actually hit this function");
+    socket.emit("get_syringe_settings");
 }
 
 function showPicture() {
