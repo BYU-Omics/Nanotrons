@@ -1,5 +1,5 @@
-var socket = io.connect('http://127.0.0.1:5000');
-var home_button = document.getElementById("back_home");
+var socket = io.connect('http://127.0.0.1:5000/');
+var home_button = document.getElementById("DrpDwnMn0-5s30label");
 var load_labware = document.getElementById("load_labware");
 
 //INSTATANEOUS COMMANDS
@@ -34,12 +34,11 @@ var labware_summary = {
     ]
 };
 
-populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
-
-
 socket.emit("start_manual_control_window");
 socket.emit("give_me_coordinates");
 socket.emit("get_labware_summary");
+
+populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
 
 home_button.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
@@ -72,6 +71,10 @@ function screen_info() {
 
 function close_lid() {
     socket.emit("close_lid");
+}
+
+function open_close_lid() {
+    socket.emit("open_close_lid");
 }
 
 function deactivate_all() {
@@ -157,7 +160,6 @@ function set_tempdeck_temp() {
     socket.emit("set_tempdeck_temp", [tdtemp.value, thtime.value]);
 }
 
-
 function deactivate_block() {
     socket.emit("deactivate_block");
 }
@@ -175,12 +177,17 @@ function get_tempdeck_temp() {
 }
 
 function take_picture() {
-    socket.emit("take_picture", "Manual Control Pictures")
+    console.log("Take picture")
+    socket.emit("take_picture", "ManualCtrlPics")
 }
 
 function alert_for_calibration() {
     alert("Please make sure that the OT2 is properly homed before controlling them");
-  }
+}
+
+function toggle_focus() {
+    socket.emit("toggle_focus");
+}
 
 let btemp = 0;
 socket.on("get_block_temp", function(temp) {
@@ -359,22 +366,22 @@ function go_button_listener() {
 }
 
 socket.on("get_syringe_settings", function(givenSetting){
-   
     console.log("getting syringe settings");
     var  htmlSetting = document.getElementById("syringe_settings")
     var mybr = "<br />";
 
-    htmlSetting.innerHTML = "Step size S set to: "; 
+    htmlSetting.innerHTML = "Step size:  S: "; 
     htmlSetting.innerHTML += givenSetting["s step"];
+
+    htmlSetting.innerHTML += "   XYZ: "
+    htmlSetting.innerHTML += givenSetting["xyz step"]
     htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "Nanoliters to pick up: ";
     htmlSetting.innerHTML += givenSetting["nL"];
     htmlSetting.innerHTML += mybr;
 
-    htmlSetting.innerHTML += "Step size XYZ set to: "
-    htmlSetting.innerHTML += givenSetting["xyz step"]
-    htmlSetting.innerHTML += mybr;
+
 
     htmlSetting.innerHTML += "Pipette controlling: "
     htmlSetting.innerHTML += givenSetting['pipette']
@@ -388,10 +395,10 @@ socket.on("get_syringe_settings", function(givenSetting){
 
     htmlSetting.innerHTML += "  Z: "
     htmlSetting.innerHTML += givenSetting['z']
-    htmlSetting.innerHTML += mybr;
 
     htmlSetting.innerHTML += "  SC_B: "
     htmlSetting.innerHTML += givenSetting['b']
+    
     htmlSetting.innerHTML += "  SC_C: "
     htmlSetting.innerHTML += givenSetting['c']  
 });

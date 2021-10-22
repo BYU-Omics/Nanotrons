@@ -35,8 +35,8 @@ RELATIVE_PATH_TO_LABWARE_L = './saved_labware/'
 RELATIVE_PATH_TO_SYRINGES_W = 'models\\syringes\\'
 RELATIVE_PATH_TO_SYRINGES_L = './models/syringes/'
 RELATIVE_PATH_TO_PICTURES_W = 'pictures\\'
-RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'Protocol Pictures\\'
-RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'Manual Control Pictures\\'
+RELATIVE_PATH_TO_PROTOCOL_PICTURES = 'protocol_pics\\'
+RELATIVE_PATH_TO_MANUAL_CONTROL_PICTURES = 'ManualCtrlPics\\'
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 MACBOOK_OS = 'Darwin'
@@ -106,11 +106,11 @@ app.config['MAX_CONTENT_LENGTH'] = 1024*1024 # Limit file limit to 1 MB
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template("home.html")
+    return render_template("home_wix.html")
 
 @app.route('/manual_control')
 def manual_control():
-    return render_template("manual_control.html")
+    return render_template("manual_control_wix.html")
 
 @app.route('/calibrate_component')
 def calibrate_component():
@@ -141,7 +141,7 @@ def save_labware_setup():
 def load_labware_setup():
     return render_template("load_labware_setup.html")
 
-@app.route('/script')
+@app.route('/protocol')
 def script():
     return render_template("script.html")
 
@@ -157,7 +157,7 @@ def system_settings():
 def PostData():
     data = request.get_json(force=True)
     coordinator.set_picture_flag(bool(data['take_pic']))
-    coordinator.set_folder_for_pictures(bool(data['folder']))
+    coordinator.set_folder_for_pictures(data['protocol_folder'])
     
 # This method checks to see if the filename ends with an allowed extension
 def allowed_file(filename):
@@ -219,6 +219,7 @@ def gen_2(camera):
             break
         frame = camera.read()
         img_with_rect = frame.copy()
+
         cv2.rectangle(img_with_rect, (BIG_SQR_X1, BIG_SQR_Y1), (BIG_SQR_X2, BIG_SQR_Y2), WHITE, BIG_SQR_LINE_THICKNESS)
         cv2.rectangle(img_with_rect, (SMALL_SQR_X1, SMALL_SQR_Y1), (SMALL_SQR_X2, SMALL_SQR_Y2), WHITE, SMALL_SQR_LINE_THICKNESS)
         
@@ -226,7 +227,10 @@ def gen_2(camera):
         width = int(frame.shape[1] * scale_percent / 100)
         height = int(frame.shape[0] * scale_percent / 100)
         dim = (width, height)
-        resized = cv2.resize(img_with_rect, dim)
+        if coordinator.get_toggle_flag() == True:
+            resized = cv2.resize(img_with_rect, dim)
+        else:
+            resized = cv2.resize(frame, dim)
         ret, jpeg = cv2.imencode('.jpg', resized)
         if jpeg is not None:
             yield (b'--frame\r\n'
@@ -235,14 +239,15 @@ def gen_2(camera):
             print("Frame is none")
         if coordinator.get_picture_flag() == True:
             folder = coordinator.get_folder_for_pictures()
-            print(f"Writing picture to {folder}")
             if folder:
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W + folder + '\\'
             else:
                 directory = sys.path[0] + "\\"+ RELATIVE_PATH_TO_PICTURES_W
+            print(f"Writing picture to: \nDirectory:       '{directory}'")
             current_time =  datetime.datetime.now()
             protocol_name = executer.get_file_name().strip(".py")
-            img_name = f"{protocol_name} {current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
+            img_name = f"{protocol_name}_{current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
+            print(f"Name of picture:         '{img_name}'")
             cv2.imwrite(directory + img_name, frame)
             print(f"{img_name} written!")
             img_counter += 1
@@ -361,6 +366,7 @@ def take_picture(folder):
 def get_syringe_settings():
     step_s = coordinator.get_syringe_settings()
     socketio.emit("get_syringe_settings", step_s)
+    print(step_s)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
@@ -373,6 +379,11 @@ def open_lid():
 def close_lid():
     print("close_lid")
     coordinator.close_lid()
+
+@socketio.on("open_close_lid")
+def open_close_lid():
+    print("open_close_lid")
+    coordinator.open_close_lid()
 
 @socketio.on("deactivate_all")
 def deactivate_all():
@@ -391,10 +402,12 @@ def deactivate_block():
 
 @socketio.on("set_temperature")
 def set_temperature(elements):
+    print(f"set block temp {elements[TEMP]}C for {elements[HOLD_TIME]}")
     coordinator.set_block_temp(elements[TEMP], elements[HOLD_TIME])
 
 @socketio.on("set_lid_temperature")
 def set_lid_temperature(temp):
+    print(f"set lid temp {temp}")
     coordinator.set_lid_temp(temp)
 
 @socketio.on("get_lid_temp")
@@ -597,7 +610,6 @@ def get_current_labware():
             
     socketio.emit("here_current_labware", labware)
 
-
 @socketio.on("delete_current_labware")
 def delete_current_labware():
     coordinator.myLabware.chip_list.clear()
@@ -618,7 +630,6 @@ def load_labware_setup(input_file_name):
     print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
     if input_file_name == None or input_file_name == "None set":
         print(f"WARNING: Filename set to: {input_file_name} ")
-    # elif coordinator.myLabware.plate_list == 0 or  coordinator.myLabware.chip_list == 0:
     else:
         labware = coordinator.load_labware_setup(input_file_name)
         print(f"Success. Labware loaded: {labware}")
@@ -727,40 +738,65 @@ def go_to_deck_slot(slot):
 def rename_deck_slot():
     print("The button has been pressed")
 
+@socketio.on("home_X")
+def home_X():
+    print("home X")
+    coordinator.ot_control.home('X')
+
+@socketio.on("home_Y")
+def home_Y():
+    print("home Y")
+    coordinator.ot_control.home('Y')
+
 @socketio.on("home_all_motors")
 def home_all_motors():
+    print("home All")
     coordinator.ot_control.home()
 
 @socketio.on("home_Z")
 def home_Z():
+    print("home Z")
     coordinator.ot_control.home('Z')
 
 @socketio.on("home_A")
 def home_A():
+    print("home A")
     coordinator.ot_control.home('A')
 
 @socketio.on("home_B")
 def home_B():
+    print("home B")
     coordinator.ot_control.home('B')
 
 @socketio.on("home_C")
 def home_C():
+    print("home C")
     coordinator.ot_control.home('C')
 
 @socketio.on("connect_all")
 def connect_all():
     coordinator.connect_all()
 
+    
+@socketio.on("toggle_focus")
+def toggle_focus():
+    if coordinator.get_toggle_flag():
+        coordinator.set_toggle_flag(False) 
+    else:
+        coordinator.set_toggle_flag(True) 
+
 #----------------------------------------------- HIGH LEVEL SCRIPT FUNCTIONS -----------------------------
 
 #------------------WORKING WITH A PROTOCOL.PY SECTION--------------------
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
+    print("run protocol message received")
     if RUNNING_APP_FOR_REAL:
         coordinator.disconnect_all() # First we disconnect all the modules
     if ' ' in protocol_name:
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     else:
+        print("Running protocol")
         executer.set_file_name(protocol_name) # Then we add the calibration to use
         executer.execute_python_protocol() # Then we execute an external file: the protocol.py
 
@@ -788,6 +824,8 @@ def set_protocol_filename(protocol_name):
     if name_of_calibration_file == None or name_of_calibration_file == 'None set':
         pass
     else:
+        coordinator.myLabware.chip_list.clear()
+        coordinator.myLabware.plate_list.clear()
         print(f"Loading labware")
         coordinator.load_labware_setup(name_of_calibration_file)
     socketio.emit("protocol_python_labware", name_of_calibration_file)

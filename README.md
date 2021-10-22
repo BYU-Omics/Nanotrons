@@ -32,6 +32,7 @@ opencv-python         4.5.2.54
 opentrons             4.4.0
 opentrons-shared-data 4.4.0
 Werkzeug              2.0.1
+Scipy                 1.7.1
 ```
 
 ## GUI

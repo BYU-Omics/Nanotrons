@@ -3,7 +3,7 @@ var socket = io.connect('http://127.0.0.1:5000');
 var run_protocol_button = document.getElementById("run_protocol");
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
 var display_protocol_button = document.getElementById("display_protocol");
-
+var show_calibration_button = document.getElementById("display_labware");
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
 var continue_button_protocol = document.getElementById("continue_protocol")
@@ -45,6 +45,7 @@ socket.on('protocols_available', function(received_protocols) {
 
 socket.on('display_contents', function(file_contents) {
     python_file_contents = file_contents
+    display_protocol_button.disabled = true;
 });
 
 
@@ -93,27 +94,6 @@ function fill_calibrations_drop_down(){
     }
 }
 
-// fills drop down list with the availble scripts
-function fill_syringes_drop_down(){
-    // Erase all the options inside the dropdown list (select object)
-    var length = syringeOptions.options.length;
-    // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
-    for (var i = length - 1; i >= 0; i--) {
-        syringeOptions.remove(i);
-    };
-    
-    // Add instruction option ()
-    var python_option = document.createElement("option"); // Adding instruction option
-    python_option.text = "- Select a syringe -"; // Adding instruction option
-    syringeOptions.add(python_option); // Adding instruction option
-
-    // Loop that adds the options to the options_list
-    for (var i = 0; i < syringes.length; i++){  
-        var python_option = document.createElement("option");
-        python_option.text = syringes[i];
-        syringeOptions.add(python_option);
-    }
-}
 
 // this runs each time you select an option from the script list
 function option_select_protocol(){
@@ -121,16 +101,15 @@ function option_select_protocol(){
     var selected_protocol = protocolOptions.options[ protocolOptions.selectedIndex ].value;
     protocol_to_display = selected_protocol; // set variable to the selected value
     console.log(selected_protocol)
-    // socket.emit("set_protocol_filename", protocol_to_display)
-    // if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
-    //     display_protocol_button.disabled = false; // enable the button
-    // }
-    // else { // if you select the instructions from the list
-    //     display_protocol_button.disabled = true; // disable button
-    // socket.emit("give_me_current_labware")
-    // }
-    display_protocol_button.disabled = true; // disable button
-    socket.emit("give_me_current_labware")
+    socket.emit("set_protocol_filename", protocol_to_display)
+    if ( selected_protocol != "- Select a Protocol -" ) { // if you select something from the list
+        display_protocol_button.disabled = false; // enable the button
+        show_calibration_button.disabled = false;
+    }
+    else { // if you select the instructions from the list
+        display_protocol_button.disabled = true; // disable button
+        show_calibration_button.disabled = true;
+    }
 }
 
 // this runs when you click the display script button
@@ -182,6 +161,10 @@ function display_contents() {
     socket.emit("display_contents")
 }
 
+function display_labware() {
+    socket.emit("give_me_current_labware")
+}
+
 // fills in the table with script commands
 function make_and_display_protocol_table(){
     console.log(python_data)
@@ -204,6 +187,7 @@ function make_and_display_protocol_table(){
 }
 
 run_protocol_button.addEventListener("click", function() {
+    console.log("Run protocol button pressed")
     socket.emit("run_protocol", protocol_to_display);
 });
 
@@ -303,18 +287,25 @@ function load() {
 
 socket.on("here_current_labware", function(labware_dict) {
     console.log(labware_dict);
+    console.log(calibrated_plates);
+    console.log(calibrated_chips);
+    // socket.emit("delete_current_labware")
+    if (calibrated_plates || calibrated_chips) {
+        // Update the list of chips
+        for (var i = 0; i < labware_dict["chips"].length; i++){
+            var node = document.createElement('li'); // Create a list element
+            node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
+            calibrated_chips.appendChild(node); // Add the node to the labware list
+        }
 
-    // Update the list of chips
-    for (var i = 0; i < labware_dict["chips"].length; i++){
-        var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
-        calibrated_chips.appendChild(node); // Add the node to the labware list
-    }
-
-    // Update the list of plates
-    for (var i = 0; i < labware_dict["plates"].length; i++){
-        var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
-        calibrated_plates.appendChild(node); // Add the node to the labware list
-    }
+        // Update the list of plates
+        for (var i = 0; i < labware_dict["plates"].length; i++){
+            var node = document.createElement('li'); // Create a list element
+            node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
+            calibrated_plates.appendChild(node); // Add the node to the labware list
+        }
+        show_calibration_button.disabled = true;
+    } else {
+        console.log("Calibration already populated.")
+    } 
 });

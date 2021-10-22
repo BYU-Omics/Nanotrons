@@ -65,6 +65,7 @@ LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
 DEFAULT_PROFILE = "default_profile.json"
+PIPPETE_POSITION_WHEN_MOVING_TC_LID = '5'
 FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
 ASPIRATE_SPEED = SLOW_SPEED
@@ -101,7 +102,7 @@ class Coordinator:
         os_recognized = os.name
         self.ot_control = OT2_nanotrons_driver()
         
-        self.myLabware = Labware_class("HAMILTON_175")
+        self.myLabware = Labware_class()
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
@@ -125,8 +126,9 @@ class Coordinator:
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
         self.user_input = 0
-        self.folder_for_pictures = None
+        self.folder_for_pictures = 'default_folder'
         self.picture_flag = False
+        self.toggle_flag = False
 
         # variables for protocols. 
         self.clean_water = None
@@ -144,16 +146,25 @@ class Coordinator:
                             datefmt="%H:%M:%S")
 
     def set_picture_flag(self, value: bool):
-        # print(f"Setting picture flag to: {value}")
+        print(f"Setting picture flag to: {value}")
         self.picture_flag = value
 
     def get_picture_flag(self) -> bool:
         return self.picture_flag
 
+    def set_toggle_flag(self, value: bool):
+        print(f"Setting toggle flag to: {value}")
+        self.toggle_flag = value
+
+    def get_toggle_flag(self) -> bool:
+        return self.toggle_flag
+
     def set_folder_for_pictures(self, folder: str):
+        print(f"COOR: Folder set to: {folder}")
         self.folder_for_pictures = folder
 
     def get_folder_for_pictures(self) -> str:
+        print(f"Getting the folder for pictures: {self.folder_for_pictures}")
         return self.folder_for_pictures
         
     """
@@ -747,16 +758,30 @@ class Coordinator:
     def open_lid(self):
         """ This function opens the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is opened"""
-        self.go_to_deck_slot('3') # for avoiding collitions
+        if self.ot_control.tc_lid_flag != 'open':
+            self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
         asyncio.run(self.tc_control.open())
         self.ot_control.set_tc_lid_flag('open')
 
     def close_lid(self):
         """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
             then it sets a flag so that other functions may know that the thermocycler lid is closed"""
-        self.go_to_deck_slot('3') # for avoiding collitions
+        self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
         asyncio.run(self.tc_control.close())
         self.ot_control.set_tc_lid_flag('closed')
+
+    def open_close_lid(self):
+        """ This function closes the lid once the pipette is out of the way and sitting on the slot 3 of the deck,
+            then it sets a flag so that other functions may know that the thermocycler lid is closed"""
+
+        self.go_to_deck_slot(PIPPETE_POSITION_WHEN_MOVING_TC_LID) # for avoiding collitions
+        if self.ot_control.tc_lid_flag == 'open':
+            asyncio.run(self.tc_control.close())
+            self.ot_control.set_tc_lid_flag('closed')
+        else:
+            asyncio.run(self.tc_control.open())
+            self.ot_control.set_tc_lid_flag('open')
+
 
     def deactivate_all(self):
         """ This function deactivates both, the lid and the block of the thermocycler"""

@@ -63,7 +63,7 @@ def _build_temp_code(temp: float,
     cmd = f"{GCODES['SET_PLATE_TEMP']} S{temp}"
     if hold_time:
         cmd += f' H{hold_time}'
-        print("Hold time _build_temp_code: {hold_time}")
+        # print(f"Hold time _build_temp_code: {hold_time} minutes")
     if volume:
         cmd += f' V{volume}'
     return cmd, temp
@@ -245,7 +245,7 @@ class Thermocycler:
         temp_cmd, temp = _build_temp_code(temp=temp,
                                           hold_time=hold_time,
                                           volume=volume)
-        print(f"temo comd: {temp_cmd}")
+        # print(f"temo comd: {temp_cmd}")
         await self._write_and_wait(temp_cmd)
         retries = 0
         # while self._target_temp != temp or \
