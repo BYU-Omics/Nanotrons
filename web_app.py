@@ -110,7 +110,7 @@ def home():
 
 @app.route('/manual_control')
 def manual_control():
-    return render_template("manual_control_wix_2.html")
+    return render_template("manual_control_wix.html")
 
 @app.route('/calibrate_component')
 def calibrate_component():
