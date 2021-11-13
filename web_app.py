@@ -557,63 +557,56 @@ def get_labware_models():
     models = coordinator.get_available_component_models()
     socketio.emit("models_available", models)
 
+def make_labware_position_dic(i, labware):#pass in either 'chip' or 'plate' and the 'labware' dict
+    newDic = dict()
+    second_key = list(labware[i]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
+    for j in range(0, len(second_key)):
+        coordinates = labware[i][second_key[j]]  
+
+        if coordinates[0] < 116.67:
+            if coordinates[1] < 123.25:
+                newDic[second_key[j]] = 1
+            elif coordinates[1] < 221.5:
+                newDic[second_key[j]] = 4
+            elif coordinates[1] < 319.5:
+                newDic[second_key[j]] = 7
+            else:
+                newDic[second_key[j]] = 10
+
+        elif coordinates[0] < 228.33:
+            if coordinates[1] < 123.25:
+                newDic[second_key[j]] = 2
+            elif coordinates[1] < 221.5:
+                newDic[second_key[j]] = 5
+            elif coordinates[1] < 319.5:
+                newDic[second_key[j]] = 8
+            else:
+                newDic[second_key[j]] = 11
+
+        else:
+            if coordinates[1] < 123.25:
+                newDic[second_key[j]] = 3
+            elif coordinates[1] < 221.5:
+                newDic[second_key[j]] = 6
+            elif coordinates[1] < 319.5:
+                newDic[second_key[j]] = 9
+            else:
+                newDic[second_key[j]] = 12
+
+    return newDic
+
+
 @socketio.on("give_me_labware_slot")
 def get_labware_slot(): #alt, we could pass in the labware dict
-    slotNum = -1
     labware = coordinator.get_current_labware()#this gets the full list of labware and each one's coorddinates, then compares them to the boundary marks of the slots to assign position
-    new_key = list(labware) #to iterate thorugh the keys chips, plates, and syringes
-    
-    for i in range (len(new_key)-1): #length minus one so that we do not run syringes. It throws an error when making the syring into a list and we don't need it anyways
-        second_key = list(labware[new_key[i]]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
-
-        for j in range(0, len(second_key)):
-            coordinates = labware[new_key[i]][second_key[j]]  
-            #print(f"VAR COORDINATES: {coordinates}") # used to test if coordinates were correct
-            if coordinates[0] < 116.67:
-                if coordinates[1] < 123.25:
-                    slotNum = 1
-                    print("FINAL SLOT: 1")
-                elif coordinates[1] < 221.5:
-                    slotNum = 4
-                    print("FINAL SLOT: 4")
-                elif coordinates[1] < 319.5:
-                    slotNum = 7
-                    print("FINAL SLOT: 7")
-                else:
-                    slotNum = 10
-                    print("FINAL SLOT: 10")
-            elif coordinates[0] < 228.33:
-                if coordinates[1] < 123.25:
-                    slotNum = 2
-                    print("FINAL SLOT: 2")
-                elif coordinates[1] < 221.5:
-                    slotNum = 5
-                    print("FINAL SLOT: 5")
-                elif coordinates[1] < 319.5:
-                    slotNum = 8
-                    print("FINAL SLOT: 8")
-                else:
-                    slotNum = 11
-                    print("FINAL SLOT: 11")
-            else:
-                if coordinates[1] < 123.25:
-                    slotNum = 3
-                    print("FINAL SLOT: 3")
-                elif coordinates[1] < 221.5:
-                    slotNum = 6
-                    print("FINAL SLOT: 6")
-                elif coordinates[1] < 319.5:
-                    slotNum = 9
-                    print("FINAL SLOT: 9")
-                else:
-                    slotNum = 12
-                    print("FINAL SLOT: 12")
-    socketio.emit("here_labware_slot", slotNum)
+    chipsSlots = make_labware_position_dic('chips', labware)
+    platesSlots = make_labware_position_dic('plates', labware)
+    socketio.emit("here_labware_slot", chipsSlots, platesSlots)
 
 @socketio.on("give_me_current_labware")
 def get_current_labware():
     labware = coordinator.get_current_labware()
-            
+    print(labware)#DELETE THIS LINE
     socketio.emit("here_current_labware", labware)
 
 @socketio.on("delete_current_labware")
