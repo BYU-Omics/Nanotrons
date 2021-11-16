@@ -145,9 +145,9 @@ def load_labware_setup():
 def script():
     return render_template("script.html")
 
-@app.route('/batch')
+@app.route('/protocol_edition')
 def batch_page():
-    return render_template("batch.html")
+    return render_template("protocol_edition_wix.html")
 
 @app.route('/settings')
 def system_settings():
@@ -441,6 +441,13 @@ def block_temperature_status():
 def hold_time():
     print("hold_time")
     coordinator.tc_control.hold_time()
+
+# ------------------- Protocol edition
+
+@socketio.on("send_protocol_info")
+def send_protocol_info(elements):
+    print("send_protocol_info")
+    coordinator.get_protocol_info(name=elements[0], author=elements[1])
 
 #----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
 

@@ -38,6 +38,7 @@ COORDINATOR CLASS
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
 from drivers.TDdriver import TempDeck
 from drivers.TCdriver import Thermocycler
+from protocol_creator import ProtocolCreator
 from joystick import XboxJoystick
 from joystick_profile import *
 from labware_class import *
@@ -106,6 +107,7 @@ class Coordinator:
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
+        self.protocol_creator = ProtocolCreator()
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
@@ -130,7 +132,11 @@ class Coordinator:
         self.picture_flag = False
         self.toggle_flag = False
 
-        # variables for protocols. 
+        # variables for protocols.
+
+        self.protocol_name = None
+        self.protocol_author = None
+
         self.clean_water = None
         self.wash_water = None
         self.waste_water = None
@@ -904,6 +910,15 @@ class Coordinator:
     def end_of_protocol(self):
         self.go_to_deck_slot('3')
         self.disconnect_all()
+
+    """
+    CREATE PROTOCOL COORDINATION SECTION
+    """
+
+    def get_protocol_info(self, name, author):
+        self.protocol_name = name 
+        self.protocol_author = author
+        print(self.protocol_name, self.protocol_author)
 
 def test():
     myApp = Coordinator()
