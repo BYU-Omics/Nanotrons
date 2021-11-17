@@ -582,7 +582,6 @@ def make_labware_position_dic(i, labware):#pass in either 'chip' or 'plate' and 
                 newDic[second_key[j]] = 8
             else:
                 newDic[second_key[j]] = 11
-
         else:
             if coordinates[1] < 123.25:
                 newDic[second_key[j]] = 3
@@ -606,7 +605,6 @@ def get_labware_slot(): #alt, we could pass in the labware dict
 @socketio.on("give_me_current_labware")
 def get_current_labware():
     labware = coordinator.get_current_labware()
-    print(labware)#DELETE THIS LINE
     socketio.emit("here_current_labware", labware)
 
 @socketio.on("delete_current_labware")
