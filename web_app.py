@@ -446,8 +446,16 @@ def hold_time():
 
 @socketio.on("send_protocol_info")
 def send_protocol_info(elements):
-    print("send_protocol_info")
-    coordinator.get_protocol_info(name=elements[0], author=elements[1])
+    print(f"Creating protocol with the following information: {elements}")
+    coordinator.protocol_creator.create_protocol_file(labware_name=elements[0], 
+                                                   filename=elements[1], 
+                                                   voided_plates=elements[2], 
+                                                   list_of_commands=elements[3], 
+                                                   author=elements[4], 
+                                                   description=elements[5], 
+                                                   waste_water_well=elements[6], 
+                                                   wash_water_well=elements[7], 
+                                                   clean_water_well=elements[8])
 
 #----------------------------------------------- TEMPDECK PAGE EVENTS SECTION
 

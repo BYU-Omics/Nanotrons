@@ -133,10 +133,6 @@ class Coordinator:
         self.toggle_flag = False
 
         # variables for protocols.
-
-        self.protocol_name = None
-        self.protocol_author = None
-
         self.clean_water = None
         self.wash_water = None
         self.waste_water = None
@@ -910,16 +906,7 @@ class Coordinator:
     def end_of_protocol(self):
         self.go_to_deck_slot('3')
         self.disconnect_all()
-
-    """
-    CREATE PROTOCOL COORDINATION SECTION
-    """
-
-    def get_protocol_info(self, name, author):
-        self.protocol_name = name 
-        self.protocol_author = author
-        print(self.protocol_name, self.protocol_author)
-
+            
 def test():
     myApp = Coordinator()
     

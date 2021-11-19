@@ -78,7 +78,7 @@ class Labware_class:
         for plate in self.plate_list:
             models[plate.get_model_name()] = plate.get_location_by_index(0)
         
-        print(f"Models: {models}")
+        print(f"Models: {models}")#A TEST, DELETE
         return models
 
     def get_current_labware(self):

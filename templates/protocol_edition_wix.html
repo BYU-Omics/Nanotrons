@@ -436,18 +436,18 @@
                                           <div id="comp-kv1vh94l" style="display:none"></div>
                                           <div id="comp-kv1uwm2v" class="_2dBhC _65cjg">
                                              <div class="XRJUI">
-                                                <input type="text" name="name" value="" id="protocol_name" class="_1SOvY has-custom-focus" placeholder="Protocol name" aria-label="Protocol name"/>
+                                                <input type="text" name="name" value="" id="filename" class="_1SOvY has-custom-focus" placeholder="Protocol name" aria-label="Protocol name"/>
                                                 </div>
                                           </div>
                                           <div id="comp-kv1uxdml" class="_2dBhC _65cjg">
-                                             <div class="XRJUI"><input type="text" name="author" id="protocol_author" class="_1SOvY has-custom-focus" value="" placeholder="Author" aria-label="Author"/></div>
+                                             <div class="XRJUI"><input type="text" name="author" id="author" class="_1SOvY has-custom-focus" value="" placeholder="Author" aria-label="Author"/></div>
                                           </div>
-                                          <div id="comp-kv1uzkzf" class="bItEI _22Vl0"><label for="textarea_comp-kv1uzkzf" class="_20uhs"></label><textarea id="textarea_comp-kv1uzkzf" class="_1VWbH has-custom-focus" placeholder="Descripton" required="" disabled=""></textarea></div>
+                                          <div id="comp-kv1uzkzf" class="bItEI _22Vl0"><label for="textarea_comp-kv1uzkzf" class="_20uhs"></label><textarea id="description" class="_1VWbH has-custom-focus" placeholder="Descripton" required=""></textarea></div>
                                           <div id="comp-kv1vvpg8" class="cyPU8 o5QNg _3I1te">
-                                             <label class="_2z549" for="collection_comp-kv1vvpg8"></label>
+                                             <label class="_2z549" for="files_stored"></label>
                                              <div class="_15XQs">
-                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="collection_comp-kv1vvpg8" disabled="" required="">
-                                                   <option selected="" value="" disabled="" class="Vx877 _3pa83">Labware file</option>
+                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="files_stored" onclick="files_stored_onclick()" required="">
+                                                   <option selected="" value="" class="Vx877 _3pa83">Labware file</option>
                                                 </select>
                                                 <div class="_3wJcy">
                                                    <div class="_2LH9s">
@@ -463,7 +463,7 @@
                                              <label class="_2z549" for="collection_comp-kv1vdxq8"></label>
                                              <div class="_15XQs">
                                                 <select class="Ch2LG has-custom-focus _1UP8Q" id="collection_comp-kv1vdxq8">
-                                                   <option selected="" value="" disabled="" class="Vx877 _3pa83">Choose command</option>
+                                                   <option selected="" value="" class="Vx877 _3pa83">Choose command</option>
                                                 </select>
                                                 <div class="_3wJcy">
                                                    <div class="_2LH9s">
@@ -540,8 +540,8 @@
                                           <div id="comp-kv5yyymg" class="_1Q9if" data-testid="richTextElement">
                                              <p class="font_2" style="font-size: 16px; line-height: 1.3em;"><span class="color_15"><span style="letter-spacing:0.01em"><span style="font-size:16px"><span style="font-family:helvetica-w01-roman,helvetica-w02-roman,helvetica-lt-w10-roman,sans-serif">Helvetica Light is an easy-to-read font, with tall and narrow letters, that works well on almost every site.</span></span></span></span></p>
                                           </div>
-                                          <div id="comp-kv1w6jwo" class="SelectionTagsList3624110994__root SelectionTagsList3624110994--disabled">
-                                             <div class="SelectionTagsList3624110994__tagList" data-testid="tags-list" role="group"><label title="custom" for="custom-comp-kv1w6jwo-0" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag SelectionTagsList3624110994--disabled" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="custom" name="custom-comp-kv1w6jwo-0" id="custom-comp-kv1w6jwo-0" disabled=""/>custom</label><label title="custom_small" for="custom_small-comp-kv1w6jwo-1" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag SelectionTagsList3624110994--disabled" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="custom_small" name="custom_small-comp-kv1w6jwo-1" id="custom_small-comp-kv1w6jwo-1" disabled=""/>custom_small</label><label title="corning" for="corning-comp-kv1w6jwo-2" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag SelectionTagsList3624110994--disabled" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="corning" name="corning-comp-kv1w6jwo-2" id="corning-comp-kv1w6jwo-2" disabled=""/>corning</label><label title="plate" for="plate-comp-kv1w6jwo-3" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag SelectionTagsList3624110994--disabled" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="plate" name="plate-comp-kv1w6jwo-3" id="plate-comp-kv1w6jwo-3" disabled=""/>plate</label></div>
+                                          <div id="comp-kv1w6jwo" class="SelectionTagsList3624110994__root">
+                                             <div class="SelectionTagsList3624110994__tagList" data-testid="tags-list" role="group"><label title="custom" for="custom-comp-kv1w6jwo-0" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag" data-testid="tags-list-tag"><input type="checkbox" value="custom" name="custom-comp-kv1w6jwo-0" id="custom-comp-kv1w6jwo-0">custom</label><label title="custom_small" for="custom_small-comp-kv1w6jwo-1" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="custom_small" name="custom_small-comp-kv1w6jwo-1" id="custom_small-comp-kv1w6jwo-1" disabled=""/>custom_small</label><label title="corning" for="corning-comp-kv1w6jwo-2" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag" data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="corning" name="corning-comp-kv1w6jwo-2" id="corning-comp-kv1w6jwo-2" disabled=""/>corning</label><label title="plate" for="plate-comp-kv1w6jwo-3" tabindex="-1" class="SelectionTag1023856791__tag SelectionTagsList3624110994__tag " data-testid="tags-list-tag"><input type="checkbox" class="SelectionTag1023856791__tagInput" value="plate" name="plate-comp-kv1w6jwo-3" id="plate-comp-kv1w6jwo-3" disabled=""/>plate</label></div>
                                           </div>
                                           <div id="comp-kv1v61gw" class="cyPU8 o5QNg _3hYUI _3I1te">
                                              <label class="_2z549" for="collection_comp-kv1v61gw">Waste</label>
@@ -662,5 +662,6 @@
       <script type="application/json" id="wix-warmup-data">{"platform":{"ssrPropsUpdates":[{"comp-kv1uwm2v":{"isValid":false,"shouldShowValidityIndication":false,"isDisabled":true},"comp-kv1uxdml":{"isValid":false,"shouldShowValidityIndication":false,"isDisabled":true},"comp-kv1uzkzf":{"isValid":false,"shouldShowValidityIndication":false,"isDisabled":true},"comp-kv1vvpg8":{"isValid":false,"shouldShowValidityIndication":false,"isDisabled":true},"comp-kv1w6jwo":{"isValid":true,"shouldShowValidityIndication":false,"isDisabled":true},"comp-kv5zahu1":{"isValid":true,"value":"","shouldShowValidityIndication":false},"comp-kv1vdxq8":{"isValid":true,"value":"","shouldShowValidityIndication":false}}],"ssrStyleUpdates":[]},"appsWarmupData":{},"ooi":{"failedInSsr":{}}}</script>
       <!-- warmup data end -->
       <script src="static/protocol_edition.js"></script>
+      <script src="static/load_labware_setup.js"></script>
    </body>
 </html>

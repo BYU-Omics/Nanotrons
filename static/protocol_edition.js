@@ -3,15 +3,21 @@ var save_button = document.getElementById("comp-kv5z3mgq");
 
 //PROCOL INFORMATION VARIABLES
 // Get select components by id
-var protocol_name = document.getElementById("protocol_name");
-var protocol_author = document.getElementById("protocol_author");
+var labware_name = document.getElementById("files_stored");
+var filename = document.getElementById("filename");
+var voided_plates = document.getElementById("comp-kv1w6jwo");
+var list_of_commands = document.getElementById("list_of_commands");
+var author = document.getElementById("author");
+var description = document.getElementById("description");
+var waste_water_well = document.getElementById("waste_water_well");
+var wash_water_well = document.getElementById("wash_water_well");
+var clean_water_well = document.getElementById("clean_water_well");
 
 function send_protocol_info() {
-    console.log(protocol_name.value)
-    console.log(protocol_author.value)
+    console.log(protocol_name.innerHTML)
+    console.log(protocol_author.innerHTML)
     socket.emit("send_protocol_info", [protocol_name, protocol_author])
 }
-
 
 function input_check(input_text) {
 
@@ -37,16 +43,15 @@ function input_check(input_text) {
 }
 
 save_button.addEventListener("click", function(){
-    var protocol_name = protocol_name.value;
-    var protocol_author = protocol_author.value;
-    var good_input = input_check(file_name); // [boolean, description]
-    var feedback = document.getElementById("feedback");
-    if (good_input[0]) {
-        socket.emit("send_protocol_info", [protocol_name, protocol_author])
-        feedback.innerText = "  Labware correctly saved to file " + "\"" + file_name + ".json\"";
-    }
-    else {
-        feedback.innerText = "  INPUT ERROR. "+ good_input[1];
-    }
+    socket.emit("send_protocol_info", [labware_name.value, filename.value, voided_plates.value, list_of_commands.value, author.value,description.value,waste_water_well.value,wash_water_well.value,clean_water_well.value])
+    // var good_input = input_check(filename_value.value); // [boolean, description]
+    // var feedback = document.getElementById("feedback");
+    // if (good_input[0]) {
+        
+    //     feedback.innerText = "  Labware correctly saved to file " + filename_value + "";
+    // }
+    // else {
+    //     feedback.innerText = "  INPUT ERROR. "+ good_input[1];
+    // }
 
 });
