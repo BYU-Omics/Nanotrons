@@ -462,8 +462,30 @@
                                           <div id="comp-kv1vdxq8" class="cyPU8 o5QNg">
                                              <label class="_2z549" for="collection_comp-kv1vdxq8"></label>
                                              <div class="_15XQs">
-                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="collection_comp-kv1vdxq8">
+                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="commands">
                                                    <option selected="" value="" class="Vx877 _3pa83">Choose command</option>
+                                                   <option value="set_washing_positions" class="Vx877">set_washing_positions</option>
+                                                   <option value="set_syringe_model" class="Vx877">set_syringe_model</option>
+                                                   <option value="start_wash" class="Vx877">start_wash</option>
+                                                   <option value="mid_wash" class="Vx877">mid_wash</option>
+                                                   <option value="air_gap" class="Vx877">air_gap</option>
+                                                   <option value="load_labware_setup" class="Vx877">load_labware_setup</option>
+                                                   <option value="aspirate_from" class="Vx877">aspirate_from</option>
+                                                   <option value="open_lid" class="Vx877">open_lid</option>
+                                                   <option value="close_lid" class="Vx877">close_lid</option>
+                                                   <option value="deactivate_lid" class="Vx877">deactivate_lid</option>
+                                                   <option value="deactivate_block" class="Vx877">deactivate_block</option>
+                                                   <option value="set_temperature" class="Vx877">set_temperature</option>
+                                                   <option value="set_lid_temp" class="Vx877">set_lid_temp</option>
+                                                   <option value="set_block_temp" class="Vx877">set_block_temp</option>
+                                                   <option value="set_tempdeck_temp" class="Vx877">set_tempdeck_temp</option>
+                                                   <option value="deactivate_tempdeck" class="Vx877">deactivate_tempdeck</option>
+                                                   <option value="deactivate_all" class="Vx877">deactivate_all</option>
+                                                   <option value="end_of_protocol" class="Vx877">end_of_protocol</option>
+                                                   <option value="void_plate_depth" class="Vx877">void_plate_depth</option>
+                                                   <option value="take_picture" class="Vx877">take_picture</option>
+                                                   <option value="set_pictures_folder" class="Vx877">set_pictures_folder</option>
+
                                                 </select>
                                                 <div class="_3wJcy">
                                                    <div class="_2LH9s">
@@ -520,7 +542,7 @@
                                              <div class="XRJUI"><input type="number" name="hold-time" id="input_comp-kv1vm46n" class="_1SOvY has-custom-focus" value="" placeholder="min" min="0"/></div>
                                           </div>
                                           <div id="comp-kv1whfxb">
-                                             <button type="button" class="StylableButton1881452515__root style-kv1whfxy__root" data-testid="buttonContent" aria-label="Download">
+                                             <button type="button" id="compile_commmand" onclick="command_selected()" class="StylableButton1881452515__root style-kv1whfxy__root" data-testid="buttonContent" aria-label="Download">
                                                 <div class="StylableButton1881452515__container">
                                                    <span class="StylableButton1881452515__label" data-testid="stylablebutton-label">Download</span>
                                                    <span class="StylableButton1881452515__icon" aria-hidden="true">

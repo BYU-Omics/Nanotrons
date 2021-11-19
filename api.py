@@ -24,6 +24,9 @@ class Api:
     def set_washing_positions(self, clean_water, wash_water, waste_water):
         self.coordinator.set_washing_positions(clean_water, wash_water, waste_water)
 
+    def set_syringe_model(self, model_name):
+        self.coordinator.myLabware.set_syringe_model(model_name)
+
     def start_wash(self):
         self.coordinator.start_wash()
 

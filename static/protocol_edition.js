@@ -1,5 +1,7 @@
 var socket = io.connect('http://127.0.0.1:5000/');
 var save_button = document.getElementById("comp-kv5z3mgq");
+var add_command_button = document.getElementById("compile_commmand");
+
 
 //PROCOL INFORMATION VARIABLES
 // Get select components by id
@@ -7,6 +9,7 @@ var labware_name = document.getElementById("files_stored");
 var filename = document.getElementById("filename");
 var voided_plates = document.getElementById("comp-kv1w6jwo");
 var list_of_commands = document.getElementById("list_of_commands");
+var command = document.getElementById("commands");
 var author = document.getElementById("author");
 var description = document.getElementById("description");
 var waste_water_well = document.getElementById("waste_water_well");
@@ -42,8 +45,27 @@ function input_check(input_text) {
     return [true, "All tests passed"]; // If the function gets this far means that all the previous tests failed (they weren't succesful at proving bad input)
 }
 
+function command_selected() {
+    console.log(command.value)
+}
+
+add_command_button.addEventListener("click", function(){
+    command_selected(command.value)
+});
+
 save_button.addEventListener("click", function(){
-    socket.emit("send_protocol_info", [labware_name.value, filename.value, voided_plates.value, list_of_commands.value, author.value,description.value,waste_water_well.value,wash_water_well.value,clean_water_well.value])
+    console.log("Labware name: " + labware_name.value)
+    console.log("File name: "+filename.value)
+    console.log("author: "+author.value)
+    socket.emit("send_protocol_info", [labware_name.value, 
+                                       filename.value, 
+                                       voided_plates.value, 
+                                       list_of_commands.value, 
+                                       author.value,
+                                       description.value,
+                                       waste_water_well.value,
+                                       wash_water_well.value,
+                                       clean_water_well.value])
     // var good_input = input_check(filename_value.value); // [boolean, description]
     // var feedback = document.getElementById("feedback");
     // if (good_input[0]) {
