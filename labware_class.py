@@ -78,7 +78,7 @@ class Labware_class:
         for plate in self.plate_list:
             models[plate.get_model_name()] = plate.get_location_by_index(0)
         
-        print(f"Models: {models}")
+        # print(f"Models: {models}")
         return models
 
     def get_current_labware(self):
@@ -86,6 +86,7 @@ class Labware_class:
         labware["chips"] = self.get_chip_models()
         labware["plates"] = self.get_plate_models()
         labware["syringe"] = self.get_syringe_model()
+        print(f"MODELS from current labware: {labware}")
         return labware
 
     def get_well_location(self, chip, well_nickname):

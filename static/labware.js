@@ -13,16 +13,16 @@ socket.on("here_current_labware", function(labware_dict) {
     console.log(labware_dict);
 
     // Update the list of chips
-    for (var i = 0; i < labware_dict["chips"].length; i++){
+    for (var key in labware_dict['chips']){
         var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
+        node.appendChild(document.createTextNode(key)); // Append a text node to the list element node
         calibrated_chips.appendChild(node); // Add the node to the labware list
     }
-
+    
     // Update the list of plates
-    for (var i = 0; i < labware_dict["plates"].length; i++){
+    for (var key in labware_dict['plates']){
         var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
+        node.appendChild(document.createTextNode(key)); // Append a text node to the list element node
         calibrated_plates.appendChild(node); // Add the node to the labware list
     }
 });
