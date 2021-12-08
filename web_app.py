@@ -600,7 +600,8 @@ def get_labware_slot(): #alt, we could pass in the labware dict
     labware = coordinator.get_current_labware()#this gets the full list of labware and each one's coorddinates, then compares them to the boundary marks of the slots to assign position
     chipsSlots = make_labware_position_dic('chips', labware)
     platesSlots = make_labware_position_dic('plates', labware)
-    socketio.emit("here_labware_slot", chipsSlots, platesSlots)
+    print(chipsSlots, platesSlots)
+    socketio.emit("here_labware_slot", platesSlots)
 
 @socketio.on("give_me_current_labware")
 def get_current_labware():

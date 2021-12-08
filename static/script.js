@@ -18,6 +18,7 @@ var SPEtime = document.getElementById("SPEtime");
 
 var calibrated_chips = document.getElementById("calibrated_chips");
 var calibrated_plates = document.getElementById("calibrated_plates");
+var locations = document.getElementById("locations");
 
 var contents = ""
 var protocols = {}
@@ -302,9 +303,17 @@ socket.on("here_current_labware", function(labware_dict) {
             var node = document.createElement('li'); // Create a list element
             node.appendChild(document.createTextNode(key)); // Append a text node to the list element node
             calibrated_plates.appendChild(node); // Add the node to the labware list
-        }
+        }        
+        socket.emit("give_me_labware_slot")
+
         show_calibration_button.disabled = true;
     } else {
         console.log("Calibration already populated.")
     } 
 });
+
+
+socket.on("here_labware_slot", function(plate_dict){
+    console.log("Positions:", plate_dict)
+    locations.innerHTML = plate_dict
+});  
