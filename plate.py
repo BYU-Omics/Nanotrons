@@ -47,7 +47,7 @@ class Plate:
 
     def void_plate_depth(self, void: bool = False):
         self.void_depth = void
-        print(f"Voiding depth for {self.get_model_name()}, self.void_depth = {self.void_depth}")
+        # print(f"Voiding depth for {self.get_model_name()}, self.void_depth = {self.void_depth}")
 
 
     # Gets the depth of the speficied pot 
@@ -70,10 +70,10 @@ class Plate:
         depth = self.get_pot_depth(0)
         location_with_depth = [x, y, z - depth]
         if self.void_depth:
-            print("Depth has been voided. Returning calibration point level.")
+            # print("Depth has been voided. Returning calibration point level.")
             return location
         else:
-            print(f"Depth for {self.get_model_name()} has not been voided. Going to the bottom of plate. ")
+            # print(f"Depth for {self.get_model_name()} has not been voided. Going to the bottom of plate. ")
             return location_with_depth
 
     # Returns the location of a given pot specified by its index

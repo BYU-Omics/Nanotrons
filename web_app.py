@@ -114,7 +114,7 @@ def manual_control():
 
 @app.route('/calibrate_component')
 def calibrate_component():
-    print("calibrate_component")
+    # print("calibrate_component")
     return render_template("calibration.html")
 
 @app.route('/load_calibration')
@@ -332,13 +332,13 @@ def stop_deliver_coordinates():
 #----------------------------------------------- MANUAL CONTROL PAGE EVENTS SECTION
 @socketio.on("start_manual_control_window")
 def start_manual_control_window():
-    print("Manual control")
+    # print("Manual control")
     coordinator.ot_control.set_tc_flag(is_tc_mounted=True)
     coordinator.manual_control()
 
 @socketio.on("stop_manual_control_window")
 def stop_manual_control_window():
-    print("stop_manual_control")
+    # print("stop_manual_control")
     coordinator.stop_manual_control()
 
 # @socketio.on("screen_info")
@@ -348,17 +348,17 @@ def stop_manual_control_window():
 
 @socketio.on("up_step_size")
 def up_step_size():
-    print("up_step_size")
+    # print("up_step_size")
     coordinator.up_step_size()
 
 @socketio.on("down_step_size")
 def down_step_size():
-    print("down_step_size")
+    # print("down_step_size")
     coordinator.down_step_size()
 
 @socketio.on("take_picture")
 def take_picture(folder):
-    print("take_picture")
+    # print("take_picture")
     coordinator.set_folder_for_pictures(folder)
     coordinator.set_picture_flag(True)
 
@@ -366,48 +366,48 @@ def take_picture(folder):
 def get_syringe_settings():
     step_s = coordinator.get_syringe_settings()
     socketio.emit("get_syringe_settings", step_s)
-    print(step_s)
+    # print(step_s)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
 @socketio.on("open_lid")
 def open_lid():
-    print("open_lid")
+    # print("open_lid")
     coordinator.open_lid()
 
 @socketio.on("close_lid")
 def close_lid():
-    print("close_lid")
+    # print("close_lid")
     coordinator.close_lid()
 
 @socketio.on("open_close_lid")
 def open_close_lid():
-    print("open_close_lid")
+    # print("open_close_lid")
     coordinator.open_close_lid()
 
 @socketio.on("deactivate_all")
 def deactivate_all():
-    print("deactivate_all")
+    # print("deactivate_all")
     coordinator.deactivate_all()
 
 @socketio.on("deactivate_lid")
 def deactivate_lid():
-    print("deactivate_lid")
+    # print("deactivate_lid")
     coordinator.deactivate_lid()
 
 @socketio.on("deactivate_block")
 def deactivate_block():
-    print("deactivate_block")
+    # print("deactivate_block")
     coordinator.deactivate_block()
 
 @socketio.on("set_temperature")
 def set_temperature(elements):
-    print(f"set block temp {elements[TEMP]}C for {elements[HOLD_TIME]}")
+    # print(f"set block temp {elements[TEMP]}C for {elements[HOLD_TIME]}")
     coordinator.set_block_temp(elements[TEMP], elements[HOLD_TIME])
 
 @socketio.on("set_lid_temperature")
 def set_lid_temperature(temp):
-    print(f"set lid temp {temp}")
+    # print(f"set lid temp {temp}")
     coordinator.set_lid_temp(temp)
 
 @socketio.on("get_lid_temp")
@@ -429,24 +429,24 @@ def get_block_temp():
     
 @socketio.on("lid_position")
 def lid_position():
-    print("lid_position")
+    # print("lid_position")
     coordinator.tc_control.lid_status()
 
 @socketio.on("block_temperature_status")
 def block_temperature_status():
-    print("block_temperature_status")
+    # print("block_temperature_status")
     coordinator.tc_control.status()
 
 @socketio.on("hold_time")
 def hold_time():
-    print("hold_time")
+    # print("hold_time")
     coordinator.tc_control.hold_time()
 
 # ------------------- Protocol edition
 
 @socketio.on("send_protocol_info")
 def send_protocol_info(elements):
-    print(f"Creating protocol with the following information: {elements}")
+    # print(f"Creating protocol with the following information: {elements}")
     coordinator.protocol_creator.create_protocol_file(labware_name=elements[0], 
                                                    filename=elements[1], 
                                                    voided_plates=elements[2], 
@@ -461,17 +461,17 @@ def send_protocol_info(elements):
 
 @socketio.on("set_tempdeck_temp")
 def set_tempdeck_temp(elements):
-    print("set_tempdeck_temp")
+    # print("set_tempdeck_temp")
     coordinator.set_tempdeck_temp(celcius=elements[TEMP], holding_time_in_minutes=elements[HOLD_TIME])
 
 @socketio.on("deactivate_tempdeck")
 def deactivate_tempdeck():
-    print("deactivate_tempdeck")
+    # print("deactivate_tempdeck")
     coordinator.deactivate_tempdeck()
 
 @socketio.on("get_tempdeck_temp")
 def get_tempdeck_temp():
-    print("get_tempdeck_temp")
+    # print("get_tempdeck_temp")
     if RUNNING_APP_FOR_REAL:
         temp = coordinator.get_tempdeck_temp()
         socketio.emit("get_tempdeck_temp", temp)
@@ -480,7 +480,7 @@ def get_tempdeck_temp():
 
 @socketio.on("check_tempdeck_status")
 def check_tempdeck_status():
-    print("check_tempdeck_status")
+    # print("check_tempdeck_status")
     if RUNNING_APP_FOR_REAL:
         coordinator.check_tempdeck_status()
         status = coordinator.check_tempdeck_status()
@@ -642,7 +642,7 @@ def save_labware_setup(output_file_name):
 
 @socketio.on("load_labware_setup")
 def load_labware_setup(input_file_name):
-    print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
+    # print(f"Web_app: Received 'load_labware_setup' message from socket with input file {input_file_name} ")
     if input_file_name == None or input_file_name == "None set":
         print(f"WARNING: Filename set to: {input_file_name} ")
     else:
@@ -746,7 +746,7 @@ def get_labware_summary():
 
 @socketio.on("go_to_deck_slot")
 def go_to_deck_slot(slot):
-    print(f"Move to slot {slot}")
+    # print(f"Move to slot {slot}")
     coordinator.go_to_deck_slot(slot)
 
 @socketio.on("rename_deck_slot")
@@ -755,37 +755,37 @@ def rename_deck_slot():
 
 @socketio.on("home_X")
 def home_X():
-    print("home X")
+    # print("home X")
     coordinator.ot_control.home('X')
 
 @socketio.on("home_Y")
 def home_Y():
-    print("home Y")
+    # print("home Y")
     coordinator.ot_control.home('Y')
 
 @socketio.on("home_all_motors")
 def home_all_motors():
-    print("home All")
+    # print("home All")
     coordinator.ot_control.home()
 
 @socketio.on("home_Z")
 def home_Z():
-    print("home Z")
+    # print("home Z")
     coordinator.ot_control.home('Z')
 
 @socketio.on("home_A")
 def home_A():
-    print("home A")
+    # print("home A")
     coordinator.ot_control.home('A')
 
 @socketio.on("home_B")
 def home_B():
-    print("home B")
+    # print("home B")
     coordinator.ot_control.home('B')
 
 @socketio.on("home_C")
 def home_C():
-    print("home C")
+    # print("home C")
     coordinator.ot_control.home('C')
 
 @socketio.on("connect_all")
@@ -805,7 +805,7 @@ def toggle_focus():
 #------------------WORKING WITH A PROTOCOL.PY SECTION--------------------
 @socketio.on("run_protocol")
 def run_protocol(protocol_name):
-    print("run protocol message received")
+    # print("run protocol message received")
     if RUNNING_APP_FOR_REAL:
         coordinator.disconnect_all() # First we disconnect all the modules
     if ' ' in protocol_name:
@@ -826,7 +826,7 @@ def get_available_protocols():
 
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
-    print(f"Filename set to: {protocol_name}")
+    # print(f"Filename set to: {protocol_name}")
     if ' ' in protocol_name:
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     elif '.py' not in protocol_name:
