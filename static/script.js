@@ -18,7 +18,8 @@ var SPEtime = document.getElementById("SPEtime");
 
 var calibrated_chips = document.getElementById("calibrated_chips");
 var calibrated_plates = document.getElementById("calibrated_plates");
-var locations = document.getElementById("locations");
+var locations = document.getElementById("chips_locations");
+var locations = document.getElementById("plates_locations");
 
 var contents = ""
 var protocols = {}
@@ -313,7 +314,16 @@ socket.on("here_current_labware", function(labware_dict) {
 });
 
 
-socket.on("here_labware_slot", function(plate_dict){
-    console.log("Positions:", plate_dict)
-    locations.innerHTML = plate_dict
+socket.on("here_labware_slot", function(locations_dict){
+    console.log("Positions:", locations_dict)
+    for (var key in locations_dict.chips){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(locations_dict.chips[key])); // Append a text node to the list element node
+        chips_locations.appendChild(node); // Add the node to the labware list
+    }
+    for (var key in locations_dict.plates){
+        var node = document.createElement('li'); // Create a list element
+        node.appendChild(document.createTextNode(locations_dict.plates[key])); // Append a text node to the list element node
+        plates_locations.appendChild(node); // Add the node to the labware list
+    }
 });  
