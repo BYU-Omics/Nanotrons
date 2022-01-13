@@ -231,7 +231,9 @@ def gen_2(camera):
             resized = cv2.resize(img_with_rect, dim)
         else:
             resized = cv2.resize(frame, dim)
-        ret, jpeg = cv2.imencode('.jpg', resized)
+        flipped = cv2.rotate(resized, cv2.cv2.ROTATE_90_CLOCKWISE)
+        flipped2 = cv2.rotate(flipped, cv2.cv2.ROTATE_90_CLOCKWISE)
+        ret, jpeg = cv2.imencode('.jpg', flipped2)
         if jpeg is not None:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
@@ -248,7 +250,7 @@ def gen_2(camera):
             protocol_name = executer.get_file_name().strip(".py")
             img_name = f"{protocol_name}_{current_time.month}-{current_time.day}-{current_time.year} at {current_time.hour}.{current_time.minute}.{current_time.second}.jpg"
             print(f"Name of picture:         '{img_name}'")
-            cv2.imwrite(directory + img_name, frame)
+            cv2.imwrite(directory + img_name, flipped2)
             print(f"{img_name} written!")
             img_counter += 1
             coordinator.set_picture_flag(False)       
