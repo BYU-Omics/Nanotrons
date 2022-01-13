@@ -935,4 +935,7 @@ def get_available_scripts():
     socketio.emit("scripts_available", list) # send the list back to js
 
 if __name__ == "__main__":
+    socketio.emit("go_to_deck_slot", 10)
+    print("BUTTON CONNECTED************************")
     socketio.run(app)
+    
