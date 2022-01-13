@@ -34,7 +34,7 @@ class Labware_class:
         self.chip_list.append(new_chip)
 
     def remove_chip(self, chip_index):
-        print(f"Chips: {self.chip_list}")
+        # print(f"Chips: {self.chip_list}")
         self.chip_list.pop(chip_index)
 
 
@@ -43,15 +43,15 @@ class Labware_class:
         self.plate_list.append(new_plate)
 
     def remove_plate(self, plate_index):
-        print(f"Plates: {self.plate_list}")
+        # print(f"Plates: {self.plate_list}")
         self.plate_list.pop(plate_index)
 
     def reset_chip_list(self):
-        print(f"Reseting the chips\n Chips: {self.chip_list}")
+        # print(f"Reseting the chips\n Chips: {self.chip_list}")
         self.chip_list.clear()
     
     def reset_plate_list(self):
-        print(f"Reseting the plates\n Plates: {self.plate_list}")
+        # print(f"Reseting the plates\n Plates: {self.plate_list}")
         self.plate_list.clear()
 
     def set_syringe_model(self, model_name):
@@ -78,7 +78,7 @@ class Labware_class:
         for plate in self.plate_list:
             models[plate.get_model_name()] = plate.get_location_by_index(0)
         
-        print(f"Models: {models}")
+        # print(f"Models: {models}")#A TEST, DELETE
         return models
 
     def get_current_labware(self):

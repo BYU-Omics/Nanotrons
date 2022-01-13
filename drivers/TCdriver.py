@@ -101,6 +101,7 @@ class Thermocycler:
         self._port = None
         self._connection = None
         if RUNNING_APP_FOR_REAL and THERMOCYCLER_CONNECTED:
+            print("Attempting to connect to TC")
             self._connection = self._connect_to_port()
         else:
             print("Not connected to the TC port")

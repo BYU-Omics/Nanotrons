@@ -52,7 +52,7 @@ class Py_Execute:
             first_arg = self.set_get_path()
         else:
             sys.exit()
-        cmd = 'python' + ' ' + first_arg 
+        cmd = 'python ' + first_arg 
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         if err == None:

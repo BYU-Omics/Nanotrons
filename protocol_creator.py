@@ -130,7 +130,7 @@ class ProtocolCreator:
         """        
         path = self.get_path_to_protocols(filename)
         os.remove(path)
-        print(f"File {filename} removed from directory.")
+        # print(f"File {filename} removed from directory.")
 
     def get_file_contents(self, filename: str) -> list:
         """This function

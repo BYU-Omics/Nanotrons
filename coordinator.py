@@ -38,6 +38,7 @@ COORDINATOR CLASS
 from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
 from drivers.TDdriver import TempDeck
 from drivers.TCdriver import Thermocycler
+from protocol_creator import ProtocolCreator
 from joystick import XboxJoystick
 from joystick_profile import *
 from labware_class import *
@@ -106,6 +107,7 @@ class Coordinator:
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
+        self.protocol_creator = ProtocolCreator()
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
@@ -130,7 +132,7 @@ class Coordinator:
         self.picture_flag = False
         self.toggle_flag = False
 
-        # variables for protocols. 
+        # variables for protocols.
         self.clean_water = None
         self.wash_water = None
         self.waste_water = None
@@ -195,10 +197,10 @@ class Coordinator:
         for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
             if axis_index == 2:
                 if self.myController.axes[2] > 0:
-                    print("ASPIRATE")
+                    # print("ASPIRATE")
                     self.aspirate(self.user_input, SLOW_SPEED)
                 elif self.myController.axes[2] < 0:
-                    print("DISPENSE")
+                    # print("DISPENSE")
                     self.dispense(self.user_input, SLOW_SPEED)
                 else:
                     pass
@@ -657,7 +659,8 @@ class Coordinator:
             plate_pot_properties = plate.export_plate_properties()
             locations = plate_pot_properties["pot_locations"]
         elif chip != None:
-            print(chip.well_locations)
+            dummy = 0
+            # print(chip.well_locations)
 
     def get_depth_of_labware(self, labware: Plate):
         plate_pot_properties = labware.export_plate_properties()
@@ -715,7 +718,7 @@ class Coordinator:
         self.waste_water = waste_water
     
     def set_amount_wanted(self, volume):
-        print(f"Amount wanted to celan for midwash: {volume}")
+        # print(f"Amount wanted to clean for midwash: {volume}")
         self.amount_wanted = volume
 
     def start_wash(self):
@@ -845,7 +848,7 @@ class Coordinator:
             current_temp = self.get_tempdeck_temp()
             time.sleep(5)
             logging.info(f"Current_temp = {current_temp} [C]")
-            print(self.check_tempdeck_status())
+            # print(self.check_tempdeck_status())
         logging.info("Target temperature {current_temp} [C] reached")
 
         logging.info(f"Holding for {holding_time_in_minutes} minutes.")
@@ -904,7 +907,7 @@ class Coordinator:
     def end_of_protocol(self):
         self.go_to_deck_slot('3')
         self.disconnect_all()
-
+            
 def test():
     myApp = Coordinator()
     
