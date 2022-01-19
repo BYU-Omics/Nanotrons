@@ -33,6 +33,9 @@ class Api:
     def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
         self.coordinator.mid_wash(left_over, cushion_1, cushion_2)
 
+    def fill_syringe_with_water(self):
+        self.coordinator.fill_syringe_with_water()
+
     def air_gap(self):
         self.coordinator.air_gap()
 

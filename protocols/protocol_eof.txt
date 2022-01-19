@@ -1,3 +1,4 @@
 #--------------END OF PROTOCOL--------------
 
+myProtocol.fill_syringe_with_water()
 myProtocol.end_of_protocol()

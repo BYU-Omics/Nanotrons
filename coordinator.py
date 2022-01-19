@@ -753,6 +753,14 @@ class Coordinator:
         # Airgap
         self.air_gap()
 
+    def fill_syringe_with_water(self):
+        """ This is the function that allows the robot to fill the syringe with water at the end of a day 
+            or protocol so that if it evaporates there is still some more the next day"""
+        # Go to clean, SYRINGE_TOP
+        self.go_to_position(self.clean_water)
+        self.move_plunger(self.syringe_top_coordinate)
+
+
     """
     PROTOCOL METHODS SECTION FOR THERMOCYCLER 
     """

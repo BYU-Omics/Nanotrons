@@ -45,14 +45,27 @@ myProtocol.start_wash()
 
 # ------------START OF PROTOCOL---------------------------------
 
-myProtocol.aspirate_from(4000, clean_water)
+myProtocol.aspirate_from(5000, clean_water)
 
-myProtocol.dispense_to(4000, micropots_3('A1'))
+myProtocol.dispense_to(500, micropots_3('A1'))
 
-myProtocol.aspirate_from(4000, clean_water)
+myProtocol.dispense_to(500, micropots_3('A2'))
 
-myProtocol.dispense_to(4000, micropots_3('A2'))
+myProtocol.dispense_to(500, micropots_3('A3'))
+
+myProtocol.dispense_to(500, micropots_3('A4'))
+
+myProtocol.dispense_to(500, micropots_3('A5'))
+
+myProtocol.dispense_to(500, micropots_3('B1'))
+
+myProtocol.dispense_to(500, micropots_3('B2'))
+
+myProtocol.dispense_to(500, micropots_3('B3'))
+
+myProtocol.dispense_to(500, micropots_3('B4'))
 
 #--------------END OF PROTOCOL--------------
 
+myProtocol.fill_syringe_with_water()
 myProtocol.end_of_protocol()
