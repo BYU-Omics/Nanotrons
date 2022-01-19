@@ -141,9 +141,9 @@ def save_labware_setup():
 def load_labware_setup():
     return render_template("load_labware_setup.html")
 
-@app.route('/protocol')
-def script():
-    return render_template("script.html")
+@app.route('/protocol_execution')
+def protocol_execution():
+    return render_template("protocol_execution.html")
 
 @app.route('/protocol_edition')
 def batch_page():

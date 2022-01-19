@@ -910,10 +910,10 @@ def tets_creation_of_file():
     cmd_9 = "myProtocol.aspirate_from(volume = 5000, source = custom_small('A2'))"
     list_of_commands = [cmd_1, cmd_2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7, cmd_8, cmd_9]
 
-    name_of_file = "Fluorescein_test"
-    author = 'Nathaniel Axtel'
-    description = 'Fluorescein test'
-    labware = "Fluorescein_test.json"
+    name_of_file = "FluotTest"
+    author = 'Yhann Masbernat'
+    description = 'Fluorescein test testing protocol creator'
+    labware = "Fluo_Test_01-19.json"
     plates_to_void_depth = ['custom']
     waste = "custom('A1')"
     wash = "custom('A2')"
