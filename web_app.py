@@ -768,6 +768,7 @@ def home_Y():
 @socketio.on("home_all_motors")
 def home_all_motors():
     # print("home All")
+    coordinator.move_plunger(70) # 70 is a position inwhich the siringe does not touuch the limit but is able to home without errors 
     coordinator.ot_control.home()
 
 @socketio.on("home_Z")

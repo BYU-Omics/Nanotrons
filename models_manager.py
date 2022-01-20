@@ -69,7 +69,8 @@ class ModelsManager:
         file_path = ""
 
         if (self.operating_system == "w"):
-            file_path = open(path_to_models_folder + "\\" + component_model + ".json")
+            print(f"Component model: {component_model}")
+            file_path = open(path_to_models_folder + "\\" + component_model[0] + ".json")
 
         elif (self.operating_system == "r"):
             file_path = open(path_to_models_folder + "/" + component_model + ".json")

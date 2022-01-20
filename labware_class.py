@@ -24,7 +24,7 @@ class Labware_class:
     def __init__(self):
         self.chip_list = []
         self.plate_list = []
-        self.syringe_model = []
+        self.syringe_model = ["HAMILTON_175"]
 
     """
     SETTERS SECTION

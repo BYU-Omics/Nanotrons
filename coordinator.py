@@ -255,6 +255,7 @@ class Coordinator:
     def home_all_motors(self):
         """ This method homes all the motors on the OT2 except for the Syringes
         """
+        print("self.ot_control.home('X Y Z A')")
         self.ot_control.home("X Y Z A") # Not B and C
 
     def up_step_size(self):
