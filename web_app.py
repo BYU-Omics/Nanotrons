@@ -153,6 +153,10 @@ def batch_page():
 def system_settings():
     return render_template("settings.html")
 
+@app.route('/about')
+def about():
+    return render_template("about.html")
+
 @app.route("/", methods =["POST"])
 def PostData():
     data = request.get_json(force=True)
