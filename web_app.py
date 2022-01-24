@@ -123,7 +123,7 @@ def load_component_calibration():
 
 @app.route('/labware')
 def labware():
-    return render_template("labware.html")
+    return render_template("labware_wix.html")
 
 @app.route('/labware/add')
 def add_labware():
@@ -147,7 +147,7 @@ def protocol_execution():
 
 @app.route('/protocol_edition')
 def batch_page():
-    return render_template("protocol_edition_wix.html")
+    return render_template("protocol_creation_wix.html")
 
 @app.route('/settings')
 def system_settings():
@@ -155,7 +155,7 @@ def system_settings():
 
 @app.route('/about')
 def about():
-    return render_template("about.html")
+    return render_template("about_wix.html")
 
 @app.route("/", methods =["POST"])
 def PostData():
