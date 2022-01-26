@@ -143,9 +143,9 @@ def load_labware_setup():
 
 @app.route('/protocol_execution')
 def protocol_execution():
-    return render_template("protocol_execution.html")
+    return render_template("protocol_execution_wix.html")
 
-@app.route('/protocol_edition')
+@app.route('/protocol_creation')
 def batch_page():
     return render_template("protocol_creation_wix.html")
 
