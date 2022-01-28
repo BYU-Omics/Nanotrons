@@ -5,7 +5,7 @@
 
 <head>
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 
 <meta charset='utf-8'>
 
@@ -108,7 +108,25 @@ window.thunderboltVersion = "1.9209.0"
 </script>
 
 
-
+<style>
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    border: 10px
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    font-size: 25px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+</style>
 
 
 <!-- Old Browsers Deprecation -->
@@ -611,7 +629,10 @@ src: url("//static.parastorage.com/services/third-party/fonts/user-site-fonts/fo
 
 <style id="css_cfvg">
 
-[data-mesh-id=ContainercfvginlineContent]{height:auto;width:100%}[data-mesh-id=ContainercfvginlineContent-gridContainer]{position:static;display:grid;height:auto;width:100%;min-height:850px;grid-template-rows:repeat(7, min-content) 1fr;grid-template-columns:100%;padding-bottom:0px;box-sizing:border-box}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvx3zok"]{position:relative;margin:9px 0px 13px calc((100% - 980px) * 0.5);left:15px;grid-area:1 / 1 / 2 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvx6dny"]{position:relative;margin:0px 0px 51px calc((100% - 980px) * 0.5);left:15px;grid-area:2 / 1 / 3 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvy3qsv"]{position:relative;margin:32px 0px 10px calc((100% - 980px) * 0.5);left:498px;grid-area:2 / 1 / 3 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxcic3"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:15px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxk5ki"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:127px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxez3y"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:451px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxfeoy"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:613px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvz2j2e"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:36px;grid-area:5 / 1 / 6 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxs0x8"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:15px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxs8cb"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:174px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxsbdu"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:333px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxqena"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:15px;grid-area:8 / 1 / 9 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxsipn"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:503px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxww8c"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:662px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxr02y"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:503px;grid-area:8 / 1 / 9 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-wedge-5]{visibility:hidden;height:323px;width:0;grid-area:1 / 1 / 5 / 2}[data-mesh-id=ContainercfvginlineContent-wedge-7]{visibility:hidden;height:526px;width:0;grid-area:1 / 1 / 7 / 2}#comp-kyvx3zok{width:436px;height:28px}#comp-kyvx6dny{width:436px;height:109px}#comp-kyvy3qsv{width:214px;height:45px}#comp-kyvxcic3{width:104px;height:40px}#comp-kyvxk5ki{width:304px;height:40px}#comp-kyvxez3y{width:142px;height:40px}#comp-kyvxfeoy{width:142px;height:40px}#comp-kyvz2j2e{width:304px;height:65px}#comp-kyvxs0x8{width:142px;height:40px}#comp-kyvxs8cb{width:142px;height:40px}#comp-kyvxsbdu{width:142px;height:40px}#comp-kyvxqena{width:460px;height:259px}#comp-kyvxsipn{width:142px;height:40px}#comp-kyvxww8c{width:142px;height:40px}#comp-kyvxr02y{width:460px;height:259px}#listModal_comp-kyvxk5ki{width:304px;height:40px}#cfvg{left:0;margin-left:0;width:100%;min-width:980px}#masterPage{--pinned-layers-in-page:0}
+[data-mesh-id=ContainercfvginlineContent]{height:auto;width:100%}[data-mesh-id=ContainercfvginlineContent-gridContainer]{position:static;display:grid;height:auto;width:100%;min-height:850px;grid-template-rows:repeat(7, min-content) 1fr;grid-template-columns:100%;padding-bottom:0px;box-sizing:border-box}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvx3zok"]{position:relative;margin:9px 0px 13px calc((100% - 980px) * 0.5);left:15px;grid-area:1 / 1 / 2 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvx6dny"]{position:relative;margin:0px 0px 51px calc((100% - 980px) * 0.5);left:15px;grid-area:2 / 1 / 3 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvy3qsv"]{position:relative;margin:32px 0px 10px calc((100% - 980px) * 0.5);left:498px;grid-area:2 / 1 / 3 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxcic3"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:15px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxk5ki"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:127px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxez3y"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:451px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxfeoy"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:613px;grid-area:3 / 1 / 4 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvz2j2e"]{position:relative;margin:0px 0px 10px calc((100% - 980px) * 0.5);left:36px;grid-area:5 / 1 / 6 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxs0x8"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:15px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxs8cb"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:174px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxsbdu"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:333px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxqena"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:15px;grid-area:8 / 1 / 9 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxsipn"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:503px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxww8c"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:662px;grid-area:7 / 1 / 8 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-gridContainer] > [id="comp-kyvxr02y"]{position:relative;margin:0px 0px 0 calc((100% - 980px) * 0.5);left:503px;grid-area:8 / 1 / 9 / 2;justify-self:start;align-self:start}[data-mesh-id=ContainercfvginlineContent-wedge-5]{visibility:hidden;height:323px;width:0;grid-area:1 / 1 / 5 / 2}[data-mesh-id=ContainercfvginlineContent-wedge-7]{visibility:hidden;height:526px;width:0;grid-area:1 / 1 / 7 / 2}#comp-kyvx3zok{width:436px;height:28px}#comp-kyvx6dny{width:436px;height:109px}#comp-kyvy3qsv{width:214px;height:45px}#comp-kyvxcic3{width:104px;height:40px}#comp-kyvxk5ki{width:304px;height:40px}#comp-kyvxez3y{width:142px;height:40px}
+#comp-kyvxfeoy{width:142px;height:40px}
+#comp-kyvz2j2e{width:900px;height:500px}
+#comp-kyvxs0x8{width:142px;height:40px}#comp-kyvxs8cb{width:142px;height:40px}#comp-kyvxsbdu{width:142px;height:40px}#comp-kyvxqena{width:460px;height:259px}#comp-kyvxsipn{width:142px;height:40px}#comp-kyvxww8c{width:142px;height:40px}#comp-kyvxr02y{width:460px;height:259px}#listModal_comp-kyvxk5ki{width:304px;height:40px}#cfvg{left:0;margin-left:0;width:100%;min-width:980px}#masterPage{--pinned-layers-in-page:0}
 
 @font-face {
 
@@ -755,7 +776,7 @@ font-weight: normal;
 
 font-style: normal;
 
-letter-spacing: 0.25em;
+letter-spacing: 0.15em;
 
 font-family: avenir-lt-w01_35-light1475496,sans-serif;
 
@@ -831,41 +852,58 @@ height: 42px
 
 </div></span></div></button></div><div id="comp-kyvxcic3" class="_2Hij5" data-testid="richTextElement"><p class="font_2" style="font-size:28px; line-height:1.3em;"><span style="font-size:28px;"><span class="color_15"><span style="font-family:futura-lt-w01-light,sans-serif;"><span style="letter-spacing:0em;">Protocols</span></span></span></span></p></div>
 <div id="comp-kyvxk5ki" class="cyPU8 o5QNg _3I1te"><label class="_2z549" for="collection_comp-kyvxk5ki"></label>
-    <div class="_15XQs"><select class="Ch2LG has-custom-focus _1UP8Q" id="collection_comp-kyvxk5ki" required="" onclick="option_select_protocol()"><option value="default" selected>-Select a Protocol-</option></select><div class="_3wJcy">
-    <div class="_2LH9s"><svg class="_1sD6O" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9.2828 4.89817"><title>arrow&amp;amp;v</title><path d="M4.64116,4.89817a.5001.5001,0,0,1-.34277-.13574L.15727.86448A.50018.50018,0,0,1,.84282.136L4.64116,3.71165,8.44.136a.50018.50018,0,0,1,.68555.72852L4.98393,4.76243A.5001.5001,0,0,1,4.64116,4.89817Z"></path></svg></div></div></div></div><div id="comp-kyvxez3y" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA"  onclick="display_contents()">Display Protocol</span></div>
-</div>
-<div id="comp-kyvxfeoy" role="button" tabindex="0" aria-disabled="false" class="xxex3">
-    <div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA" onclick="display_labware()">Display Labware</span></div>
-
-    <table>
-        <tr>
-          <th>Labware file</th>
-          <th id="calibration_file"></th>
-        </tr>
-        <tr>
-          <th>Author</th>
-          <th id="author"></th>
-        </tr>
-        <tr>
-            <th>Description</th>
-            <th id="description"></th>
-        </tr>
-    </table>
-    <table>
-        <tr>
-          <th>Chips</th>
-          <th>Plates</th>
-          <th>Location</th>
-        </tr>
-        <tr>
-          <th id="calibrated_chips"></th>
-          <th id="calibrated_plates"></th>
-          <th>Locations</th>
-        </tr>
-    </table>
-
-</div>
-    <div id="comp-kyvxs0x8" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">RUN PROTOCOL</span></div></div><div id="comp-kyvxs8cb" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">PAUSE</span></div></div><div id="comp-kyvxsbdu" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">CONTINUE</span></div></div><div id="comp-kyvxqena" class="VideoPlayer2054936319__root"></div><div id="comp-kyvxsipn" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">STOP</span></div></div><div id="comp-kyvxww8c" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">CLEAR QUEUE</span></div></div><div id="comp-kyvxr02y" class="VideoPlayer2054936319__root"></div><div data-mesh-id="ContainercfvginlineContent-wedge-5"></div><div data-mesh-id="ContainercfvginlineContent-wedge-7"></div></div></div></div></div></div></div></div></main><footer tabindex="-1" id="SITE_FOOTER_WRAPPER"><div id="SITE_FOOTER" class="_3Fgqs"><div class="rmFV4"></div><div class="_319u9"><div class="_3N4he"></div><div class="_1U65c"><div data-mesh-id="SITE_FOOTERinlineContent" data-testid="inline-content" class=""><div data-mesh-id="SITE_FOOTERinlineContent-gridContainer" data-testid="mesh-container-content"><div id="WRchTxt0-16wb" class="_1Q9if" data-testid="richTextElement"><p class="font_9" style="text-align:center; font-size:14px;">Fell free to edit this website and contribute.&nbsp;</p></div></div></div></div></div></div></footer></div></div><div id="SCROLL_TO_BOTTOM" class="qhwIj ignore-focus" tabindex="-1" role="region" aria-label="bottom of page"> </div></div></div>
+    <div class="_15XQs"><select class="Ch2LG has-custom-focus _1UP8Q" id="protocols" name="protocols" required="" onclick="option_select_protocol()"><option value="default" selected>-Select a Protocol-</option></select><div class="_3wJcy">
+    <div class="_2LH9s"><svg class="_1sD6O" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9.2828 4.89817"><title>arrow&amp;amp;v</title><path d="M4.64116,4.89817a.5001.5001,0,0,1-.34277-.13574L.15727.86448A.50018.50018,0,0,1,.84282.136L4.64116,3.71165,8.44.136a.50018.50018,0,0,1,.68555.72852L4.98393,4.76243A.5001.5001,0,0,1,4.64116,4.89817Z"></path></svg></div></div></div></div><button type="button" id="comp-kyvxez3y" disabled="disabled" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA" onclick="display_contents()">Display Protocol</span></div>
+    </button>
+<button type="button" id="comp-kyvxfeoy" disabled="disabled"  tabindex="0" aria-disabled="false" class="xxex3">
+    <div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA" id="display_labware" onclick="display_labware()">Display Labware</span></div>
+</button> 
+<div id="comp-kyvz2j2e" class="_2Hij5" data-testid="richTextElement"><span class="color_15"><span style="letter-spacing:0em;"><span style="font-family:avenir-lt-w01_35-light1475496,sans-serif;">
+  <table>
+  <tr>
+    <th>Labware file</th>
+    <th id="calibration_file"></th>
+  </tr>
+  <tr>
+    <th>Author</th>
+    <th id="author"></th>
+  </tr>
+  <tr>
+      <th>Description</th>
+      <th id="description"></th>
+  </tr>
+</table>
+<br>
+<br>
+<table>
+  <tr>
+    <th>Chips</th>
+    <th>Plates</th>
+    <th>Location</th>
+  </tr>
+  <tr>
+    <th id="calibrated_chips"></th>
+    <th id="calibrated_plates"></th>
+    <th>Locations</th>
+  </tr>
+</table>
+<span style="color:rgb(40, 34, 122);font-weight:bold" id="file_contents"> </span>
+</span></span></span></div>
+    <div id="comp-kyvxs0x8" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">RUN PROTOCOL</span></div></div><div id="comp-kyvxs8cb" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">PAUSE</span></div></div><div id="comp-kyvxsbdu" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">CONTINUE</span></div></div><div id="comp-kyvxqena" class="VideoPlayer2054936319__root"></div><div id="comp-kyvxsipn" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">STOP</span></div></div><div id="comp-kyvxww8c" role="button" tabindex="0" aria-disabled="false" class="xxex3"><div data-testid="linkElement" class="vjMqk" aria-disabled="false"><span class="_2TTZA">CLEAR QUEUE</span></div></div>
+    
+    
+    
+    <div id="comp-kyvxr02y" class="VideoPlayer2054936319__root"></div><div data-mesh-id="ContainercfvginlineContent-wedge-5"><img id="bg" src="{{ url_for('video_1_feed') }}"> 
+       </div><div data-mesh-id="ContainercfvginlineContent-wedge-7"><img id="bg" src="{{ url_for('video_2_feed') }}"></div>
+  
+  
+  </div></div></div></div></div></div></div></main>
+    
+    
+    
+    
+    
+    <footer tabindex="-1" id="SITE_FOOTER_WRAPPER"><div id="SITE_FOOTER" class="_3Fgqs"><div class="rmFV4"></div><div class="_319u9"><div class="_3N4he"></div><div class="_1U65c"><div data-mesh-id="SITE_FOOTERinlineContent" data-testid="inline-content" class=""><div data-mesh-id="SITE_FOOTERinlineContent-gridContainer" data-testid="mesh-container-content"><div id="WRchTxt0-16wb" class="_1Q9if" data-testid="richTextElement"><p class="font_9" style="text-align:center; font-size:14px;">Fell free to edit this website and contribute.&nbsp;</p></div></div></div></div></div></div></footer></div></div><div id="SCROLL_TO_BOTTOM" class="qhwIj ignore-focus" tabindex="-1" role="region" aria-label="bottom of page"> </div></div></div>
 
 
 
@@ -936,7 +974,7 @@ window.fedops.phaseStarted('partially_visible')
 
 
 
-
+<script src="/static/protocol_execution.js"></script>
 
 
 </body>

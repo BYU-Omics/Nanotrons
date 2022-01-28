@@ -2,8 +2,8 @@ var socket = io.connect('http://127.0.0.1:5000');
 
 var run_protocol_button = document.getElementById("run_protocol");
 var protocolOptions = document.getElementById("protocols"); // Dropdown list that shows the available models
-var display_protocol_button = document.getElementById("display_protocol");
-var show_calibration_button = document.getElementById("display_labware");
+var display_protocol_button = document.getElementById("comp-kyvxez3y");
+var show_calibration_button = document.getElementById("comp-kyvxfeoy");
 var pause_button_protocol = document.getElementById("pause_protocol");
 var stop_button_protocol = document.getElementById("stop_protocol")
 var continue_button_protocol = document.getElementById("continue_protocol")
