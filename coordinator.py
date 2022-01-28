@@ -375,6 +375,7 @@ class Coordinator:
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
+        
         # Extract syringe radius
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         diameter = syringe_parameters["inner_diameter"] # This parameter has units of mm

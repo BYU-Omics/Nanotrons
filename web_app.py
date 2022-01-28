@@ -821,6 +821,8 @@ def run_protocol(protocol_name):
         print("Running protocol")
         executer.set_file_name(protocol_name) # Then we add the calibration to use
         executer.execute_python_protocol() # Then we execute an external file: the protocol.py
+        coordinator.disconnect_all()
+        coordinator.connect_all()
 
 @socketio.on("get_available_protocols")
 def get_available_protocols():

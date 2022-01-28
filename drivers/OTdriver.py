@@ -173,7 +173,7 @@ class OT2_nanotrons_driver(SM):
         if self.i > 0:
             self.i -= 1
             self.xyz_step_size = list_of_sizes[self.i]
-            # print(f"Stepping {self.xyz_step_size}[mm]")
+            print(f"Stepping {self.xyz_step_size}[mm]")
         else:
             print("Trying to move morethan allowed predefined steps")
             print(f"The stepping size is currently set to {self.xyz_step_size}")
