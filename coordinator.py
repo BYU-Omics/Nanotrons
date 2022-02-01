@@ -86,7 +86,7 @@ SYRINGE_BOTTOM = -190
 SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
 SYRINGE_TOP = -90
 
-from constants import RUNNING_APP_FOR_REAL
+from constants import RUNNING_APP_FOR_REAL, CONTROLLER_CONNECTED
 
 
 def interrupt_callback(res):
@@ -112,7 +112,7 @@ class Coordinator:
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
             operating_system = "w"
-            if RUNNING_APP_FOR_REAL:
+            if RUNNING_APP_FOR_REAL and CONTROLLER_CONNECTED:
                 self.myController = XboxJoystick(operating_system)
         elif os_recognized == LINUX_OS:
             logging.info("Operating system: Linux")

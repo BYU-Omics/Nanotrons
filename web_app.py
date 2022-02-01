@@ -143,7 +143,7 @@ def load_labware_setup():
 
 @app.route('/protocol_execution')
 def protocol_execution():
-    return render_template("protocol_execution_wix.html")
+    return render_template("protocol_execution.html")
 
 @app.route('/protocol_creation')
 def batch_page():
@@ -815,7 +815,11 @@ def run_protocol(protocol_name):
     # print("run protocol message received")
     if RUNNING_APP_FOR_REAL:
         coordinator.disconnect_all() # First we disconnect all the modules
-    if ' ' in protocol_name:
+    
+    if protocol_name == "- Select a Protocol -":
+        print(protocol_name)
+    elif ' ' in protocol_name:
+        print(protocol_name)
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     else:
         print("Running protocol")
@@ -837,6 +841,7 @@ def get_available_protocols():
 def set_protocol_filename(protocol_name):
     # print(f"Filename set to: {protocol_name}")
     if ' ' in protocol_name:
+        print(protocol_name)
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     elif '.py' not in protocol_name:
         print("WARNING: Trying to set the filename to a not allowed extension. ")
