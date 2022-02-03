@@ -133,17 +133,17 @@ def add_labware():
 def create_labware_model():
     return render_template("labware_creation.html")
 
-@app.route('/save_labware_setup')
+@app.route('/labware/save_labware_setup')
 def save_labware_setup():
     return render_template("save_labware_setup.html")
 
-@app.route('/load_labware_setup')
+@app.route('/labware/load_labware_setup')
 def load_labware_setup():
     return render_template("load_labware_setup.html")
 
 @app.route('/protocol_execution')
 def protocol_execution():
-    return render_template("protocol_execution.html")
+    return render_template("protocol_execution_wix.html")
 
 @app.route('/protocol_creation')
 def batch_page():
