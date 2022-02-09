@@ -3,6 +3,7 @@
 
 <head>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1" id="wixDesktopViewport" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -5132,14 +5133,14 @@
             direction: var(--dir)
         }
     </style>
-    <title>Labware | My Site 1</title>
+    <title>Labware | Nanotrons</title>
     <link rel="canonical" href="https://alejandrobrozalezv.wixsite.com/my-site-1/copy-of-run-4" />
-    <meta property="og:title" content="Labware | My Site 1" />
+    <meta property="og:title" content="Labware | Nanotrons" />
     <meta property="og:url" content="https://alejandrobrozalezv.wixsite.com/my-site-1/copy-of-run-4" />
-    <meta property="og:site_name" content="My Site 1" />
+    <meta property="og:site_name" content="Nanotrons" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Labware | My Site 1" />
+    <meta name="twitter:title" content="Labware | Nanotrons" />
 
 
 </head>
@@ -7304,15 +7305,16 @@
                                                     <div id="comp-kz6554kr" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
                                                         <div data-testid="linkElement" class="vjMqk"
-                                                            aria-disabled="false"><span class="_2TTZA">Load</span></div>
+                                                            aria-disabled="false"><button class="_2TTZA" id="load_button" onclick="load_button_listener()">Load</button></div>
                                                     </div>
                                                     <div id="comp-kzd59ub3" class="cyPU8 o5QNg _3I1te"><label
-                                                            class="_2z549" for="collection_comp-kzd59ub3"></label>
+                                                            class="_2z549" for="labware_components"></label>
                                                         <div class="_15XQs"><select
                                                                 class="Ch2LG has-custom-focus _1UP8Q"
-                                                                id="collection_comp-kzd59ub3" required="">
+                                                                id="labware_components" required="">
                                                                 <option selected="" value="" disabled=""
-                                                                    class="Vx877 _3pa83">-Select Labware to Remove-
+                                                                    class="Vx877 _3pa83" onclick="component_model_onclick()"
+                                                                            >-Select Labware to Remove-
                                                                 </option>
                                                             </select>
                                                             <div class="_3wJcy">
@@ -7331,7 +7333,7 @@
                                                             class="_2z549" for="collection_comp-kzd5abyh"></label>
                                                         <div class="_15XQs"><select
                                                                 class="Ch2LG has-custom-focus _1UP8Q"
-                                                                id="collection_comp-kzd5abyh" required="">
+                                                                id="collection_comp-kzd5abyh" required="" onclick="files_stored_onclick()">
                                                                 <option selected="" value="" disabled=""
                                                                     class="Vx877 _3pa83">-Select Labware to Load-
                                                                 </option>
@@ -7356,7 +7358,7 @@
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
                                                                                 style="text-decoration:underline;">Remove
-                                                                                Labware</span></span></span></span></span>
+                                                                                Component</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div id="comp-kzd6lm15" class="_2Hij5"
@@ -7377,9 +7379,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Currently
-                                                                                Stored Labware
-                                                                                Files:&nbsp;</span></span></span></span></span>
+                                                                                style="text-decoration:underline;">Saved Labware Files</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div id="comp-kzd6r6xv" class="_2Hij5"
@@ -7389,8 +7389,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Calibrated
-                                                                                Chips</span></span></span></span></span>
+                                                                                style="text-decoration:underline;">Chips</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div id="comp-kzd6snu9" class="_2Hij5"
@@ -7400,8 +7399,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Calibrated
-                                                                                Plates</span></span></span></span></span>
+                                                                                style="text-decoration:underline;">Plates</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div id="comp-kzd6evzq" class="_2Hij5"
@@ -7587,7 +7585,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Calibrate/Create
+                                                                                style="text-decoration:underline;">Labware 
                                                                                 Models</span></span></span></span></span>
                                                         </h2>
                                                     </div>
@@ -7660,8 +7658,12 @@
     <!-- warmup data end -->
 
 
-
-
+    <script src="static/labware.js"></script>
+    <script src="static/save_labware_setup.js"></script>
+    <script src="/static/add_labware.js"></script>
+    <script src="static/upload_new_model.js"></script>
+    <script src="static/load_labware_setup.js"></script>
+    <script src="static/manual_control.js"></script>
 
 </body>
 

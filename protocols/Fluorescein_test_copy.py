@@ -48,6 +48,16 @@ myProtocol.start_wash()
 
 # ------------START OF PROTOCOL---------------------------------
 
+myProtocol.aspirate_from(600, custom_small('A1'))
+myProtocol.dispense_to(0, custom('D1'))
+
+myProtocol.dispense_to(100, corning_384('K13'))
+myProtocol.dispense_to(100, corning_384('K14'))
+myProtocol.dispense_to(100, corning_384('K15'))
+myProtocol.dispense_to(100, corning_384('K16'))
+myProtocol.dispense_to(100, corning_384('K17'))
+
 #--------------END OF PROTOCOL--------------
 
+myProtocol.fill_syringe_with_water()
 myProtocol.end_of_protocol()

@@ -5,7 +5,7 @@ var files_list = ["mock_file1.json", "mock_file2.json", "mock_file3.json", "mock
 socket.emit("available_saved_labware_files");
 
 // Get select components by id
-var files_select = document.getElementById("files_stored");
+var files_select = document.getElementById("collection_comp-kzd5abyh");
 var load_button = document.getElementById("load_button");
 var previous_labware_selected = "";
 populate_file_options(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
