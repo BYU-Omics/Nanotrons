@@ -10,6 +10,7 @@ var file_name_input = document.getElementById("file_name");
 var stored_files_list = ["holiwi.json"];
 
 socket.emit("available_saved_labware_files");
+console.log("Loading page")
 
 socket.on("saved_labware_files", function(files_list) {
     stored_files_list = files_list;

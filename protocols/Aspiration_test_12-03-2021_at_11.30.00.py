@@ -21,12 +21,12 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('Fluo_test_03-12.json')
+chips, plates = myProtocol.load_labware_setup('Fluo_test_03-01.json')
 
 
-custom = plates[0] 
-custom_small = plates[1] 
-corning_384 = plates[2]
+corning_384 = plates[0]
+custom = plates[1] 
+custom_small = plates[2] 
 
 # If the depth has been voided for any of the plates, this is specified here:
 
@@ -45,16 +45,16 @@ myProtocol.set_syringe_model("HAMILTON_175")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
-# myProtocol.start_wash()
+myProtocol.start_wash()
 
 # ------------START OF PROTOCOL---------------------------------
 
 myProtocol.aspirate_from(500, custom('A2'))
 
-myProtocol.dispense_to(500, custom('A1'))
+myProtocol.dispense_to(500, corning_384('A1'))
 
-myProtocol.aspirate_from(0, custom('B1'))
 
 #--------------END OF PROTOCOL--------------
 
-# myProtocol.end_of_protocol()
+myProtocol.fill_syringe_with_water()
+myProtocol.end_of_protocol()
