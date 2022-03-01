@@ -552,6 +552,7 @@ class OT2_nanotrons_driver(SM):
         """
         This function is called at the beginning of the class in the init function to connect the robot
         """
+        # self.disconnect()
         self.find_port()
         self.connect(self._port)
 

@@ -582,53 +582,83 @@ def get_labware_models():
 def get_current_labware():
     labware = coordinator.get_current_labware()
     new_key = list(labware) #to iterate thorugh the keys chips, plates, and syringes
-    
+    labware_slot = {"chips":[], "plates":[]}
     for i in range (len(new_key)-1): #length minus one so that we do not run syringes. It throws an error when making the syring into a list and we don't need it anyways
         second_key = list(labware[new_key[i]]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
-
+        print(second_key)
         for j in range(0, len(second_key)):
+            slot = 0
+            piece_of_labware = ""
             coordinates = labware[new_key[i]][second_key[j]]    
             #print(f"VAR COORDINATES: {coordinates}") # used to test if coordinates were correct
+            print(f"Labware: {second_key[j]}")
             if coordinates[0] < 116.67:
                 if coordinates[1] < 123.25:
+                    slot = 1
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 1
                     print("FINAL SLOT: 1")
                 elif coordinates[1] < 221.5:
+                    slot = 4
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 4
                     print("FINAL SLOT: 4")
                 elif coordinates[1] < 319.5:
+                    slot = 7
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 7
                     print("FINAL SLOT: 7")
                 else:
+                    slot = 10
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 10
                     print("FINAL SLOT: 10")
             elif coordinates[0] < 228.33:
                 if coordinates[1] < 123.25:
+                    slot = 2
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 2
                     print("FINAL SLOT: 2")
                 elif coordinates[1] < 221.5:
+                    slot = 5
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 5
                     print("FINAL SLOT: 5")
                 elif coordinates[1] < 319.5:
+                    slot = 8
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 8
                     print("FINAL SLOT: 8")
                 else:
+                    slot = 11
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 11
                     print("FINAL SLOT: 11")
             else:
                 if coordinates[1] < 123.25:
+                    slot = 3
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 3
                     print("FINAL SLOT: 3")
                 elif coordinates[1] < 221.5:
-                    labware[new_key[i]][second_key[j]] = 6
+                    slot = 6
+                    piece_of_labware = second_key[j]
                     print("FINAL SLOT: 6")
                 elif coordinates[1] < 319.5:
+                    slot = 9
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 9
                     print("FINAL SLOT: 9")
                 else:
+                    slot = 12
+                    piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 12
                     print("FINAL SLOT: 12")
             
+            labware_slot[new_key[i]]  += [piece_of_labware, slot]
+    
+    print(f"Returning: {labware_slot} ")
+    socketio.emit("labware_locations_dict", labware_slot)  
     socketio.emit("here_current_labware", labware)
 
 @socketio.on("delete_current_labware")

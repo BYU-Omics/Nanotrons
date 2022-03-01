@@ -15,8 +15,8 @@ $(document).ready( function(){
     });    
 
     // Obtain input objects from the HTML code
-    var selectedChip = document.getElementById("Container1"); // Radio button corresponding to the Chip option
-    var selectedPlate = document.getElementById("Container2"); // Radio button corresponding to the Plate option
+    var selectedChip = document.getElementById("ContainerC"); // Radio button corresponding to the Chip option
+    var selectedPlate = document.getElementById("ContainerP"); // Radio button corresponding to the Plate option
     var modelOptions = document.getElementById("models"); // Dropdown list that shows the available models
     var calibrateButton = document.getElementById("calibrate"); // Button that triggers a calibration
     var loadCalibrationButton = document.getElementById("load_calibration"); // Button that directs to loading a calibration
@@ -67,11 +67,8 @@ $(document).ready( function(){
 
     // Event handler in case the radio button for "Chip" is clicked
     selectedChip.onclick = function() {
-
         uploadNewModel.disabled = false; // Activate the upload new model button
-
         fill_model_options("chips");
-
     }
 
     // Event handler in case the radio button for "Plate" is clicked
@@ -88,7 +85,7 @@ $(document).ready( function(){
 
         // This returns the value of the selection
         var selected_model = modelOptions.options[ modelOptions.selectedIndex ].value;
-
+        console.log(selected_model)
         // console.log(selected_model);
         if ( (selected_model != "- Select a Model -") && (selected_model != "- Select Chip or Reagent Plate -") ) {
             calibrateButton.disabled = false;

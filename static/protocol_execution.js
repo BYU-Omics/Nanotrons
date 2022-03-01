@@ -137,6 +137,28 @@ socket.on('protocol_python_description', function(description) {
     description_text.innerHTML = description
 });  
 
+
+socket.on('protocol_python_chips', function(chips) {
+    console.log("Description of protocol: ", chips)
+    var chips_text = document.getElementById("chips")
+    chips_text.innerHTML = chips
+});  
+
+
+socket.on('protocol_python_plates', function(plates) {
+    console.log("Description of protocol: ", plates[0])
+    var plates_text = document.getElementById("plates")
+    plates_text.innerHTML = plates
+});  
+
+
+socket.on('protocol_python_locations', function(locations) {
+    console.log("Description of protocol: ", locations[1])
+    var locations_text = document.getElementById("locations")
+    locations_text.innerHTML = locations
+});  
+
+
 // listens for the json data
 socket.on('protocol_python_data', function(python_lines_list) {
     console.log("protocols received")
@@ -285,8 +307,8 @@ function load() {
     console.log("Page load finished");
 }
 
-socket.on("here_current_labware", function(labware_dict) {
-    console.log(labware_dict);
+socket.on("labware_locations_dict", function(labware_slot) {
+    console.log(labware_slot);
     console.log(calibrated_plates);
     console.log(calibrated_chips);
     // socket.emit("delete_current_labware")
