@@ -7490,16 +7490,17 @@
                                                                 <span style="font-size:22px;">
                                                                     <span class="color_15">
                                                                         <span style="font-family:futura-lt-w01-light,sans-serif;">
-                                                                            <span style="letter-spacing:0em;" for="models">Calibrate Model:</span></span></span></span>
+                                                                            <span style="letter-spacing:0em;" for="models">Calibrate Model:</span>
+                                                                        </span>
+                                                                    </span>
+                                                                </span>
                                                             </p>
                                                         </div>
                                                         <div id="comp-kytawfba1" class="cyPU8 o5QNg _3I1te">
                                                             <label class="_2z549" for="collection_comp-kytawfba1"></label>
                                                             <div class="_15XQs">
-                                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="models" name="models" required="">
-                                                                    <option value="default" class="Vx877 _3pa83" selected>-Select Chip or Reagent
-                                                                        Plate-
-                                                                    </option>
+                                                                <select class="Ch2LG has-custom-focus _1UP8Q" id="models" name="models">
+                                                                    <option value="default" class="Vx877 _3pa83" selected>-Select Chip or Reagent Plate-</option>
                                                                 </select>
                                                     
                                                                 <div class="_3wJcy">
@@ -7514,25 +7515,16 @@
                                                                 </div>
                                                     
                                                             </div>
-                                                            <div id="upload_model" role="button" value="calibrate_model" tabindex="0" aria-disabled="false" class="xxex3">
-                                                                <div data-testid="linkElement" class="vjMqk" aria-disabled="false">
-                                                                    <button type="button" disabled="disabled" class="_2TTZA"
-                                                                        onclick="location.href='/upload_new_model'">Upload New Model</span>
-                                                                </div>
+                                                            <div role="button" class="xxex3">
+                                                                <button type="button" class="vjMqk" disabled="disabled" id="upload_model" value="calibrate_model" onclick="location.href='/upload_new_model'">Upload New Model</span>
                                                             </div>
-                                                            <div id="submit_button">
-                                                                <div  role="button"  tabindex="0" aria-disabled="false"
-                                                                    class="xxex3">
-                                                                    <div data-testid="linkElement" class="vjMqk" aria-disabled="false">
-                                                                        <button type="submit" disabled="disabled" id="calibrate" name="action" value="calibrate_model" onclick="location.href='/calibrate_component'" class="_2TTZA"> Calibrate </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div  role="button" tabindex="0" aria-disabled="false" class="xxex3">
-                                                                    <div data-testid="linkElement" class="vjMqk" aria-disabled="false">
-                                                                        <button type="submit" class="_2TTZA" disabled="disabled" id="load_calibration" name="action" value="calibrate_model" onclick="location.href='/load_calibration'"> Load Calibration </button>
-                                                                    </div>
-                                                                </div>
+                                                            <div role="button" class="xxex3">
+                                                                <button type="submit" class="vjMqk" disabled="disabled" id="calibrate" name="action" value="calibrate_model" onclick="location.href='/calibrate_component'" > Calibrate </button>
                                                             </div>
+                                                            <div role="button" class="xxex3">
+                                                                <button type="submit" class="vjMqk" disabled="disabled" id="load_calibration" name="action" value="calibrate_model" onclick="location.href='/load_calibration'"> Load Calibration </button>
+                                                            </div>
+                                                            
                                                         </div>
                                                     </form>
 

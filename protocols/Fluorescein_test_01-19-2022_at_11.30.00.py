@@ -52,11 +52,11 @@ myProtocol.start_wash()
 myProtocol.aspirate_from(600, custom_small('A1'))
 myProtocol.dispense_to(0, custom('D1'))
 
-myProtocol.dispense_to(100, corning_384('L1'))
-myProtocol.dispense_to(100, corning_384('L2'))
-myProtocol.dispense_to(100, corning_384('L3'))
-myProtocol.dispense_to(100, corning_384('L4'))
-myProtocol.dispense_to(100, corning_384('L5'))
+myProtocol.dispense_to(100, corning_384('F7'))
+myProtocol.dispense_to(100, corning_384('F8'))
+myProtocol.dispense_to(100, corning_384('F9'))
+myProtocol.dispense_to(100, corning_384('F10'))
+myProtocol.dispense_to(100, corning_384('F11'))
 
 myProtocol.mid_wash()
 
@@ -64,11 +64,11 @@ myProtocol.aspirate_from(300, custom_small('B1'))
 myProtocol.dispense_to(0, custom('D1'))
 
 
-myProtocol.dispense_to(50, corning_384('M1'))
-myProtocol.dispense_to(50, corning_384('M2'))
-myProtocol.dispense_to(50, corning_384('M3'))
-myProtocol.dispense_to(50, corning_384('M4'))
-myProtocol.dispense_to(50, corning_384('M5'))
+myProtocol.dispense_to(50, corning_384('G7'))
+myProtocol.dispense_to(50, corning_384('G8'))
+myProtocol.dispense_to(50, corning_384('G9'))
+myProtocol.dispense_to(50, corning_384('G10'))
+myProtocol.dispense_to(50, corning_384('G11'))
 
 myProtocol.mid_wash()
 
@@ -76,33 +76,33 @@ myProtocol.aspirate_from(120, custom_small('C1'))
 myProtocol.dispense_to(0, custom('D1'))
 
 
-myProtocol.dispense_to(20, corning_384('N1'))
-myProtocol.dispense_to(20, corning_384('N2'))
-myProtocol.dispense_to(20, corning_384('N3'))
-myProtocol.dispense_to(20, corning_384('N4'))
-myProtocol.dispense_to(20, corning_384('N5'))
+myProtocol.dispense_to(20, corning_384('H7'))
+myProtocol.dispense_to(20, corning_384('H8'))
+myProtocol.dispense_to(20, corning_384('H9'))
+myProtocol.dispense_to(20, corning_384('H10'))
+myProtocol.dispense_to(20, corning_384('H11'))
 
 myProtocol.mid_wash()
 
 myProtocol.aspirate_from(60, custom_small('D1'))
 myProtocol.dispense_to(0, custom('D1'))
 
-myProtocol.dispense_to(10, corning_384('O1'))
-myProtocol.dispense_to(10, corning_384('O2'))
-myProtocol.dispense_to(10, corning_384('O3'))
-myProtocol.dispense_to(10, corning_384('O4'))
-myProtocol.dispense_to(10, corning_384('O5'))
+myProtocol.dispense_to(10, corning_384('I7'))
+myProtocol.dispense_to(10, corning_384('I8'))
+myProtocol.dispense_to(10, corning_384('I9'))
+myProtocol.dispense_to(10, corning_384('I10'))
+myProtocol.dispense_to(10, corning_384('I11'))
 
 myProtocol.mid_wash()
 
 myProtocol.aspirate_from(30, custom_small('D1'))
 myProtocol.dispense_to(0, custom('D1'))
 
-myProtocol.dispense_to(5, corning_384('P1'))
-myProtocol.dispense_to(5, corning_384('P2'))
-myProtocol.dispense_to(5, corning_384('P3'))
-myProtocol.dispense_to(5, corning_384('P4'))
-myProtocol.dispense_to(5, corning_384('P5'))
+myProtocol.dispense_to(5, corning_384('J7'))
+myProtocol.dispense_to(5, corning_384('J8'))
+myProtocol.dispense_to(5, corning_384('J9'))
+myProtocol.dispense_to(5, corning_384('J10'))
+myProtocol.dispense_to(5, corning_384('J11'))
 
 myProtocol.mid_wash()
 

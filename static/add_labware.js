@@ -73,11 +73,8 @@ $(document).ready( function(){
 
     // Event handler in case the radio button for "Plate" is clicked
     selectedPlate.onclick = function() {
-
         uploadNewModel.disabled = false; // Activate the upload new model button
-
         fill_model_options("plates");
-
     }
 
     // This method checks the values of the model select object when it's clicked upon
@@ -86,7 +83,6 @@ $(document).ready( function(){
         // This returns the value of the selection
         var selected_model = modelOptions.options[ modelOptions.selectedIndex ].value;
         console.log(selected_model)
-        // console.log(selected_model);
         if ( (selected_model != "- Select a Model -") && (selected_model != "- Select Chip or Reagent Plate -") ) {
             calibrateButton.disabled = false;
             loadCalibrationButton.disabled = false;
@@ -100,20 +96,17 @@ $(document).ready( function(){
     // Event listener for the form object. Gets activated when the submit button is pressed and captures the values entered
     form.addEventListener("submit", function(event) {
         var data = new FormData(form); // This stores all the values captured in the form entered by the user
+        console.log("Form data: ", data)
         var command = []; // This array will hold the values to be sent to the python code
         var index = 0;
         for (const entry of data) {
-        command[index] = entry[1]; // extract the useful information in each entry (only in index 1, index 0 containes the "name" identifier of each HTML input component)
-        index++;
+            command[index] = entry[1]; // extract the useful information in each entry (only in index 1, index 0 containes the "name" identifier of each HTML input component)
+            index++;
         };
 
         console.log(command); // example output: ["c", "SZ002"]
-
-        // alert("Accept to continue");
-
         // Send the data captured from the form to the Python code through the socket
         socket.emit("calibration_parameters", command);
-
         document.getElementById("myForm").reset(); // This resets the values of the form after it has been submitted
         event.preventDefault(); // don't know if this is needed
     }, false
