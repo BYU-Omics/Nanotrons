@@ -9,6 +9,27 @@ var delete_form = document.getElementById("delete_form");
 
 socket.emit("give_me_current_labware");
 
+
+/*function remove_component_onclick(){
+    console.log("remove_component_onclick called!");
+    var option_selected = chip_plate_select.options[ chip_plate_select.selectedIndex ].value;
+    console.log(option_selected);
+    var current_labware_selected = option_selected;
+    var labware_selected_changed = current_labware_selected != previous_labware_selected;
+
+    if (labware_selected_changed) {
+        // Erase all the options inside the dropdown list (select object)
+        var length = component_locations_select.options.length;
+        // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
+        for (var i = length - 1; i >= 0; i--) {
+            if (labware_selected_changed == component_locations_select.attachInternals(i){
+                component_locations_select.remove(i);
+            }
+        };
+
+}
+*/
+
 socket.on("here_current_labware", function(labware_dict) {
     console.log(labware_dict);
 

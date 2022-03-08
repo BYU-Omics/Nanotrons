@@ -5173,6 +5173,8 @@
 </head>
 
 <body class=''>
+    
+    <link rel= "stylesheet" type= "text/css" href= "/static/styles/labware.css">
     <script type="text/javascript">
         var bodyCacheable = true;
 
@@ -7340,17 +7342,13 @@
                                                         <p class="font_2" style="font-size:16px; line-height:1.3em;">
                                                             <span class="color_15"><span
                                                                     style="font-family:futura-lt-w01-light,sans-serif;"><span
-                                                                        style="letter-spacing:0em;"><span
-                                                                            style="font-size:16px;">Place holder for
-                                                                            list of currently stored labware
-                                                                            files.&nbsp;</span></span></span></span></p>
+                                                                        style="letter-spacing:0em;"><ol id="current_files"></ol></span></span></span></p>
                                                     </div>
                                                     <div id="comp-kz6669ed" class="_2UdPt"></div>
                                                     <div id="comp-kz669amb" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
                                                         <div data-testid="linkElement" class="vjMqk"
-                                                            aria-disabled="false"><span class="_2TTZA">Remove
-                                                                File</span></div>
+                                                            aria-disabled="false"><button class="_2TTZA" id="delete_button" onclick="remove_component_onclick()">Remove File</button></div>
                                                     </div>
                                                     <div id="comp-kz6554kr" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
@@ -7574,7 +7572,7 @@
                                                     </div>
                                                     <div id="comp-kz65st8g" class="_2dBhC _65cjg">
                                                         <div class="XRJUI"><input type="text" name="file-name"
-                                                                id="input_comp-kz65st8g" class="_1SOvY has-custom-focus"
+                                                                id="file_name" class="_1SOvY has-custom-focus"
                                                                 value="" placeholder="File Name" required=""
                                                                 aria-label="File Name" /></div>
                                                     </div>
@@ -7590,8 +7588,9 @@
                                                     <div id="comp-kz65nwos" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
                                                         <div data-testid="linkElement" class="vjMqk"
-                                                            aria-disabled="false"><span class="_2TTZA">Save File</span>
+                                                            aria-disabled="false"><button class="_2TTZA" id="save_to_file_btn">Save File</button>
                                                         </div>
+                                                        <label id="feedback"></label>
                                                     </div>
                                                     <div id="comp-kzd6ggdy" class="_2UdPt"></div>
                                                     <div id="comp-kzd6hdzz" class="_3mguU">
@@ -7687,7 +7686,7 @@
         id="wix-warmup-data">{"platform":{"ssrPropsUpdates":[],"ssrStyleUpdates":[]},"appsWarmupData":{},"ooi":{"failedInSsr":{}}}</script>
     <!-- warmup data end -->
 
-
+    
     <script src="/static/labware.js"></script>
     <script src="/static/save_labware_setup.js"></script>
     <script src="/static/add_labware.js"></script>
