@@ -243,6 +243,14 @@ function reset_chip_plate_options() {
     chip_plate_select.add(new_option);
 }
 
+
+function rate_to_distance_converter(){
+    let infusion_rate = document.getElementById("infusion_rate");
+    let withdraw_rate = document.getElementById("withdraw_rate");
+    console.log("Rates: ", infusion_rate, withdraw_rate);
+    socket.emit("rate_to_distance_converter", [infusion_rate, withdraw_rate]);
+}
+
 function populate_component_models() {
     var index = 1;
     for (let chip_summary of labware_summary.chips) {

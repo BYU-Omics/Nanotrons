@@ -90,6 +90,8 @@ class OT2_nanotrons_driver(SM):
         # Attributes that control the size and speed of the plunger. 
         self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
         self.s_step_speed = SLOW_SPEED #Step speed for the syringe
+        self.s_step_size_infusion = 0
+        self.s_step_size_withdraw = 0
 
         self.nL = 0 #nanoliters that the syringe is currently working with
         self.side = LEFT 
@@ -347,6 +349,12 @@ class OT2_nanotrons_driver(SM):
 
     def set_step_size_syringe_motor(self, new_step_size):
         self.s_step_size = new_step_size
+
+    def set_step_size_syringe_motor_infusion(self, new_step_size):
+        self.s_step_size_infusion = new_step_size
+    
+    def set_step_size_syringe_motor_withdraw(self, new_step_size):
+        self.s_step_size_withdraw = new_step_size
 
     def set_step_speed_xyz_motor(self, new_step_speed):
         self.s_step_speed = new_step_speed

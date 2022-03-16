@@ -76,6 +76,8 @@ PLATE_DEPTH = "Plate's depth"
 AIR_GAP_NL_AMOUNT = 50
 AIR_GAP_ASPIRATING_Z_STEP_DISTANCE = 25
 
+DEFAULT_RATE = 50 # nL/sec
+
 
 STANDARD_LEFT_OVER = 200
 STANDARD_CUSHION_1 = 200
@@ -389,6 +391,42 @@ class Coordinator:
         # Return the distance needed to displace that amount of volume
         self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
+
+    def rate_to_distance_converter(self, infusion_rate = DEFAULT_RATE, withdraw_rate = DEFAULT_RATE):
+        """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
+
+        Args:
+            volume ([float]): volume of liquid to be converted. UNIT: NANOLITERS
+
+        Returns:
+            [float]: displacement that results in the displacement of the provided volume on the syringe. UNIT: MILIMETERS
+        """
+        # Get the current syringe model
+        syringe_model = self.myLabware.get_syringe_model()
+        
+        # Extract syringe radius
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        diameter = syringe_parameters["inner_diameter"] # This parameter has units of mm
+        radius = diameter / 2
+                 
+        # rate = nL/sec
+        print(f"infusion_rate: {infusion_rate}")
+        print(f"withdraw_rate: {withdraw_rate}")
+        infusion_volume = infusion_rate * 60 * 10^(-9)
+        withdraw_volume = withdraw_rate * 60 * 10^(-9)
+
+        # Calculate area and distance (height of the cylindric volume)
+        area = (math.pi * radius * radius) # Basic formula for area
+        infusion_distance_in_mm = infusion_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
+        withdraw_distance_in_mm = withdraw_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
+
+        infusion_distance_to_feed_to_stepper_motor = infusion_distance_in_mm * UNIT_CONVERSION
+        withdraw_distance_to_feed_to_stepper_motor = withdraw_distance_in_mm * UNIT_CONVERSION
+
+        # Return the distance needed to displace that amount of volume
+        self.ot_control.set_step_size_syringe_motor_infusion(infusion_distance_to_feed_to_stepper_motor)
+        self.ot_control.set_step_size_syringe_motor_withdraw(withdraw_distance_to_feed_to_stepper_motor)
+        return 0
         
     def aspirate(self, volume, speed = SLOW_SPEED): 
         """ Pick up amount in nL and speed in nL/min  """

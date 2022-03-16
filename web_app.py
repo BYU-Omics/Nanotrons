@@ -5,6 +5,7 @@ WEB APP SCRIPT
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
+from pickletools import read_bytes1
 import cv2
 import os
 import time
@@ -373,6 +374,13 @@ def get_syringe_settings():
     step_s = coordinator.get_syringe_settings()
     socketio.emit("get_syringe_settings", step_s)
     # print(step_s)
+
+
+@socketio.on("rate_to_distance_converter")
+def rate_to_distance_converter(rates):
+    print(f"Rates: {rates}")
+    infusion_rate, withdraw_rate = rates[0], rates[1]
+    coordinator.rate_to_distance_converter(infusion_rate, withdraw_rate)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
