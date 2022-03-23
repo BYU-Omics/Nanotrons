@@ -1,7 +1,7 @@
 
 """
 WEB APP SCRIPT
-    This script is the heart/brain of the system. It has an instance of Coordinator through which it sends and receives commands and 
+    This script is the heart and brain of the system. It has an instance of Coordinator through which it sends and receives commands and 
     information respectively. It also hosts a server through which it can interface with the user, using predefined html templates 
     linked to registered server routes.
 """
@@ -25,7 +25,7 @@ ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LABWARE_SYRINGE = "s"
-CAMERA_PORT = 0
+CAMERA_PORT = 2
 CAMERA_PORT_MACBOOK = 1
 PIPPETE_CAMERA_PORT = 1
 PIPPETE_CAMERA_PORT_MACBOOK = 2
