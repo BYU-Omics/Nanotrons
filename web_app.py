@@ -20,7 +20,7 @@ from coordinator import *
 from python_execute import Py_Execute
 import platform
 import datetime
-from constants import RUNNING_APP_FOR_REAL
+from constants import RUNNING_APP_FOR_REAL, THERMOCYCLER_CONNECTED
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -339,8 +339,8 @@ def stop_deliver_coordinates():
 #----------------------------------------------- MANUAL CONTROL PAGE EVENTS SECTION
 @socketio.on("start_manual_control_window")
 def start_manual_control_window():
-    # print("Manual control")
-    coordinator.ot_control.set_tc_flag(is_tc_mounted=True)
+    print("Manual control")
+    coordinator.ot_control.set_tc_flag(is_tc_mounted=THERMOCYCLER_CONNECTED)
     coordinator.manual_control()
 
 @socketio.on("stop_manual_control_window")

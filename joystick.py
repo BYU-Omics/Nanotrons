@@ -163,6 +163,7 @@ class XboxJoystick:
         
     # Read the state of the buttons in the joystick
     def read_buttons(self):
+        print("Reading buttons")
         self.buttons = [self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())]
         if self.buttons[LEFT_BUMPER_INDEX] == 1:
             self.buttons[LEFT_BUMPER_INDEX] = 1 * self.bumpers_direction
@@ -195,12 +196,20 @@ class XboxJoystick:
         # associated function
     def deliver_buttons(self):
         pressed_buttons = []
+        # print(f"OS: {self.os}")
+        # print(f"buttons: {len(self.buttons)}")
         for button in range(len(self.buttons)):
+            print(f"button: {self.buttons[button]}")
             if self.buttons[button] != 0:
+                # print(f"buttons[button]: {self.buttons[button]}")
+                # print(f"Is os windows: {self.os == WINDOWS_OS}")
                 if self.os == WINDOWS_OS:
+                    # print("In windows")
                     pressed_buttons.append(BUTTONS_DICT_W[button])
                 elif self.os == RASPBERRY_OS:
                     pressed_buttons.append(BUTTONS_DICT_R[button])
+            
+                # print(f"Buttons are: {self.buttons}")
         return pressed_buttons
 
     # This returns a list of strings that represent all the hats that are currently being pressed
@@ -230,12 +239,20 @@ class XboxJoystick:
     """
     # Listens to the controller's input
     def listen(self):
+        print("Listen()")
         self.reset_values() # reset the values read from the last call for listen_one()
         self.keep_listening = True
         while (self.keep_listening):
+            # print("In while loop")
             # EVENT DETECTION AND PRINT
             # Possible joystick actions: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN, JOYBUTTONUP, JOYHATMOTION
+            # print(len(pygame.event.get()))
             for event in pygame.event.get(): # User did something.
+                # print(f"Event type: {event.type}")
+                # print(f"Event button up: {pygame.JOYBUTTONDOWN}")
+                # print(f"Event butn dwn: {pygame.JOYBUTTONUP}")
+                # print(f"Event axis: {pygame.JOYAXISMOTION}")
+                # print(f"Event hat: {pygame.JOYHATMOTION}")
                 if event.type == pygame.JOYBUTTONDOWN:
                     self.read_buttons()
                     # print(self.get_buttons())

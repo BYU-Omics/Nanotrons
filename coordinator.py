@@ -58,7 +58,7 @@ from collections import deque
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
-WINDOWS_OS = 'nt'
+WINDOWS_OS = "nt"
 MACBOOK_OS = 'Darwin'
 UNIT_CONVERSION  = 4.23 #3.8896 4.16
 INBETWEEN_LIFT_DISTANCE = -10 # Default distance the syringe will be lifted/lowered when going from one nanopots well\reagent pot to another
@@ -103,6 +103,7 @@ class Coordinator:
         """
         operating_system = ""
         os_recognized = os.name
+        print(f"OS recognized in init: {os_recognized}")
         self.ot_control = OT2_nanotrons_driver()
         
         self.myLabware = Labware_class()
@@ -113,9 +114,10 @@ class Coordinator:
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
+            print("Init function Windows")
             operating_system = "w"
             if RUNNING_APP_FOR_REAL and CONTROLLER_CONNECTED:
-                self.myController = XboxJoystick(operating_system)
+                self.myController = XboxJoystick("w")
         elif os_recognized == LINUX_OS:
             logging.info("Operating system: Linux")
             operating_system = "r"
@@ -192,10 +194,13 @@ class Coordinator:
     def monitor_joystick(self):
         """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
         """
+        print("Monitoring joystick")
         axes = self.myController.deliver_axes() # Dictionary with the axes index and value that are being pressed
         buttons = self.myController.deliver_buttons() # List with strings according to the buttons currently being pressed
         hats = self.myController.deliver_hats() # List with strings according to the buttons currently being pressed
-        
+        print(f"axes: {axes}")
+        print(f"buttons: {buttons}")
+        print(f"hats: {hats}")
         for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
             if axis_index == 2:
                 if self.myController.axes[2] > 0:
@@ -231,20 +236,15 @@ class Coordinator:
     def manual_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
-        if platform.system() == MACBOOK_OS:
-            try:
-                self.myController.listen()
-            except AttributeError:
-                print("No controller connected")
-        else:
-            try:  
-                t1 = threading.Thread(target=self.myController.listen)
-                t1.start()
-                while(t1.is_alive()):
-                    self.monitor_joystick()
-                    time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
-            except AttributeError:
-                print("No controller connected")
+        try:  
+            t1 = threading.Thread(target=self.myController.listen)
+            t1.start()
+            while(t1.is_alive()):
+                # self.myController.listen()
+                self.monitor_joystick()
+                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
+        except AttributeError:
+            print("No controller connected")
 
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
