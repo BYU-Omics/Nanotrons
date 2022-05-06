@@ -95,6 +95,12 @@ function set_temperature() {
     socket.emit("set_temperature", [btemp.value, htime.value]);
 }
 
+function rate_to_distance_converter() {
+    let infusion_rate = document.getElementById("infusion_rate");
+    let withdraw_rate = document.getElementById("withdraw_rate");
+    socket.emit("rate_to_distance_converter", [infusion_rate.value, withdraw_rate.value]);
+}
+
 function set_lid_temperature() {
     let ltemp = document.getElementById("ltemp");
     socket.emit("set_lid_temperature", ltemp.value);

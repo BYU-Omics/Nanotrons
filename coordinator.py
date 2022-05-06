@@ -194,13 +194,13 @@ class Coordinator:
     def monitor_joystick(self):
         """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
         """
-        print("Monitoring joystick")
+       # print("Monitoring joystick")
         axes = self.myController.deliver_axes() # Dictionary with the axes index and value that are being pressed
         buttons = self.myController.deliver_buttons() # List with strings according to the buttons currently being pressed
         hats = self.myController.deliver_hats() # List with strings according to the buttons currently being pressed
-        print(f"axes: {axes}")
-        print(f"buttons: {buttons}")
-        print(f"hats: {hats}")
+        # print(f"axes: {axes}")
+        # print(f"buttons: {buttons}")
+        # print(f"hats: {hats}")
         for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
             if axis_index == 2:
                 if self.myController.axes[2] > 0:
@@ -412,20 +412,25 @@ class Coordinator:
         # rate = nL/sec
         print(f"infusion_rate: {infusion_rate}")
         print(f"withdraw_rate: {withdraw_rate}")
-        infusion_volume = infusion_rate * 60 * 10^(-9)
-        withdraw_volume = withdraw_rate * 60 * 10^(-9)
-
+        infusion_volume = infusion_rate * 60 #* 0.000000001
+        withdraw_volume = withdraw_rate * 60 #* 0.000000001
+        print(f"infusion_volume: {infusion_volume}")
+        print(f"withdraw_volume: {withdraw_volume}")
         # Calculate area and distance (height of the cylindric volume)
         area = (math.pi * radius * radius) # Basic formula for area
         infusion_distance_in_mm = infusion_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
         withdraw_distance_in_mm = withdraw_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
-
+        print(f"infusion_distance_in_mm: {infusion_distance_in_mm}")
+        print(f"withdraw_distance_in_mm: {withdraw_distance_in_mm}")
         infusion_distance_to_feed_to_stepper_motor = infusion_distance_in_mm * UNIT_CONVERSION
         withdraw_distance_to_feed_to_stepper_motor = withdraw_distance_in_mm * UNIT_CONVERSION
+        
 
+        print(f"mm/sec: {infusion_distance_in_mm}")
+        print(f"mm/sec: {withdraw_distance_in_mm}")
         # Return the distance needed to displace that amount of volume
-        self.ot_control.set_step_size_syringe_motor_infusion(infusion_distance_to_feed_to_stepper_motor)
-        self.ot_control.set_step_size_syringe_motor_withdraw(withdraw_distance_to_feed_to_stepper_motor)
+        self.ot_control.set_step_size_syringe_motor_infusion(infusion_distance_in_mm)
+        self.ot_control.set_step_size_syringe_motor_withdraw(withdraw_distance_in_mm)
         return 0
         
     def aspirate(self, volume, speed = SLOW_SPEED): 

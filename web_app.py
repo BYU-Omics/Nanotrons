@@ -339,7 +339,7 @@ def stop_deliver_coordinates():
 #----------------------------------------------- MANUAL CONTROL PAGE EVENTS SECTION
 @socketio.on("start_manual_control_window")
 def start_manual_control_window():
-    print("Manual control")
+    #print("Manual control")
     coordinator.ot_control.set_tc_flag(is_tc_mounted=THERMOCYCLER_CONNECTED)
     coordinator.manual_control()
 
@@ -375,11 +375,10 @@ def get_syringe_settings():
     socketio.emit("get_syringe_settings", step_s)
     # print(step_s)
 
-
 @socketio.on("rate_to_distance_converter")
 def rate_to_distance_converter(rates):
-    print(f"Rates: {rates}")
-    infusion_rate, withdraw_rate = rates[0], rates[1]
+    # print(f"Rates: {rates}")
+    infusion_rate, withdraw_rate = float(rates[0]), float(rates[1])
     coordinator.rate_to_distance_converter(infusion_rate, withdraw_rate)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
@@ -593,13 +592,13 @@ def get_current_labware():
     labware_slot = {"chips":[], "plates":[]}
     for i in range (len(new_key)-1): #length minus one so that we do not run syringes. It throws an error when making the syring into a list and we don't need it anyways
         second_key = list(labware[new_key[i]]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
-        print(second_key)
+        #print(second_key)
         for j in range(0, len(second_key)):
             slot = 0
             piece_of_labware = ""
             coordinates = labware[new_key[i]][second_key[j]]    
             #print(f"VAR COORDINATES: {coordinates}") # used to test if coordinates were correct
-            print(f"Labware: {second_key[j]}")
+            #print(f"Labware: {second_key[j]}")
             if coordinates[0] < 116.67:
                 if coordinates[1] < 123.25:
                     slot = 1
@@ -665,7 +664,7 @@ def get_current_labware():
             
             labware_slot[new_key[i]]  += [piece_of_labware, slot]
     
-    print(f"Returning: {labware_slot} ")
+    #print(f"Returning: {labware_slot} ")
     socketio.emit("labware_locations_dict", labware_slot)  
     socketio.emit("here_current_labware", labware)
 

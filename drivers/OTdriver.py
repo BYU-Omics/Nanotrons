@@ -90,8 +90,8 @@ class OT2_nanotrons_driver(SM):
         # Attributes that control the size and speed of the plunger. 
         self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
         self.s_step_speed = SLOW_SPEED #Step speed for the syringe
-        self.s_step_size_infusion = 0
-        self.s_step_size_withdraw = 0
+        self.s_step_size_infusion = SLOW_SPEED
+        self.s_step_size_withdraw = SLOW_SPEED
 
         self.nL = 0 #nanoliters that the syringe is currently working with
         self.side = LEFT 
@@ -256,7 +256,8 @@ class OT2_nanotrons_driver(SM):
         b_pos: float = self._position['B'] # stores the current position
         b_pos += size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size)): # if the future position is a valid move 
-            self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
+            print(self.s_step_size_withdraw)
+            self.move({'B': b_pos}, speed=self.s_step_size_withdraw) # move to the indicated position
 
     def plunger_L_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         # print(f"Size aspirating:{size}")
@@ -265,7 +266,8 @@ class OT2_nanotrons_driver(SM):
         b_pos: float = self._position['B'] # stores the current position
         b_pos -= size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size*(-1))):
-            self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
+            print(self.s_step_size_infusion)
+            self.move({'B': b_pos}, speed= self.s_step_size_infusion) # move to the indicated position
 
     def plunger_R_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         if self.flag == True:
@@ -273,7 +275,7 @@ class OT2_nanotrons_driver(SM):
         c_pos: float = self._position['C'] # stores the current position
         c_pos = c_pos + size # adds a step size to the current position
         if(self.check_for_valid_move(c_pos, 'B', size)): # if the future position is a valid move 
-            self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
+            self.move({'C': c_pos}, speed= speed) # move to the indicated position
 
     def plunger_R_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         if self.flag == True:
@@ -405,9 +407,9 @@ class OT2_nanotrons_driver(SM):
     def joystick_step_syringe_motor(self, direction = 1):
         if self.side == LEFT:    
             if direction > 0:
-                self.plunger_L_Down(self.s_step_size, self.s_step_speed)
+                self.plunger_L_Down(self.s_step_size, self.s_step_size_infusion)
             elif direction < 0:
-                self.plunger_L_Up(self.s_step_size, self.s_step_speed)
+                self.plunger_L_Up(self.s_step_size, self.s_step_size_withdraw)
             else:
                 pass
 

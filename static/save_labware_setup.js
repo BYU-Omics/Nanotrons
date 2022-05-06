@@ -15,7 +15,7 @@ console.log("Loading page")
 socket.on("saved_labware_files", function(files_list) {
     stored_files_list = files_list;
     console.log(stored_files_list);
-    for (var i = 0; i < files_list.length; i++){
+    for (var i = 0; i < files_list.length / 2 ; i++){
         var node = document.createElement('li'); // Create a list element
         node.appendChild(document.createTextNode(files_list[i])); // Append a text node to the list element node
         stored_files_component.appendChild(node); // Add the node to the labware list

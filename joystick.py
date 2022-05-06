@@ -163,7 +163,7 @@ class XboxJoystick:
         
     # Read the state of the buttons in the joystick
     def read_buttons(self):
-        print("Reading buttons")
+        # print("Reading buttons")
         self.buttons = [self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())]
         if self.buttons[LEFT_BUMPER_INDEX] == 1:
             self.buttons[LEFT_BUMPER_INDEX] = 1 * self.bumpers_direction
@@ -199,7 +199,7 @@ class XboxJoystick:
         # print(f"OS: {self.os}")
         # print(f"buttons: {len(self.buttons)}")
         for button in range(len(self.buttons)):
-            print(f"button: {self.buttons[button]}")
+            #print(f"button: {self.buttons[button]}")
             if self.buttons[button] != 0:
                 # print(f"buttons[button]: {self.buttons[button]}")
                 # print(f"Is os windows: {self.os == WINDOWS_OS}")
@@ -239,7 +239,7 @@ class XboxJoystick:
     """
     # Listens to the controller's input
     def listen(self):
-        print("Listen()")
+        # print("Listen()")
         self.reset_values() # reset the values read from the last call for listen_one()
         self.keep_listening = True
         while (self.keep_listening):
@@ -278,7 +278,7 @@ class XboxJoystick:
 
     """
     TO STRING SECTION 
-    """
+    
     def to_string_buttons(self):
         return f"Buttons: {self.buttons}"
 
@@ -301,3 +301,5 @@ def testing():
 
 if __name__ == "__main__":
     testing()
+
+"""
