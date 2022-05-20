@@ -16,7 +16,7 @@ myProtocol = Api() # creates a protocol object using the Api
 metadata = {
 	'protocolName': 'Standard_fluorescein_test_uL.py', 
 	'author': 'Yhann Masbernat / Alex Buttars', 
-	'description': 'Standard Fluorescein test using syringe 1702.' 
+	'description': 'Standard Fluorescein test using syringe 1705.' 
 }
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
@@ -41,7 +41,7 @@ waste_water = custom('A1')
 wash_water = custom('A2')
 clean_water = custom('A3')
 
-myProtocol.set_syringe_model("HAMILTON_1702")
+myProtocol.set_syringe_model("HAMILTON_1705")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
@@ -49,88 +49,135 @@ myProtocol.start_wash()
 
 # ------------START OF PROTOCOL---------------------------------
 
-myProtocol.aspirate_from(20, custom_small('A1')) # 10 uM Solution
-myProtocol.dispense_to(20, corning_384('A1'))
+myProtocol.aspirate_from(20000, custom_small('A1')) # 10 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('A6'))
 
-myProtocol.aspirate_from(20, custom_small('A1'))
-myProtocol.dispense_to(20, corning_384('A2'))
+myProtocol.aspirate_from(20000, custom_small('A1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('A7'))
 
-myProtocol.aspirate_from(20, custom_small('A1'))
-myProtocol.dispense_to(20, corning_384('A3'))
+myProtocol.aspirate_from(20000, custom_small('A1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('A8'))
 
-myProtocol.aspirate_from(20, custom_small('A1'))
-myProtocol.dispense_to(20, corning_384('A4'))
+myProtocol.aspirate_from(20000, custom_small('A1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('A9'))
 
-myProtocol.aspirate_from(20, custom_small('A1'))
-myProtocol.dispense_to(20, corning_384('A5'))
-
-myProtocol.mid_wash()
-
-myProtocol.aspirate_from(20, custom_small('B1')) # 8 uM Solution
-myProtocol.dispense_to(20, corning_384('B1'))
-
-myProtocol.aspirate_from(20, custom_small('B1'))
-myProtocol.dispense_to(20, corning_384('B2'))
-
-myProtocol.aspirate_from(20, custom_small('B1'))
-myProtocol.dispense_to(20, corning_384('B3'))
-
-myProtocol.aspirate_from(20, custom_small('B1'))
-myProtocol.dispense_to(20, corning_384('B4'))
-
-myProtocol.aspirate_from(20, custom_small('B1'))
-myProtocol.dispense_to(20, corning_384('B5'))
+myProtocol.aspirate_from(20000, custom_small('A1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('A10'))
 
 myProtocol.mid_wash()
 
-myProtocol.aspirate_from(20, custom_small('C1')) # 6 uM Solution
-myProtocol.dispense_to(20, corning_384('C1'))
+myProtocol.aspirate_from(20000, custom_small('B1')) # 8 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('B6'))
 
-myProtocol.aspirate_from(20, custom_small('C1'))
-myProtocol.dispense_to(20, corning_384('C2'))
+myProtocol.aspirate_from(20000, custom_small('B1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('B7'))
 
-myProtocol.aspirate_from(20, custom_small('C1'))
-myProtocol.dispense_to(20, corning_384('C3'))
+myProtocol.aspirate_from(20000, custom_small('B1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('B8'))
 
-myProtocol.aspirate_from(20, custom_small('C1'))
-myProtocol.dispense_to(20, corning_384('C4'))
+myProtocol.aspirate_from(20000, custom_small('B1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('B9'))
 
-myProtocol.aspirate_from(20, custom_small('C1'))
-myProtocol.dispense_to(20, corning_384('C5'))
-
-myProtocol.mid_wash()
-
-myProtocol.aspirate_from(20, custom_small('D1')) # 4 uM Solution
-myProtocol.dispense_to(20, corning_384('D1'))
-
-myProtocol.aspirate_from(20, custom_small('D1'))
-myProtocol.dispense_to(20, corning_384('D2'))
-
-myProtocol.aspirate_from(20, custom_small('D1'))
-myProtocol.dispense_to(20, corning_384('D3'))
-
-myProtocol.aspirate_from(20, custom_small('D1'))
-myProtocol.dispense_to(20, corning_384('D4'))
-
-myProtocol.aspirate_from(20, custom_small('D1'))
-myProtocol.dispense_to(20, corning_384('D5'))
+myProtocol.aspirate_from(20000, custom_small('B1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('B10'))
 
 myProtocol.mid_wash()
 
-myProtocol.aspirate_from(20, custom_small('E1')) # 2 uM Solution
-myProtocol.dispense_to(20, corning_384('E1'))
+myProtocol.aspirate_from(20000, custom_small('C1')) # 6 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('C6'))
 
-myProtocol.aspirate_from(20, custom_small('E1'))
-myProtocol.dispense_to(20, corning_384('E2'))
+myProtocol.aspirate_from(20000, custom_small('C1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('C7'))
 
-myProtocol.aspirate_from(20, custom_small('E1'))
-myProtocol.dispense_to(20, corning_384('E3'))
+myProtocol.aspirate_from(20000, custom_small('C1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('C8'))
 
-myProtocol.aspirate_from(20, custom_small('E1'))
-myProtocol.dispense_to(20, corning_384('E4'))
+myProtocol.aspirate_from(20000, custom_small('C1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('C9'))
 
-myProtocol.aspirate_from(20, custom_small('E1'))
-myProtocol.dispense_to(20, corning_384('E5'))
+myProtocol.aspirate_from(20000, custom_small('C1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('C10'))
+
+myProtocol.mid_wash()
+
+myProtocol.aspirate_from(20000, custom_small('D1')) # 4 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('D6'))
+
+myProtocol.aspirate_from(20000, custom_small('D1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('D7'))
+
+myProtocol.aspirate_from(20000, custom_small('D1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('D8'))
+
+myProtocol.aspirate_from(20000, custom_small('D1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('D9'))
+
+myProtocol.aspirate_from(20000, custom_small('D1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('D10'))
+
+myProtocol.mid_wash()
+
+myProtocol.aspirate_from(20000, custom_small('E1')) # 2 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('E6'))
+
+myProtocol.aspirate_from(20000, custom_small('E1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('E7'))
+
+myProtocol.aspirate_from(20000, custom_small('E1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('E8'))
+
+myProtocol.aspirate_from(20000, custom_small('E1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('E9'))
+
+myProtocol.aspirate_from(20000, custom_small('E1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('E10'))
+
+myProtocol.mid_wash()
+
+myProtocol.aspirate_from(20000, custom_small('F1')) # 0 uM Solution
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('F6'))
+
+myProtocol.aspirate_from(20000, custom_small('F1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('F7'))
+
+myProtocol.aspirate_from(20000, custom_small('F1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('F8'))
+
+myProtocol.aspirate_from(20000, custom_small('F1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('F9'))
+
+myProtocol.aspirate_from(20000, custom_small('F1'))
+myProtocol.dispense_to(0, custom('D1'))
+myProtocol.dispense_to(20000, corning_384('F10'))
 
 myProtocol.mid_wash()
 

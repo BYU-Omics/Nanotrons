@@ -49,68 +49,10 @@ myProtocol.start_wash()
 2000000
 # ------------START OF PROTOCOL---------------------------------
 
-# L wells 
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L6'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L7'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L8'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L9'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L10'))
-
-# M wells 
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M6'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M7'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M8'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M9'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M10'))
-
-# N wells
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N6'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N7'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N8'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N9'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N10'))
-
 # O wells 
 
 myProtocol.aspirate_from(20000, custom('A5'))
 myProtocol.dispense_to(20000, corning_384('O6'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O7'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O8'))
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O9'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
 myProtocol.dispense_to(20000, corning_384('O10'))
