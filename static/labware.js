@@ -32,6 +32,7 @@ socket.emit("give_me_current_labware");
 }*/
 
 
+
 socket.on("here_current_labware", function(labware_dict) {
     console.log(labware_dict);
 

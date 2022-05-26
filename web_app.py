@@ -508,6 +508,7 @@ def check_tempdeck_status():
 def calibration_parameters(component_information):
     # Empty pre-existing components
     print(componentToCalibrate)
+    print(component_information)
 
     componentToCalibrate.clear()
     print(componentToCalibrate)
