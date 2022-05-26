@@ -147,6 +147,7 @@ def protocol_execution():
     return render_template("protocol_execution_wix.html")
 
 @app.route('/protocol_creation')
+
 def batch_page():
     return render_template("protocol_creation_wix.html")
 
@@ -506,10 +507,17 @@ def check_tempdeck_status():
 @socketio.on("calibration_parameters")
 def calibration_parameters(component_information):
     # Empty pre-existing components
+    print(componentToCalibrate)
+
     componentToCalibrate.clear()
+    print(componentToCalibrate)
+   # print(component_information)
+
     # component_information comes in the following format: ["c", "SZ002"]
     componentToCalibrate.append(component_information[0]) # Type of component: either "c" or "p" for chip and plate. respectively
     componentToCalibrate.append(component_information[1]) # Component model
+    print(componentToCalibrate)
+
 
 @socketio.on("start_calibration")
 def start_calibration():
@@ -672,6 +680,11 @@ def get_current_labware():
 def delete_current_labware():
     coordinator.myLabware.chip_list.clear()
     coordinator.myLabware.plate_list.clear()
+
+@socketio.on("remove_component_onclick")
+def remove_component_onclick():
+    print(f"hello world")
+
 
 @socketio.on("delete_labware")
 def delete_labware(command):
