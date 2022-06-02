@@ -42,8 +42,8 @@ class Api:
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
-    def aspirate_from(self, volume, source):
-        self.coordinator.aspirate_from(volume, source)
+    def aspirate_from(self, volume, source, rate):
+        self.coordinator.aspirate_from(volume, source, rate)
         self.amount_wanted = volume
 
     def dispense_to(self, volume, to):

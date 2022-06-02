@@ -69,7 +69,6 @@ DEFAULT_PROFILE = "default_profile.json"
 PIPPETE_POSITION_WHEN_MOVING_TC_LID = '5'
 FROM_NANOLITERS = 0.001
 REFRESH_COORDINATE_INTERVAL = 0.1
-ASPIRATE_SPEED = SLOW_SPEED
 POSITION_IN_Z_TO_PLACE_WHEN_GOING_TO_SLOT = 150
 TIME_TO_SETTLE = 1 #SECOND
 PLATE_DEPTH = "Plate's depth"
@@ -344,36 +343,39 @@ class Coordinator:
         location = self.myLabware.get_pot_location(plate, pot_nickname) # [x, y, z]
         self.go_to_position(location)
     
-    def pick_up_liquid(self, volume, speed = SLOW_SPEED): 
+    def pick_up_liquid(self, volume, rate = DEFAULT_RATE): 
         """ Sends a command to the syringe motor to displace a distance that is equivalent to aspirating a given volume of liquid
 
         Args:
             volume ([float]): volume of liquid to be aspirated. UNIT: NANOLITERS
             speed ([float]): speed at which the given volume of liquid will be aspirated. UNIT: MILIMITERS/SECOND
-        """     
-        step_displacement = self.volume_to_displacement_converter(volume) 
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Up(size=self.ot_control.s_step_size)
+        """ 
 
-    def drop_off_liquid(self, volume, speed =SLOW_SPEED):
+        speed = self.flowrate_to_speed_converter(rate)
+        step_displacement = self.volume_to_distance_converter(volume) 
+        self.ot_control.set_step_size_syringe_motor(step_displacement)
+        self.ot_control.plunger_L_Up(step_displacement, speed)
+
+    def drop_off_liquid(self, volume, rate = DEFAULT_RATE):
         """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
 
         Args:
             volume ([float]): volume of liquid to be dispensed,. UNIT: NANOLITERS
             speed ([float]): speed at which the given volume of liquid will be dispensed. UNIT: MILIMITERS/SECOND
         """
-        step_displacement = self.volume_to_displacement_converter(volume)
+        speed = self.flowrate_to_speed_converter(rate)
+        step_displacement = self.volume_to_distance_converter(volume)
         self.ot_control.set_step_size_syringe_motor(step_displacement)
-        self.ot_control.plunger_L_Down(size=self.ot_control.s_step_size)
+        self.ot_control.plunger_L_Down(step_displacement, speed)
     
-    def volume_to_displacement_converter(self, volume):
+    def volume_to_distance_converter(self, volume):
         """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
 
         Args:
             volume ([float]): volume of liquid to be converted. UNIT: NANOLITERS
 
         Returns:
-            [float]: displacement that results in the displacement of the provided volume on the syringe. UNIT: MILIMETERS
+            [float]: displacement that results in the displacement of the provided volume on the syringe. UNIT: MILLIMETERS
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
@@ -392,7 +394,7 @@ class Coordinator:
         self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
 
-    def rate_to_distance_converter(self, infusion_rate = DEFAULT_RATE, withdraw_rate = DEFAULT_RATE):
+    def flowrate_to_speed_converter(self, rate):
         """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
 
         Args:
@@ -410,38 +412,27 @@ class Coordinator:
         radius = diameter / 2
                  
         # rate = nL/sec
-        print(f"infusion_rate: {infusion_rate}")
-        print(f"withdraw_rate: {withdraw_rate}")
-        infusion_volume = infusion_rate * 60 #* 0.000000001
-        withdraw_volume = withdraw_rate * 60 #* 0.000000001
-        print(f"infusion_volume: {infusion_volume}")
-        print(f"withdraw_volume: {withdraw_volume}")
+        print(f"Rate: {rate}")
+        volume = rate #* 0.000000001
+        print(f"volume: {volume}")
         # Calculate area and distance (height of the cylindric volume)
         area = (math.pi * radius * radius) # Basic formula for area
-        infusion_distance_in_mm = infusion_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
-        withdraw_distance_in_mm = withdraw_volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
-        print(f"infusion_distance_in_mm: {infusion_distance_in_mm}")
-        print(f"withdraw_distance_in_mm: {withdraw_distance_in_mm}")
-        infusion_distance_to_feed_to_stepper_motor = infusion_distance_in_mm * UNIT_CONVERSION
-        withdraw_distance_to_feed_to_stepper_motor = withdraw_distance_in_mm * UNIT_CONVERSION
+        distance_in_mm = volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
         
-
-        print(f"mm/sec: {infusion_distance_in_mm}")
-        print(f"mm/sec: {withdraw_distance_in_mm}")
+        print(f"mm/sec: {distance_in_mm}")
         # Return the distance needed to displace that amount of volume
-        self.ot_control.set_step_size_syringe_motor_infusion(infusion_distance_in_mm)
-        self.ot_control.set_step_size_syringe_motor_withdraw(withdraw_distance_in_mm)
-        return 0
+        self.ot_control.set_step_size_syringe_motor_infusion(distance_in_mm)
+        return distance_in_mm
         
-    def aspirate(self, volume, speed = SLOW_SPEED): 
-        """ Pick up amount in nL and speed in nL/min  """
-        logging.info(f"Aspirating {volume} nL at speed {speed} nL/s")
-        self.pick_up_liquid(int(volume)) # Pick up the amount needed
+    def aspirate(self, volume, rate = DEFAULT_RATE):
+        """ Pick up amount in nL and speed in nL/s  """
+        logging.info(f"Aspirating {volume} nL at speed {rate} nL/s")
+        self.pick_up_liquid(int(volume), rate) # Pick up the amount needed
 
-    def dispense(self, amount, speed = SLOW_SPEED): 
-        """ Drop of amount in nL and speed in nL/min  """
-        logging.info(f"Dispensing {amount} nL at speed {speed} nL/s")
-        self.drop_off_liquid(int(amount))
+    def dispense(self, volume, rate = DEFAULT_RATE): 
+        """ Drop of amount in nL and speed in nL/s  """
+        logging.info(f"Dispensing {volume} nL at speed {rate} nL/s")
+        self.drop_off_liquid(int(volume), rate)
 
     def air_gap(self):
         """This is the function that allows the user to have an 50 nL airgap in the syringe"""
@@ -450,7 +441,7 @@ class Coordinator:
         z = self.ot_control._position['Z'] + AIR_GAP_ASPIRATING_Z_STEP_DISTANCE
         new_location = [x, y, z]
         self.go_to_position(new_location)
-        self.aspirate(AIR_GAP_NL_AMOUNT, speed=ASPIRATE_SPEED)
+        self.aspirate(AIR_GAP_NL_AMOUNT, rate = DEFAULT_RATE)
 
     """
     LABWARE METHODS SECTION
@@ -735,18 +726,18 @@ class Coordinator:
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
-    def aspirate_from(self, amount, source):
+    def aspirate_from(self, volume, source, W_rate = DEFAULT_RATE):
         """ This will go to the position of the source and aspirate an amount in nL"""
         self.go_to_position(source)
-        self.pick_up_liquid(int(100)) # Pick up an extra 100 for backlash
-        self.aspirate(amount, ASPIRATE_SPEED)
-        self.drop_off_liquid(int(100)) # Drop off liquid to account for backlash
+        self.pick_up_liquid(int(100), W_rate) # Pick up an extra 100 for backlash
+        self.aspirate(volume, W_rate)
+        self.drop_off_liquid(int(100), W_rate) # Drop off liquid to account for backlash
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, amount, to, depth: int = None):
+    def dispense_to(self, volume, to, I_rate = DEFAULT_RATE):
         """ This will go to the position of the destination and dispense an amount in nL"""
         self.go_to_position(to)
-        self.dispense(amount, ASPIRATE_SPEED)
+        self.dispense(volume, I_rate)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
     def move_plunger(self, position):

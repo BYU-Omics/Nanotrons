@@ -30,7 +30,7 @@ Z_MIN= 10
 A_MAX= 170.15
 A_MIN= 10 
 B_MAX= 0
-B_MIN= -1*190 # TO-DO: change thee limit according to the syringe we are sugin. note for self. 
+B_MIN= -1*190 # TO-DO: change the limit according to the syringe we are using. note for self. 
 C_MAX= 0
 C_MIN= -1*190 
 TC_X = 211
@@ -48,9 +48,10 @@ MIN_STEPING_SIZE = 0.02
 
 SPEED = 300
 STEP_SPEED = 100
-SLOW_SPEED = 15
+SLOW_SPEED = 0.3 #mm/s
 MOVE_TO_SPEED = 70
 MEDIUM_SPEED = 100
+SLOW_XYZ_SPEED = 5
 
 X_MAX_SPEED = 600
 Y_MAX_SPEED = 400
@@ -66,7 +67,7 @@ MIDDLE_STEP = 7
 HALF = 0.5
 XYZ = 'X Y Z'
 
-LEFT = 'Left' #X
+LEFT = 'Left' #A
 RIGHT = 'Right' #B
 
 WINDOWS_OT_PORT = 'COM4'
@@ -148,7 +149,7 @@ class OT2_nanotrons_driver(SM):
         There are only 2 different speeds that are assigned: Slow, Medium and High
         """
         if step_size <= SHORT_MEDIUM_STEP_LIMIT:
-            return SLOW_SPEED
+            return SLOW_XYZ_SPEED
         elif step_size <= MEDIUM_LONG_STEP_LIMIT:
             return MEDIUM_SPEED
         else:
@@ -180,7 +181,7 @@ class OT2_nanotrons_driver(SM):
             print("Trying to move morethan allowed predefined steps")
             print(f"The stepping size is currently set to {self.xyz_step_size}")
 
-# Functions to move the different axis, X, Y, Z and sirenge:    
+# Functions to move the different axis, X, Y, Z and syringe:    
 
     def move_up(self, step_size = STEP_SIZE):  
         """
@@ -253,37 +254,41 @@ class OT2_nanotrons_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
+        speed = float(speed)
         b_pos: float = self._position['B'] # stores the current position
         b_pos += size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size)): # if the future position is a valid move 
             print(self.s_step_size_withdraw)
-            self.move({'B': b_pos}, speed=self.s_step_size_withdraw) # move to the indicated position
+            self.move({'B': b_pos}, speed) # move to the indicated position
 
     def plunger_L_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
+        speed = float(speed)
         b_pos: float = self._position['B'] # stores the current position
         b_pos -= size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size*(-1))):
             print(self.s_step_size_infusion)
-            self.move({'B': b_pos}, speed= self.s_step_size_infusion) # move to the indicated position
+            self.move({'B': b_pos}, speed) # move to the indicated position
 
     def plunger_R_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
-        if self.flag == True:
-            size = S_STEP_SIZE
+        #if self.flag == True:
+           # size = S_STEP_SIZE
+        speed = float(speed)
         c_pos: float = self._position['C'] # stores the current position
         c_pos = c_pos + size # adds a step size to the current position
         if(self.check_for_valid_move(c_pos, 'B', size)): # if the future position is a valid move 
-            self.move({'C': c_pos}, speed= speed) # move to the indicated position
+            self.move({'C': c_pos}, speed) # move to the indicated position
 
     def plunger_R_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
-        if self.flag == True:
-            size = S_STEP_SIZE
+       # if self.flag == True:
+           # size = S_STEP_SIZE
+        speed = float(speed)
         c_pos: float = self._position['C'] # stores the current position
         c_pos = c_pos - size # adds a step size to the current position
         if(self.check_for_valid_move(c_pos, 'B', size*(-1))): # if the future position is a valid move 
-            self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
+            self.move({'C': c_pos}, speed) # move to the indicated position
 
 ## These functions are just as the ones without the _aut but the logic is a little
 ## different since they are used by coordinator/volume etc. The step size input in 
