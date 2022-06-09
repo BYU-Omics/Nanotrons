@@ -44,11 +44,12 @@ clean_water = custom('A3')
 infusion_rate = 500  #nL/s
 withdraw_rate = 500  #nL/s
 
+
 myProtocol.set_syringe_model("HAMILTON_1705")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
-myProtocol.start_wash()
+myProtocol.start_wash(500) # <- You can input a custom flow rate in nL/s if desired. 
 # ------------START OF PROTOCOL---------------------------------
 
 # L wells 
@@ -135,9 +136,9 @@ myProtocol.dispense_to(20000, corning_384('D4'), infusion_rate)
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('D5'), infusion_rate)
 
-myProtocol.mid_wash()
+myProtocol.mid_wash(500) # <- You can input a custom flow rate in nL/s if desired.
 
 #--------------END OF PROTOCOL--------------
 
-myProtocol.fill_syringe_with_water()
+myProtocol.fill_syringe_with_water(500) # <- You can input a custom flow rate in nL/s if desired.
 myProtocol.end_of_protocol()

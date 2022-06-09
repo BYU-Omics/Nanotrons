@@ -60,7 +60,7 @@ SMALL_SQR_LINE_THICKNESS = 1
 
 app = Flask(__name__) # __name__ return the name of the file when called by another function. If called within the file it will return "__main__"
 
-print("Running web_app.py")
+print("Running web_app.py (web_app line 63)")
 if RUNNING_APP_FOR_REAL:
     print("Make sure the computer is connected to the modules and controller.")
 else: 
@@ -78,7 +78,9 @@ logging.getLogger("engineio").setLevel(logging.ERROR)
 # -----------------------------------
 
 coordinator = Coordinator()
+
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
+
 
 executer = Py_Execute()
 if RUNNING_APP_FOR_REAL:
@@ -379,8 +381,8 @@ def get_syringe_settings():
 @socketio.on("rate_to_distance_converter")
 def rate_to_distance_converter(rates):
     # print(f"Rates: {rates}")
-    infusion_rate, withdraw_rate = float(rates[0]), float(rates[1])
-    coordinator.rate_to_distance_converter(infusion_rate, withdraw_rate)
+    rates = float(rates[0]), float(rates[1])
+    coordinator.flowrate_to_speed_converter(rates)
 
 #----------------------------------------------- THERMOCYCLER PAGE EVENTS SECTION
 
@@ -706,10 +708,24 @@ def load_labware_setup(input_file_name):
         labware = coordinator.load_labware_setup(input_file_name)
         print(f"Success. Labware loaded: {labware}")
 
+@socketio.on("load_syringe_setup")
+def load_syringe_setup(syringe_file_name): 
+    # print(f"Web_app: Received 'syringe_file_name' message from socket with input file {input_file_name} ")
+    if syringe_file_name == None or syringe_file_name == "None set":
+        print(f"WARNING: Filename set to: {syringe_file_name} ")
+    else:
+        syringe = coordinator.load_syringe_setup(syringe_file_name)
+        print(f"Success. Labware loaded: {syringe}")
+
 @socketio.on("available_saved_labware_files")
 def available_saved_labware():
     files_list = coordinator.get_available_labware_setup_files()
     socketio.emit("saved_labware_files", files_list)
+
+@socketio.on("available_saved_syringe_files")
+def available_saved_syringe():
+    files_list = coordinator.get_available_syringe_files()
+    socketio.emit("saved_syringe_files", files_list)
 
 @socketio.on("new_labware_model")
 def new_labware_model(model_properties):

@@ -35,7 +35,7 @@ COORDINATOR CLASS
 
 """
 
-from drivers.OTdriver import OT2_nanotrons_driver, SLOW_SPEED
+from drivers.OTdriver import OT2_nanotrons_driver, SYRINGE_SLOW_SPEED
 from drivers.TDdriver import TempDeck
 from drivers.TCdriver import Thermocycler
 from protocol_creator import ProtocolCreator
@@ -93,6 +93,7 @@ from constants import RUNNING_APP_FOR_REAL, CONTROLLER_CONNECTED
 def interrupt_callback(res):
     sys.stderr.write(res)
 
+
 class Coordinator:
     def __init__(self):
         """ Initialize the class and instanciate all the subordinate classes
@@ -149,6 +150,7 @@ class Coordinator:
         format = "%(asctime)s: %(message)s" #format logging
         logging.basicConfig(format=format, level=logging.INFO,
                             datefmt="%H:%M:%S")
+                  
 
     def set_picture_flag(self, value: bool):
         print(f"Setting picture flag to: {value}")
@@ -193,7 +195,6 @@ class Coordinator:
     def monitor_joystick(self):
         """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
         """
-       # print("Monitoring joystick")
         axes = self.myController.deliver_axes() # Dictionary with the axes index and value that are being pressed
         buttons = self.myController.deliver_buttons() # List with strings according to the buttons currently being pressed
         hats = self.myController.deliver_hats() # List with strings according to the buttons currently being pressed
@@ -202,14 +203,22 @@ class Coordinator:
         # print(f"hats: {hats}")
         for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
             if axis_index == 2:
-                if self.myController.axes[2] > 0:
-                    # print("ASPIRATE")
-                    self.aspirate(self.user_input, SLOW_SPEED)
-                elif self.myController.axes[2] < 0:
-                    # print("DISPENSE")
-                    self.dispense(self.user_input, SLOW_SPEED)
-                else:
-                    pass
+
+            ### Nathaniel commented this section out and replaced it with the joystick_step_syringe_motor function 6-7-22
+                
+                # if self.myController.axes[2] > 0:
+                #     # print("ASPIRATE")
+                #     self.aspirate(self.user_input, SYRINGE_SLOW_SPEED) 
+                # elif self.myController.axes[2] < 0:
+                #     # print("DISPENSE")
+                #     self.dispense(self.user_input, SYRINGE_SLOW_SPEED)
+                # else:
+                #     pass
+
+                if self.myController.axes[2] != 0:
+                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2])
+
+
             method_name = self.myProfile.get_axis_function(axis_index).__name__            
             method = getattr(self.ot_control, method_name, False)
             method(self.myController.axes[axis_index])
@@ -217,9 +226,12 @@ class Coordinator:
         if (len(buttons) != 0):
             for button in buttons:
                 if button == "START":
-                    self.user_input = input("Enter volume to aspirate in nanoliters: ")
+                    self.user_input = input("Enter volume in nanoliters: ")
                     self.ot_control.set_nL(self.user_input)
-                    self.ot_control.set_step_size_syringe_motor(self.volume_to_displacement_converter(int(self.user_input)))
+                    self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
+                    #self.ot_control.set_nL(self.user_input2) (Not being used currently)
+                    self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
+                    self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
                 method_name = self.myProfile.get_button_function(button).__name__
                 method = getattr(self.ot_control, method_name, False)
                 if not method:
@@ -248,6 +260,7 @@ class Coordinator:
     def stop_manual_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
         """
+
         try:
             self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
         except AttributeError:
@@ -353,7 +366,6 @@ class Coordinator:
 
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume) 
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
         self.ot_control.plunger_L_Up(step_displacement, speed)
 
     def drop_off_liquid(self, volume, rate = DEFAULT_RATE):
@@ -365,17 +377,17 @@ class Coordinator:
         """
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume)
-        self.ot_control.set_step_size_syringe_motor(step_displacement)
         self.ot_control.plunger_L_Down(step_displacement, speed)
     
     def volume_to_distance_converter(self, volume):
-        """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
+        """ This method converts a certain amount of volume into displacement needed to move that amount 
+            of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
 
         Args:
             volume ([float]): volume of liquid to be converted. UNIT: NANOLITERS
 
         Returns:
-            [float]: displacement that results in the displacement of the provided volume on the syringe. UNIT: MILLIMETERS
+            [float]: motor distance that results in the displacement of the provided volume on the syringe. UNIT: MILLIMETERS
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
@@ -388,20 +400,21 @@ class Coordinator:
         # Calculate area and distance (height of the cylindric volume)
         area = (math.pi * radius * radius) # Basic formula for area
         distance_in_mm = volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
-        distance_to_feed_to_stepper_motor = distance_in_mm * UNIT_CONVERSION
+        distance_to_feed_to_stepper_motor = distance_in_mm * UNIT_CONVERSION # something is off with the syringe motors, so distances have to be adjusted
 
+        print(f"Distance: {distance_in_mm} mm")
         # Return the distance needed to displace that amount of volume
-        self.ot_control.set_step_size_syringe_motor(distance_to_feed_to_stepper_motor)
         return distance_to_feed_to_stepper_motor
 
     def flowrate_to_speed_converter(self, rate):
-        """ This method converts a certain amount of volume into displacement needed to move that amount of liquid in the syringe by retrieving the syringe dimensions from the system and doing some simple math
+        """ This method converts a flowrate (nL/s) into speed (mm/s) appropriate for the current syringe 
+            It does this by retrieving the syringe dimensions from the system and doing some simple math
 
         Args:
-            volume ([float]): volume of liquid to be converted. UNIT: NANOLITERS
+            rate ([float]): flowrate of liquid transfer to be converted to speed. UNIT: NANOLITERS/S
 
         Returns:
-            [float]: displacement that results in the displacement of the provided volume on the syringe. UNIT: MILIMETERS
+            [float]: speed to be used by the syringe motor. UNIT: MILLIMETERS
         """
         # Get the current syringe model
         syringe_model = self.myLabware.get_syringe_model()
@@ -412,17 +425,13 @@ class Coordinator:
         radius = diameter / 2
                  
         # rate = nL/sec
-        print(f"Rate: {rate}")
-        volume = rate #* 0.000000001
-        print(f"volume: {volume}")
+        # print(f"Rate: {rate} nL/s")
         # Calculate area and distance (height of the cylindric volume)
         area = (math.pi * radius * radius) # Basic formula for area
-        distance_in_mm = volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
-        
-        print(f"mm/sec: {distance_in_mm}")
-        # Return the distance needed to displace that amount of volume
-        self.ot_control.set_step_size_syringe_motor_infusion(distance_in_mm)
-        return distance_in_mm
+        speed_in_mm_s = rate * FROM_NANOLITERS / area * UNIT_CONVERSION # rate is assumed to come in nanoLiters/s, it's converted to microliters/s, then to mm/s 
+        # print(f"speed: {speed_in_mm_s / UNIT_CONVERSION} mm/s")
+        # Return the speed to be used 
+        return speed_in_mm_s
         
     def aspirate(self, volume, rate = DEFAULT_RATE):
         """ Pick up amount in nL and speed in nL/s  """
@@ -545,6 +554,16 @@ class Coordinator:
         labware = [chip_list, plate_list]
         return labware
 
+    def load_syringe_setup(self, loaded_syringe):
+        """ Import previously calibrated and saved labware components from a json file to avoid recalibrating them individually
+
+        Args:
+            input_file_name ([str]): name of desired input file
+        """
+        print(f"Coordinator: Loading labware from {loaded_syringe}")
+        
+        return self.myLabware.set_syringe_model(loaded_syringe)
+
     def get_available_labware_setup_files(self):
         """ Obtain the list of available files with previously calibrated and exported labware components
 
@@ -552,6 +571,10 @@ class Coordinator:
             [list]: list of strings of names of files with previously calibrated labware components 
         """
         return self.myLabware.available_saved_labware_files()
+
+    def get_available_syringe_files(self):
+
+        return self.myLabware.available_saved_syringe_files()
 
     def guess_fourth_calibration_point(self, calibration_points):
         """ Guess the fourth point that defines a rectangle (plane) in 3D
@@ -734,17 +757,17 @@ class Coordinator:
         self.drop_off_liquid(int(100), W_rate) # Drop off liquid to account for backlash
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, volume, to, I_rate = DEFAULT_RATE):
+    def dispense_to(self, volume, source, I_rate = DEFAULT_RATE):
         """ This will go to the position of the destination and dispense an amount in nL"""
-        self.go_to_position(to)
+        self.go_to_position(source)
         self.dispense(volume, I_rate)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
-    def move_plunger(self, position):
+    def move_plunger(self, position, speed = SYRINGE_SLOW_SPEED):
         """ This allows the protocol to move the plunger passed the set limit for manual control, 
             it is important to understand that if the right values are not input correctly for 
             the syringe being used, this could break """
-        self.ot_control.move({'B': position})
+        self.ot_control.move({'B': position}, speed = speed)
 
     def set_washing_positions(self, clean_water, wash_water, waste_water):
         """ For every protocol we assume the scientist will have these three location in which the 
@@ -757,44 +780,59 @@ class Coordinator:
         # print(f"Amount wanted to clean for midwash: {volume}")
         self.amount_wanted = volume
 
-    def start_wash(self):
+    def start_wash(self, rate):
         """ This is the function that allows the robot to get rid of the contamination on the syringe, 
             by dispensing everything that was left over from before, then it will pick up clean water 
             and end in a postition that allows the protocol to aspirate and dispense without hitting limmmits"""
         # Go to waste and SYRINGE_BOTTOM
+        syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        syringe_bottom_coordinate = syringe_parameters["lower_syringe_limit"] # This parameter is a coordinate on the B axis
+        syringe_top_coordinate = syringe_parameters["upper_syringe_limit"] # This parameter is a coordinate on the B axis
+        syringe_sweet_spot_coordinate = syringe_parameters["sweetspot_on_syringe"] # This parameter is a coordinate on the B axis
+
+        speed = self.flowrate_to_speed_converter(rate)
+
         self.go_to_position(self.waste_water)
-        self.move_plunger(self.syringe_bottom_coordinate)
+        self.move_plunger(syringe_bottom_coordinate, speed)
         # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
         self.go_to_position(self.wash_water)
-        self.move_plunger(self.syringe_top_coordinate)
-        self.move_plunger(self.syringe_bottom_coordinate)
+        self.move_plunger(syringe_top_coordinate, speed)
+        self.move_plunger(syringe_bottom_coordinate, speed)
         # Go to clean, SYRINGE_SWEET_SPOT
         self.go_to_position(self.clean_water)
-        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        self.move_plunger(syringe_sweet_spot_coordinate, speed)
         # Airgap
         self.air_gap()
+        
 
-    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
+    def mid_wash(self, left_over, cushion_1, cushion_2, rate):
         """ This is a wash that is done to the syringe when picking up and dispensing different liquids"""
         # Go to waste, dispense left overs
+        syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        syringe_sweet_spot_coordinate = syringe_parameters["sweetspot_on_syringe"] # This parameter is a coordinate on the B axis
+
+        speed = self.flowrate_to_speed_converter(rate)
         self.go_to_position(self.waste_water)
-        self.dispense(left_over)
+        self.dispense(left_over,rate)
         # Go to wash, aspirate amount wanted + Cushion 1, dipense amount wanted + Cushion 2
         self.go_to_position(self.wash_water)
-        self.aspirate(self.amount_wanted + cushion_1)
-        self.dispense(self.amount_wanted + cushion_2)
+        self.aspirate(self.amount_wanted + cushion_1, rate)
+        self.dispense(self.amount_wanted + cushion_2, rate)
         # Go to clean, go to sweet spot
         self.go_to_position(self.clean_water)
-        self.move_plunger(self.syringe_sweet_spot_coordinate)
+        self.move_plunger(syringe_sweet_spot_coordinate, speed)
         # Airgap
         self.air_gap()
 
-    def fill_syringe_with_water(self):
+    def fill_syringe_with_water(self, rate):
         """ This is the function that allows the robot to fill the syringe with water at the end of a day 
             or protocol so that if it evaporates there is still some more the next day"""
         # Go to clean, SYRINGE_TOP
+        speed = self.flowrate_to_speed_converter(rate)
         self.go_to_position(self.clean_water)
-        self.move_plunger(self.syringe_top_coordinate)
+        self.move_plunger(self.syringe_top_coordinate, speed)
 
 
     """

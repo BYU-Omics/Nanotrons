@@ -69,11 +69,11 @@ class ModelsManager:
         file_path = ""
 
         if (self.operating_system == "w"):
-            print(f"Component model: {component_model}")
-            file_path = open(path_to_models_folder + "\\" + str(component_model).strip("[]'") + ".json")
+            #print(f"Component model: {component_model}")
+            file_path = open(path_to_models_folder + "\\" + str(component_model).strip("[]'"))
 
         elif (self.operating_system == "r"):
-            file_path = open(path_to_models_folder + "/" + str(component_model).strip("[]'") + ".json")
+            file_path = open(path_to_models_folder + "/" + str(component_model).strip("[]'"))
         
         parameters = json.load(file_path)
 

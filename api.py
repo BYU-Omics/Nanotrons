@@ -27,14 +27,14 @@ class Api:
     def set_syringe_model(self, model_name):
         self.coordinator.myLabware.set_syringe_model(model_name)
 
-    def start_wash(self):
-        self.coordinator.start_wash()
+    def start_wash(self, rate = DEFAULT_RATE):
+        self.coordinator.start_wash(rate)
 
-    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
-        self.coordinator.mid_wash(left_over, cushion_1, cushion_2)
+    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2, rate = DEFAULT_RATE):
+        self.coordinator.mid_wash(left_over, cushion_1, cushion_2, rate)
 
-    def fill_syringe_with_water(self):
-        self.coordinator.fill_syringe_with_water()
+    def fill_syringe_with_water(self, rate = DEFAULT_RATE):
+        self.coordinator.fill_syringe_with_water(rate)
 
     def air_gap(self):
         self.coordinator.air_gap()

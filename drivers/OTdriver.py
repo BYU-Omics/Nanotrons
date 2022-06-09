@@ -19,7 +19,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0 a
 from opentrons.config.robot_configs import build_config
 from serial.tools import list_ports
 import os
-from constants import RUNNING_APP_FOR_REAL
+from constants import RUNNING_APP_FOR_REAL, UNIT_CONVERSION
 
 X_MAX= 418
 X_MIN= 25
@@ -29,10 +29,10 @@ Z_MAX= 170.15
 Z_MIN= 10 
 A_MAX= 170.15
 A_MIN= 10 
-B_MAX= 0
-B_MIN= -1*190 # TO-DO: change the limit according to the syringe we are using. note for self. 
-C_MAX= 0
-C_MIN= -1*190 
+B_MAX= 17
+B_MIN= -1*187 # TO-DO: change the limit according to the syringe we are using. note for self. 
+C_MAX= 17
+C_MIN= -1*187 
 TC_X = 211
 TC_Y = 155
 TC_Z_OPEN_LID = 170
@@ -47,8 +47,9 @@ MAX_STEPING_SIZE = 160
 MIN_STEPING_SIZE = 0.02
 
 SPEED = 300
-STEP_SPEED = 100
-SLOW_SPEED = 0.3 #mm/s
+STEP_SPEED = 100 
+SYRINGE_SLOW_SPEED = 0.3 * UNIT_CONVERSION #mm/s (The syringe motor distances are off by a factor of UNIT_CONVERSION) 
+SYRINGE_DEFAULT_STEP = 1 * UNIT_CONVERSION #mm (The syringe motor distances are off by a factor of UNIT_CONVERSION)
 MOVE_TO_SPEED = 70
 MEDIUM_SPEED = 100
 SLOW_XYZ_SPEED = 5
@@ -89,10 +90,8 @@ class OT2_nanotrons_driver(SM):
         self.xyz_step_speed = STEP_SPEED
         self._port = None
         # Attributes that control the size and speed of the plunger. 
-        self.s_step_size = list_of_sizes[MIDDLE_STEP] #Step size for the syringe
-        self.s_step_speed = SLOW_SPEED #Step speed for the syringe
-        self.s_step_size_infusion = SLOW_SPEED
-        self.s_step_size_withdraw = SLOW_SPEED
+        self.syringe_step_size = SYRINGE_DEFAULT_STEP #Step size for the syringe in mm.
+        self.syringe_step_speed = SYRINGE_SLOW_SPEED #Step speed for the syringe
 
         self.nL = 0 #nanoliters that the syringe is currently working with
         self.side = LEFT 
@@ -250,7 +249,7 @@ class OT2_nanotrons_driver(SM):
         else:
             pass
 
-    def plunger_L_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_L_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
@@ -258,10 +257,23 @@ class OT2_nanotrons_driver(SM):
         b_pos: float = self._position['B'] # stores the current position
         b_pos += size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size)): # if the future position is a valid move 
-            print(self.s_step_size_withdraw)
-            self.move({'B': b_pos}, speed) # move to the indicated position
+            # print(f"This is in OTdriver (Plunger L up)")
+            # print(f"step size is {(size / UNIT_CONVERSION)}")
+            # print(f"current plunger speed is: {speed} mm/s")
+            # good_speed = input("Is this a good speed (y/n): ")
+            # if good_speed == "y":
+            self.move({'B': b_pos}, speed = speed) # move to the indicated position
+            # # else:
+            #     speed = float(input("What speed would you like to use (mm/s): "))
+            #     self.move({'B': b_pos}, speed = speed) # move to the indicated position
+            #     print(f"New B position: {b_pos}")
+        else:
+            print(f"Cannot move to {b_pos}")
+            print(f"Current position is: {self._position['B']}")
+            print(f"Requested step size is: {size}")
+                # Add print for boundary position
 
-    def plunger_L_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_L_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
@@ -269,50 +281,89 @@ class OT2_nanotrons_driver(SM):
         b_pos: float = self._position['B'] # stores the current position
         b_pos -= size # adds a step size to the current position
         if(self.check_for_valid_move(b_pos, 'B', size*(-1))):
-            print(self.s_step_size_infusion)
-            self.move({'B': b_pos}, speed) # move to the indicated position
+            # print(f"This is in OTdriver (Plunger L down")
+            # print(f"current step size is {(size / UNIT_CONVERSION)} mm")
+            # print(f"current plunger speed is: {speed} mm/s")
+            # good_speed = input("Is this a good speed (y/n): ")
+            # if good_speed == "y":
+            self.move({'B': b_pos}, speed = speed) # move to the indicated position
+            # else:
+            #     speed = float(input("What speed would you like to use (mm/s): "))
+            #     self.move({'B': b_pos}, speed = speed) # move to the indicated position
+            # print(f"New B position: {b_pos}")
+        else:
+            print(f"Cannot move to {b_pos}")
+            print(f"Current position is: {self._position['B']}")
+            print(f"Requested step size is: {size}")
+                # Add print for boundary position
 
-    def plunger_R_Up(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_R_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         #if self.flag == True:
            # size = S_STEP_SIZE
         speed = float(speed)
         c_pos: float = self._position['C'] # stores the current position
         c_pos = c_pos + size # adds a step size to the current position
-        if(self.check_for_valid_move(c_pos, 'B', size)): # if the future position is a valid move 
-            self.move({'C': c_pos}, speed) # move to the indicated position
+        if(self.check_for_valid_move(c_pos, 'C', size)): # if the future position is a valid move 
+            # print(f"step size is {(size / UNIT_CONVERSION)}")
+            # print(f"current plunger speed is: {speed} mm/s")
+            # good_speed = input("Is this a good speed (y/n): ")
+            # if good_speed == "y":
+                self.move({'C': c_pos}, speed = speed) # move to the indicated position
+            # else:
+            #     speed = float(input("What speed would you like to use (mm/s): "))
+            #     self.move({'C': c_pos}, speed = speed) # move to the indicated position
+            # print(f"New C position: {c_pos}")
+        else:
+            print(f"Cannot move to {c_pos}")
+            print(f"Current position is: {self._position['B']}")
+            print(f"Requested step size is: {size}")
+                # Add print for boundary position
 
-    def plunger_R_Down(self, size: float = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_R_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
        # if self.flag == True:
            # size = S_STEP_SIZE
         speed = float(speed)
         c_pos: float = self._position['C'] # stores the current position
         c_pos = c_pos - size # adds a step size to the current position
-        if(self.check_for_valid_move(c_pos, 'B', size*(-1))): # if the future position is a valid move 
-            self.move({'C': c_pos}, speed) # move to the indicated position
+        if(self.check_for_valid_move(c_pos, 'C', size*(-1))): # if the future position is a valid move 
+            # print(f"step size is {(size / UNIT_CONVERSION)}")
+            # print(f"current plunger speed is: {speed} mm/s")
+            # good_speed = input("Is this a good speed (y/n): ")
+            # if good_speed == "y":
+                self.move({'C': c_pos}, speed = speed) # move to the indicated position
+            # else:
+            #     speed = float(input("What speed would you like to use (mm/s): "))
+            #     self.move({'C': c_pos}, speed = speed) # move to the indicated position
+            # print(f"New C position: {c_pos}")
+        else:
+            print(f"Cannot move to {c_pos}")
+            print(f"Current position is: {self._position['B']}")
+            print(f"Requested step size is: {size}")
+                # Add print for boundary position
 
 ## These functions are just as the ones without the _aut but the logic is a little
 ## different since they are used by coordinator/volume etc. The step size input in 
 ## this case comes with a negative sign if it goes down, so both have the same sign. 
 
-    def plunger_L_Up_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_L_Up_aut(self, size = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         b_pos = self._position['B']
         b_pos += size
-        self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
+        self.move({'B': b_pos}, speed= self.syringe_step_speed) # move to the indicated position
 
-    def plunger_L_Down_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_L_Down_aut(self, size = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         b_pos = self._position['B']
         b_pos += size
-        self.move({'B': b_pos}, speed= self.s_step_speed) # move to the indicated position
+        self.move({'B': b_pos}, speed= self.syringe_step_speed) # move to the indicated position
 
-    def plunger_R_Up_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_R_Up_aut(self, size = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         c_pos = self._position['C']
         c_pos += size
-        self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
+        self.move({'C': c_pos}, speed= self.syringe_step_speed) # move to the indicated position
 
-    def plunger_R_Down_aut(self, size = STEP_SIZE, speed = SLOW_SPEED):
+    def plunger_R_Down_aut(self, size = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED):
         c_pos = self._position['C']
         c_pos += size
-        self.move({'C': c_pos}, speed= self.s_step_speed) # move to the indicated position
+        self.move({'C': c_pos}, speed= self.syringe_step_speed) # move to the indicated position
 
 # Getters and Setters 
     def get_side(self):
@@ -334,40 +385,28 @@ class OT2_nanotrons_driver(SM):
         return (self.xyz_step_size)
 
     def get_step_size_syringe_motor(self):
-        return self.s_step_size
+        return self.syringe_step_size
 
     def get_step_speed_xyz_motor(self):
         return self.xyz_step_speed
 
     def get_step_speed_syringe_motor(self):
-        return self.s_step_speed
-
-    def get_motor_base_speed(self):
-        return SLOW_SPEED
-
-    def get_motor_max_speed(self):
-        return MAX_SPEED
+        return self.syringe_step_speed
     
     def get_nL(self):
         return self.nL
 
     def set_step_size_xyz_motor(self, new_step_size):
         self.xyz_step_size = new_step_size
+    
+    def set_step_speed_xyz_motor(self, new_step_speed):
+        self.xyz_step_speed = new_step_speed
 
     def set_step_size_syringe_motor(self, new_step_size):
-        self.s_step_size = new_step_size
-
-    def set_step_size_syringe_motor_infusion(self, new_step_size):
-        self.s_step_size_infusion = new_step_size
-    
-    def set_step_size_syringe_motor_withdraw(self, new_step_size):
-        self.s_step_size_withdraw = new_step_size
-
-    def set_step_speed_xyz_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
+        self.syringe_step_size = new_step_size
 
     def set_step_speed_syringe_motor(self, new_step_speed):
-        self.s_step_speed = new_step_speed
+        self.syringe_step_speed = new_step_speed
 
     def set_nL(self, nL):
         self.nL = nL
@@ -412,17 +451,17 @@ class OT2_nanotrons_driver(SM):
     def joystick_step_syringe_motor(self, direction = 1):
         if self.side == LEFT:    
             if direction > 0:
-                self.plunger_L_Down(self.s_step_size, self.s_step_size_infusion)
+                self.plunger_L_Down(self.syringe_step_size, self.syringe_step_speed)
             elif direction < 0:
-                self.plunger_L_Up(self.s_step_size, self.s_step_size_withdraw)
+                self.plunger_L_Up(self.syringe_step_size, self.syringe_step_speed)
             else:
                 pass
 
         elif self.side == RIGHT:        
             if direction > 0:
-                self.plunger_R_Down(self.s_step_size, self.s_step_speed)
+                self.plunger_R_Down(self.syringe_step_size, self.syringe_step_speed)
             elif direction < 0:
-                self.plunger_R_Up(self.s_step_size, self.s_step_speed)
+                self.plunger_R_Up(self.syringe_step_size, self.syringe_step_speed)
             else:
                 pass
 
@@ -467,7 +506,7 @@ class OT2_nanotrons_driver(SM):
 
     def step_syringe_motor(self, step_size="DEFAULT"):
         if (step_size == "DEFAULT"):
-            step_size = self.s_step_size
+            step_size = self.syringe_step_size
         if step_size < 0:
             # print(f"Down: {step_size}")
             self.plunger_L_Up_aut(step_size)
@@ -532,7 +571,7 @@ class OT2_nanotrons_driver(SM):
     def screen_info(self, dummyarg):
         print("............................................")
         print("")
-        print(f"Step size S set to:          {self.s_step_size}") 
+        print(f"Step size S set to:          {self.syringe_step_size}") 
         print(f"Nanoliters to pick up:       {self.nL}")
         print(f"Step size XYZ set to:        {self.xyz_step_size}")
         print(f"Pipette controlling:         {self.side}")
