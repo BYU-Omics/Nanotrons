@@ -203,20 +203,30 @@ class Coordinator:
         # print(f"hats: {hats}")
         for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
             if axis_index == 2:
+                syringe_model = self.myLabware.get_syringe_model()
+                # print (syringe_model)
 
             ### Nathaniel commented this section out and replaced it with the joystick_step_syringe_motor function 6-7-22
-                
-                # if self.myController.axes[2] > 0:
-                #     # print("ASPIRATE")
-                #     self.aspirate(self.user_input, SYRINGE_SLOW_SPEED) 
-                # elif self.myController.axes[2] < 0:
-                #     # print("DISPENSE")
-                #     self.dispense(self.user_input, SYRINGE_SLOW_SPEED)
+                print(self.myController.axes[2])
+                if self.myController.axes[2] > 0:
+                    # print("ASPIRATE")
+                      #self.aspirate(self.user_input, SYRINGE_SLOW_SPEED) 
+                    print(f" inside if aspirate  {syringe_model}")
+                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
+                elif self.myController.axes[2] < 0:
+                    # print("DISPENSE")
+                      #self.dispense(self.user_input, SYRINGE_SLOW_SPEED)
+                    print(f" inside if dispense  {syringe_model}")
+                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
+                else:
+                    print("working")
+                    pass
+
+                # if self.myController.axes[2] != 0:
+                #     print(f" inside if statement  {syringe_model}")
+                #     self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
                 # else:
                 #     pass
-
-                if self.myController.axes[2] != 0:
-                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2])
 
 
             method_name = self.myProfile.get_axis_function(axis_index).__name__            
@@ -226,12 +236,19 @@ class Coordinator:
         if (len(buttons) != 0):
             for button in buttons:
                 if button == "START":
-                    self.user_input = input("Enter volume in nanoliters: ")
-                    self.ot_control.set_nL(self.user_input)
-                    self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
-                    #self.ot_control.set_nL(self.user_input2) (Not being used currently)
-                    self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
-                    self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
+                    syringe_model = self.myLabware.get_syringe_model()
+                    if (syringe_model == labware_class.SYRINGE_MODEL):
+                        print("Please select a syringe model (start) ")
+                
+                    else :
+                        print(f"Current syringe model is: {syringe_model}")
+                        self.user_input = input("Enter volume in nanoliters: ")
+                        self.ot_control.set_nL(self.user_input)
+                        self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
+                        #self.ot_control.set_nL(self.user_input2) (Not being used currently)
+                        self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
+                        self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
+                    
                 method_name = self.myProfile.get_button_function(button).__name__
                 method = getattr(self.ot_control, method_name, False)
                 if not method:
@@ -366,7 +383,7 @@ class Coordinator:
 
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume) 
-        self.ot_control.plunger_L_Up(step_displacement, speed)
+        self.ot_control.plunger_L_Up(step_displacement, speed, syringe_model = self.myLabware.get_syringe_model())
 
     def drop_off_liquid(self, volume, rate = DEFAULT_RATE):
         """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
@@ -377,7 +394,7 @@ class Coordinator:
         """
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume)
-        self.ot_control.plunger_L_Down(step_displacement, speed)
+        self.ot_control.plunger_L_Down(step_displacement, speed, syringe_model = self.myLabware.get_syringe_model())
     
     def volume_to_distance_converter(self, volume):
         """ This method converts a certain amount of volume into displacement needed to move that amount 
@@ -430,6 +447,8 @@ class Coordinator:
         area = (math.pi * radius * radius) # Basic formula for area
         speed_in_mm_s = rate * FROM_NANOLITERS / area * UNIT_CONVERSION # rate is assumed to come in nanoLiters/s, it's converted to microliters/s, then to mm/s 
         # print(f"speed: {speed_in_mm_s / UNIT_CONVERSION} mm/s")
+
+        print(f"Speed: {speed_in_mm_s} mm/s")
         # Return the speed to be used 
         return speed_in_mm_s
         

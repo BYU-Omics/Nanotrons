@@ -21,12 +21,13 @@ LABWARE_PLATE = "p"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 JSON_EXTENTION = '.json'
+SYRINGE_MODEL = "HAMILTON_FAKE.json"
 
 class Labware_class:
     def __init__(self):
         self.chip_list = []
         self.plate_list = []
-        self.syringe_model = ["HAMILTON_175.json"]
+        self.syringe_model = SYRINGE_MODEL
 
     """
     SETTERS SECTION

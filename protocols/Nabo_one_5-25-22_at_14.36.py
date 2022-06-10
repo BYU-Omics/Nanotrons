@@ -45,7 +45,7 @@ infusion_rate = 500  #nL/s
 withdraw_rate = 500  #nL/s
 
 
-myProtocol.set_syringe_model("HAMILTON_1705")
+myProtocol.set_syringe_model("HAMILTON_1705.json")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
