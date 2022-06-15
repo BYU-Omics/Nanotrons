@@ -4,6 +4,7 @@ LABWARE CLASS
     from each of them.
 """
 
+from numpy import False_
 from models_manager import LABWARE_CHIP, LABWARE_PLATE
 from chip import Chip
 from plate import Plate
@@ -21,13 +22,14 @@ LABWARE_PLATE = "p"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 JSON_EXTENTION = '.json'
-SYRINGE_MODEL = "HAMILTON_FAKE.json"
+SYRINGE_MODEL = "HAMILTON_1705.json"
 
 class Labware_class:
     def __init__(self):
         self.chip_list = []
         self.plate_list = []
         self.syringe_model = SYRINGE_MODEL
+        self.syringe_model_is_default = True
 
     """
     SETTERS SECTION
@@ -59,6 +61,7 @@ class Labware_class:
 
     def set_syringe_model(self, model_name):
         self.syringe_model = model_name
+        self.syringe_model_is_default = False
 
     """
     GETTERS SECTION

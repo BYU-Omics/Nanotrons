@@ -42,13 +42,13 @@ class Api:
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
-    def aspirate_from(self, volume, source, rate):
-        self.coordinator.aspirate_from(volume, source, rate)
+    def aspirate_from(self, volume, position, rate):
+        self.coordinator.aspirate_from(volume, position, rate)
         self.amount_wanted = volume
 
-    def dispense_to(self, volume, to):
+    def dispense_to(self, volume, position, rate):
         self.coordinator.set_amount_wanted(volume)
-        self.coordinator.dispense_to(volume, to)
+        self.coordinator.dispense_to(volume, position, rate)
 
     def open_lid(self):
         self.coordinator.open_lid()

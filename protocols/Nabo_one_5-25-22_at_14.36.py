@@ -52,7 +52,7 @@ myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 myProtocol.start_wash(500) # <- You can input a custom flow rate in nL/s if desired. 
 # ------------START OF PROTOCOL---------------------------------
 
-# L wells 
+# A wells 
 
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('A1'), infusion_rate)
@@ -69,7 +69,7 @@ myProtocol.dispense_to(20000, corning_384('A4'), infusion_rate)
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('A5'), infusion_rate)
 
-# M wells H1
+# B wells
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('B1'), infusion_rate)
 
@@ -85,7 +85,7 @@ myProtocol.dispense_to(20000, corning_384('B4'), infusion_rate)
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('B5'), infusion_rate)
 
-# N wells
+# C wells
 
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('C1'), infusion_rate)
@@ -102,24 +102,7 @@ myProtocol.dispense_to(20000, corning_384('C4'), infusion_rate)
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('C5'), infusion_rate)
 
-# O wells 
-
-myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
-myProtocol.dispense_to(20000, corning_384('C1'), infusion_rate)
-
-myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
-myProtocol.dispense_to(20000, corning_384('C2'), infusion_rate)
-
-myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
-myProtocol.dispense_to(20000, corning_384('C3'), infusion_rate)
-
-myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
-myProtocol.dispense_to(20000, corning_384('C4'), infusion_rate)
-
-myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
-myProtocol.dispense_to(20000, corning_384('C5'), infusion_rate)
-
-# P wells
+# D wells 
 
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('D1'), infusion_rate)
@@ -135,6 +118,25 @@ myProtocol.dispense_to(20000, corning_384('D4'), infusion_rate)
 
 myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
 myProtocol.dispense_to(20000, corning_384('D5'), infusion_rate)
+
+# E wells
+
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(20000, corning_384('E1'), infusion_rate)
+
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(20000, corning_384('E2'), infusion_rate)
+
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(20000, corning_384('E3'), infusion_rate)
+
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(20000, corning_384('E4'), infusion_rate)
+
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(20000, corning_384('E5'), infusion_rate)
+
+
 
 myProtocol.mid_wash(500) # <- You can input a custom flow rate in nL/s if desired.
 

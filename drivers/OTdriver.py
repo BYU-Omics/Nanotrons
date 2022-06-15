@@ -30,10 +30,10 @@ Z_MAX= 170.15
 Z_MIN= 10 
 A_MAX= 170.15
 A_MIN= 10 
-B_MAX= 17
-B_MIN= -1*187 # TO-DO: change the limit according to the syringe we are using. note for self. 
-C_MAX= 17
-C_MIN= -1*187 
+B_MAX= 105 # (16) is the new limit if B axis is homed after a protocol without hard resetting. 
+B_MIN= -1*105 # (-187) is the new limit if B axis is homed after a protocol without hard resetting. 
+C_MAX= 105
+C_MIN= -1*105
 TC_X = 211
 TC_Y = 155
 TC_Z_OPEN_LID = 170
@@ -254,7 +254,7 @@ class OT2_nanotrons_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        if syringe_model != labware_class.SYRINGE_MODEL:
+        if syringe_model == labware_class.SYRINGE_MODEL:
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos += size # adds a step size to the current position
@@ -282,7 +282,7 @@ class OT2_nanotrons_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        if syringe_model != labware_class.SYRINGE_MODEL:
+        if syringe_model == labware_class.SYRINGE_MODEL:
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos -= size # adds a step size to the current position
@@ -560,13 +560,31 @@ class OT2_nanotrons_driver(SM):
                 if(self.check_for_valid_move(z, 'Z', None)):
                     self.move({'Z': z}, speed= MOVE_TO_SPEED)
 
-    def change_to_L_axis(self, dummyarg):
+    def change_vertical_axis(self, dummyarg):
         # This function allows the controller to have more functionality
-        self.side = LEFT
+        if self.side == LEFT:
+            self.side = RIGHT
+            print("Vertical axis: RIGHT")
+        elif self.side == RIGHT:
+            self.side = LEFT
+            print("Vertical axis: Left")
+        else:
+            print("Vertical Axis Error!")
             
-    def change_to_R_axis(self, dummyarg):
+    def report_current_position(self, dummyarg):
         # This function allows the controller to have more functionality
-        self.side = RIGHT
+        X_position: float = self._position['X']
+        Y_position: float = self._position['Y']
+        print(f"Current X position: {X_position}")
+        print(f"Current Y position: {Y_position}")
+        if self.side == LEFT:
+            print(f"Current Z is {self._position['Z']}")
+            print(f"Syringe position is {self._position['B']}")
+        elif self.side == RIGHT:
+            print(f"Current A is {self._position['A']}")
+            print(f"Syringe position is {self._position['C']}")
+        else:
+            print("Vertical Axis Error!")
 
     def get_motor_coordinates(self):
         x = self._position['X']

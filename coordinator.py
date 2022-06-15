@@ -207,24 +207,24 @@ class Coordinator:
                 # print (syringe_model)
 
             ### Nathaniel commented this section out and replaced it with the joystick_step_syringe_motor function 6-7-22
-                print(self.myController.axes[2])
+                # print(self.myController.axes[2])
                 if self.myController.axes[2] > 0:
-                    # print("ASPIRATE")
+                    print("ASPIRATE")
                       #self.aspirate(self.user_input, SYRINGE_SLOW_SPEED) 
                     print(f" inside if aspirate  {syringe_model}")
                     self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
                 elif self.myController.axes[2] < 0:
-                    # print("DISPENSE")
+                    print("DISPENSE")
                       #self.dispense(self.user_input, SYRINGE_SLOW_SPEED)
                     print(f" inside if dispense  {syringe_model}")
                     self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
                 else:
-                    print("working")
+                    # print("working")
                     pass
 
                 # if self.myController.axes[2] != 0:
                 #     print(f" inside if statement  {syringe_model}")
-                #     self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
+                    # self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
                 # else:
                 #     pass
 
@@ -237,7 +237,7 @@ class Coordinator:
             for button in buttons:
                 if button == "START":
                     syringe_model = self.myLabware.get_syringe_model()
-                    if (syringe_model == labware_class.SYRINGE_MODEL):
+                    if self.myLabware.syringe_model_is_default:
                         print("Please select a syringe model (start) ")
                 
                     else :
@@ -768,17 +768,17 @@ class Coordinator:
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
-    def aspirate_from(self, volume, source, W_rate = DEFAULT_RATE):
+    def aspirate_from(self, volume, position, W_rate = DEFAULT_RATE):
         """ This will go to the position of the source and aspirate an amount in nL"""
-        self.go_to_position(source)
+        self.go_to_position(position)
         self.pick_up_liquid(int(100), W_rate) # Pick up an extra 100 for backlash
         self.aspirate(volume, W_rate)
         self.drop_off_liquid(int(100), W_rate) # Drop off liquid to account for backlash
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, volume, source, I_rate = DEFAULT_RATE):
+    def dispense_to(self, volume, position, I_rate = DEFAULT_RATE):
         """ This will go to the position of the destination and dispense an amount in nL"""
-        self.go_to_position(source)
+        self.go_to_position(position)
         self.dispense(volume, I_rate)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
@@ -805,6 +805,7 @@ class Coordinator:
             and end in a postition that allows the protocol to aspirate and dispense without hitting limmmits"""
         # Go to waste and SYRINGE_BOTTOM
         syringe_model = self.myLabware.get_syringe_model()
+        print (f" start wash syringe: {syringe_model}")
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         syringe_bottom_coordinate = syringe_parameters["lower_syringe_limit"] # This parameter is a coordinate on the B axis
         syringe_top_coordinate = syringe_parameters["upper_syringe_limit"] # This parameter is a coordinate on the B axis
@@ -812,7 +813,9 @@ class Coordinator:
 
         speed = self.flowrate_to_speed_converter(rate)
 
+        print(f"Syringe position is {self.ot_control._position['B']}")
         self.go_to_position(self.waste_water)
+        print (f"syringe_bottom_coordinate: {syringe_bottom_coordinate}")
         self.move_plunger(syringe_bottom_coordinate, speed)
         # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
         self.go_to_position(self.wash_water)
@@ -823,7 +826,6 @@ class Coordinator:
         self.move_plunger(syringe_sweet_spot_coordinate, speed)
         # Airgap
         self.air_gap()
-        
 
     def mid_wash(self, left_over, cushion_1, cushion_2, rate):
         """ This is a wash that is done to the syringe when picking up and dispensing different liquids"""
