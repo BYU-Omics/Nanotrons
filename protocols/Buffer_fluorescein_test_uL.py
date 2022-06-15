@@ -16,7 +16,7 @@ myProtocol = Api() # creates a protocol object using the Api
 metadata = {
 	'protocolName': 'Buffer_fluorescein_test_uL.py', 
 	'author': 'Yhann Masbernat / Alex Buttars', 
-	'description': 'Buffer Fluorescein test using syringe 1702.' 
+	'description': 'Buffer Fluorescein test using syringe 1705.' 
 }
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
@@ -51,86 +51,85 @@ myProtocol.start_wash()
 
 # L wells 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L6'))
+myProtocol.dispense_to(20000, corning_384('G11'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L7'))
+myProtocol.dispense_to(20000, corning_384('G12'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L8'))
+myProtocol.dispense_to(20000, corning_384('G13'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L9'))
+myProtocol.dispense_to(20000, corning_384('G14'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('L10'))
+myProtocol.dispense_to(20000, corning_384('G15'))
 
-# M wells 
+# M wells H1
+myProtocol.aspirate_from(20000, custom('A5'))
+myProtocol.dispense_to(20000, corning_384('H11'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M6'))
+myProtocol.dispense_to(20000, corning_384('H12'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M7'))
+myProtocol.dispense_to(20000, corning_384('H13'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M8'))
+myProtocol.dispense_to(20000, corning_384('H14'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M9'))
-
-myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('M10'))
+myProtocol.dispense_to(20000, corning_384('H15'))
 
 # N wells
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N6'))
+myProtocol.dispense_to(20000, corning_384('I11'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N7'))
+myProtocol.dispense_to(20000, corning_384('I12'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N8'))
+myProtocol.dispense_to(20000, corning_384('I13'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N9'))
+myProtocol.dispense_to(20000, corning_384('I14'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('N10'))
+myProtocol.dispense_to(20000, corning_384('I15'))
 
 # O wells 
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O6'))
+myProtocol.dispense_to(20000, corning_384('J11'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O7'))
+myProtocol.dispense_to(20000, corning_384('J12'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O8'))
+myProtocol.dispense_to(20000, corning_384('J13'))
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O9'))
+myProtocol.dispense_to(20000, corning_384('J14'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('O10'))
+myProtocol.dispense_to(20000, corning_384('J15'))
 
 # P wells
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('P6'))
+myProtocol.dispense_to(20000, corning_384('K11'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('P7'))
+myProtocol.dispense_to(20000, corning_384('K12'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('P8'))
+myProtocol.dispense_to(20000, corning_384('K13'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('P9'))
+myProtocol.dispense_to(20000, corning_384('K14'))
 
 myProtocol.aspirate_from(20000, custom('A5'))
-myProtocol.dispense_to(20000, corning_384('P10'))
+myProtocol.dispense_to(20000, corning_384('K15'))
 
 myProtocol.mid_wash()
 

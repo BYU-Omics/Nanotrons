@@ -1,4 +1,7 @@
 {
     "volume": 10,
-    "inner_diameter": 0.46
+    "inner_diameter": 0.46,
+    "upper_syringe_limit": -90,
+    "lower_syringe_limit": -190,
+    "sweetspot_on_syringe": -165
 }

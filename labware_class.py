@@ -4,6 +4,7 @@ LABWARE CLASS
     from each of them.
 """
 
+from numpy import False_
 from models_manager import LABWARE_CHIP, LABWARE_PLATE
 from chip import Chip
 from plate import Plate
@@ -14,17 +15,21 @@ import json
 
 RELATIVE_PATH_L = "/saved_labware"
 RELATIVE_PATH_W = "\\saved_labware"
+RELATIVE_PATH_L1 = "/models/syringes"
+RELATIVE_PATH_W1 = "\\models\\syringes"
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
 LINUX_OS = 'posix'
 WINDOWS_OS = 'nt'
 JSON_EXTENTION = '.json'
+SYRINGE_MODEL = "HAMILTON_1705.json"
 
 class Labware_class:
     def __init__(self):
         self.chip_list = []
         self.plate_list = []
-        self.syringe_model = ["HAMILTON_175"]
+        self.syringe_model = SYRINGE_MODEL
+        self.syringe_model_is_default = True
 
     """
     SETTERS SECTION
@@ -56,6 +61,7 @@ class Labware_class:
 
     def set_syringe_model(self, model_name):
         self.syringe_model = model_name
+        self.syringe_model_is_default = False
 
     """
     GETTERS SECTION
@@ -196,6 +202,14 @@ class Labware_class:
             path_of_interest = current_path + RELATIVE_PATH_W
         return path_of_interest
 
+    def get_path_to_saved_syringe_folder(self):
+        current_path = os.getcwd() # Returns a string representing the location of this file
+        if os.name == LINUX_OS:
+            path_of_interest = current_path + RELATIVE_PATH_L1 # Joins the current location with the name of the folder thhat contains all the saved labware setup files
+        elif os.name == WINDOWS_OS:
+            path_of_interest = current_path + RELATIVE_PATH_W1
+        return path_of_interest
+
     def save_labware_to_file(self, file_name):
         # Path
         folder_path = self.get_path_to_saved_labware_folder()
@@ -234,5 +248,9 @@ class Labware_class:
         
     def available_saved_labware_files(self):
         path = os.listdir(self.get_path_to_saved_labware_folder())
+        return path
+
+    def available_saved_syringe_files(self):
+        path = os.listdir(self.get_path_to_saved_syringe_folder())
         return path
 

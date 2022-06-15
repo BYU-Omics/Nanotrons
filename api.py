@@ -27,14 +27,14 @@ class Api:
     def set_syringe_model(self, model_name):
         self.coordinator.myLabware.set_syringe_model(model_name)
 
-    def start_wash(self):
-        self.coordinator.start_wash()
+    def start_wash(self, rate = DEFAULT_RATE):
+        self.coordinator.start_wash(rate)
 
-    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2):
-        self.coordinator.mid_wash(left_over, cushion_1, cushion_2)
+    def mid_wash(self, left_over = STANDARD_LEFT_OVER, cushion_1 = STANDARD_CUSHION_1, cushion_2 = STANDARD_CUSHION_2, rate = DEFAULT_RATE):
+        self.coordinator.mid_wash(left_over, cushion_1, cushion_2, rate)
 
-    def fill_syringe_with_water(self):
-        self.coordinator.fill_syringe_with_water()
+    def fill_syringe_with_water(self, rate = DEFAULT_RATE):
+        self.coordinator.fill_syringe_with_water(rate)
 
     def air_gap(self):
         self.coordinator.air_gap()
@@ -42,13 +42,13 @@ class Api:
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
-    def aspirate_from(self, volume, source):
-        self.coordinator.aspirate_from(volume, source)
+    def aspirate_from(self, volume, position, rate):
+        self.coordinator.aspirate_from(volume, position, rate)
         self.amount_wanted = volume
 
-    def dispense_to(self, volume, to):
+    def dispense_to(self, volume, position, rate):
         self.coordinator.set_amount_wanted(volume)
-        self.coordinator.dispense_to(volume, to)
+        self.coordinator.dispense_to(volume, position, rate)
 
     def open_lid(self):
         self.coordinator.open_lid()
