@@ -83,10 +83,6 @@ STANDARD_CUSHION_1 = 200
 STANDARD_CUSHION_2 = 300
 AMOUNT_WANTED_DEFAULT = 1000
 
-SYRINGE_BOTTOM = -190
-SYRINGE_SWEET_SPOT = -165 # Place where the plunger is at 3/4 from the top to bottom
-SYRINGE_TOP = -90
-
 from constants import RUNNING_APP_FOR_REAL, CONTROLLER_CONNECTED
 
 
@@ -141,10 +137,6 @@ class Coordinator:
         self.wash_water = None
         self.waste_water = None
         self.amount_wanted = AMOUNT_WANTED_DEFAULT
-
-        self.syringe_bottom_coordinate =  SYRINGE_BOTTOM 
-        self.syringe_sweet_spot_coordinate =  SYRINGE_SWEET_SPOT 
-        self.syringe_top_coordinate =  SYRINGE_TOP 
 
         # initialize the logging info format
         format = "%(asctime)s: %(message)s" #format logging
@@ -851,9 +843,12 @@ class Coordinator:
         """ This is the function that allows the robot to fill the syringe with water at the end of a day 
             or protocol so that if it evaporates there is still some more the next day"""
         # Go to clean, SYRINGE_TOP
+        syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        upper_syringe_limit = syringe_parameters["upper_syringe_limit"]
         speed = self.flowrate_to_speed_converter(rate)
         self.go_to_position(self.clean_water)
-        self.move_plunger(self.syringe_top_coordinate, speed)
+        self.move_plunger(upper_syringe_limit, speed)
 
 
     """

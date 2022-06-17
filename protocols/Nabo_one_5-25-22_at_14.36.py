@@ -138,7 +138,7 @@ myProtocol.dispense_to(20000, corning_384('E5'), infusion_rate)
 
 
 
-myProtocol.mid_wash(500) # <- You can input a custom flow rate in nL/s if desired.
+myProtocol.mid_wash(rate = 500) # <- You can input a custom flow rate in nL/s if desired.
 
 #--------------END OF PROTOCOL--------------
 
