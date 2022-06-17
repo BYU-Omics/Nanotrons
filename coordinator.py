@@ -39,7 +39,7 @@ from drivers.OTdriver import OT2_nanotrons_driver, SYRINGE_SLOW_SPEED
 from drivers.TDdriver import TempDeck
 from drivers.TCdriver import Thermocycler
 from protocol_creator import ProtocolCreator
-from joystick import XboxJoystick
+import joystick
 from joystick_profile import *
 from labware_class import *
 from models_manager import ModelsManager
@@ -101,7 +101,7 @@ class Coordinator:
         os_recognized = os.name
         print(f"OS recognized in init: {os_recognized}")
         self.ot_control = OT2_nanotrons_driver()
-        
+        self.mc = joystick.XboxJoystick(operating_system)
         self.myLabware = Labware_class()
         self.joystick_profile = DEFAULT_PROFILE
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
@@ -184,97 +184,95 @@ class Coordinator:
         settingsDic['c'] = self.ot_control.position['C']
         return settingsDic
 
-    def monitor_joystick(self):
-        """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
-        """
-        axes = self.myController.deliver_axes() # Dictionary with the axes index and value that are being pressed
-        buttons = self.myController.deliver_buttons() # List with strings according to the buttons currently being pressed
-        hats = self.myController.deliver_hats() # List with strings according to the buttons currently being pressed
-        # print(f"axes: {axes}")
-        # print(f"buttons: {buttons}")
-        # print(f"hats: {hats}")
-        for axis_index in range(len(self.myController.axes[:5])): # 5 is to reject the last index in the list in case there is one (for Unix OS)
-            if axis_index == 2:
-                syringe_model = self.myLabware.get_syringe_model()
-                # print (syringe_model)
-
-            ### Nathaniel commented this section out and replaced it with the joystick_step_syringe_motor function 6-7-22
-                # print(self.myController.axes[2])
-                if self.myController.axes[2] > 0:
-                    print("ASPIRATE")
-                      #self.aspirate(self.user_input, SYRINGE_SLOW_SPEED) 
-                    print(f" inside if aspirate  {syringe_model}")
-                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
-                elif self.myController.axes[2] < 0:
-                    print("DISPENSE")
-                      #self.dispense(self.user_input, SYRINGE_SLOW_SPEED)
-                    print(f" inside if dispense  {syringe_model}")
-                    self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
-                else:
-                    # print("working")
-                    pass
-
-                # if self.myController.axes[2] != 0:
-                #     print(f" inside if statement  {syringe_model}")
-                    # self.ot_control.joystick_step_syringe_motor(self.myController.axes[2], syringe_model)
-                # else:
-                #     pass
-
-
-            method_name = self.myProfile.get_axis_function(axis_index).__name__            
-            method = getattr(self.ot_control, method_name, False)
-            method(self.myController.axes[axis_index])
-
-        if (len(buttons) != 0):
-            for button in buttons:
-                if button == "START":
-                    syringe_model = self.myLabware.get_syringe_model()
-                    if self.myLabware.syringe_model_is_default:
-                        print("Please select a syringe model (start) ")
-                
-                    else :
-                        print(f"Current syringe model is: {syringe_model}")
-                        self.user_input = input("Enter volume in nanoliters: ")
-                        self.ot_control.set_nL(self.user_input)
-                        self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
-                        #self.ot_control.set_nL(self.user_input2) (Not being used currently)
-                        self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
-                        self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
-                    
-                method_name = self.myProfile.get_button_function(button).__name__
-                method = getattr(self.ot_control, method_name, False)
-                if not method:
-                    method = getattr(self.myController, method_name, False)
-                method(self.myController.get_button_by_name(button))
-
-        if (len(hats) != 0):
-            for hat in hats:
-                method_name = self.myProfile.get_hat_function(hat).__name__
-                method = getattr(self.ot_control, method_name, False)
-                method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
-
-    def manual_control(self):
+    def start_listening(self):
+        self.mc.start_pygame()
+        self.mc.listen()
+    
+    def joystick_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
-        try:  
-            t1 = threading.Thread(target=self.myController.listen)
-            t1.start()
-            while(t1.is_alive()):
-                # self.myController.listen()
-                self.monitor_joystick()
-                time.sleep(0.2) # Debounce method, so that it allows for the user to loose the button 
-        except AttributeError:
-            print("No controller connected")
+        
+        t1 = threading.Thread(target=self.start_listening)
+        t1.start()
+        while(t1.is_alive()):
+            self.monitor_joystick()
+            time.sleep(0.1)
 
-    def stop_manual_control(self):
+    def stop_joystick_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
         """
-
         try:
-            self.myController.stop_listening("") # It as a "" as an argument because it askes for a dummy argument for the method(self.myController.get_hats()[self.myController.get_hats_dict_index(hat)])
+            self.mc.stop_joystick = True
         except AttributeError:
             print("Trying to stop listening controller inputs but no controller connected")
 
+    
+    def monitor_joystick(self):
+        """ This method reads the values being collected from triggered inputs in the joystick and executes the methods associated with them
+        """
+        button, hat, axis,  = self.mc.deliver_joy()
+        self.mc.reset_values()
+        syringe_model = self.myLabware.get_syringe_model()
+        
+        if len(button) != 0:
+            if button[0] == "START":
+                if self.myLabware.syringe_model_is_default:
+                    print("Please select a syringe model (start) ")
+                
+                else :
+                    print(f"Current syringe model is: {syringe_model}")
+                    self.user_input = input("Enter volume in nanoliters: ")
+                    self.ot_control.set_nL(self.user_input)
+                    self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
+                    #self.ot_control.set_nL(self.user_input2) (Not being used currently)
+                    self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
+                    self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
+            
+            elif button[0] == "A":
+                self.ot_control.pipete_L_Down(self.ot_control.xyz_step_size)
+            elif button[0] == "B":
+                self.ot_control.report_current_position()
+            elif button[0] == "X":
+                self.ot_control.change_vertical_axis()
+            elif button[0] == "Y":
+                self.ot_control.pipete_L_Up(self.ot_control.xyz_step_size)
+            elif button[0] == "RB":
+                self.ot_control.step_size_up()
+            elif button[0] == "LB":
+                self.ot_control.step_size_down()
+            elif button[0] == "LSTICK":
+                pass
+            elif button[0] == "RSTICK":
+                pass
+            elif button[0] == "BACK":
+                self.mc.stop_joystick = True
+
+        if len(hat) != 0:
+            pass
+
+        if len(axis) != 0:
+            if axis[0] == "L_STICK_LEFT":
+                self.ot_control.move_left(self.ot_control.xyz_step_size)
+            elif axis[0] == "L_STICK_RIGHT":
+                self.ot_control.move_right(self.ot_control.xyz_step_size)
+            elif axis[0] == "L_STICK_UP":
+                self.ot_control.move_up(self.ot_control.xyz_step_size)
+            elif axis[0] == "L_STICK_DOWN":
+                self.ot_control.move_down(self.ot_control.xyz_step_size)
+            elif axis[0] == "R_STICK_LEFT":
+                pass
+            elif axis[0] == "R_STICK_RIGHT":
+                pass
+            elif axis[0] == "R_STICK_UP":
+                self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model)
+            elif axis[0] == "R_STICK_DOWN":
+                self.ot_control.plunger_L_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model)
+            elif axis[0] == "L_TRIGGER":
+                pass
+            elif axis[0] == "R_TRIGGER":
+                pass
+
+    
     def home_all_motors(self):
         """ This method homes all the motors on the OT2 except for the Syringes
         """

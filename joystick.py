@@ -6,7 +6,7 @@ JOYSTICK CLASS
 """
 
 import pygame
-import inspect
+import time
 
 # JOYSTICK BUTTONS MAPPING
 BUTTONS_DICT_W = { 0:"A", 1:"B", 2:"X", 3:"Y", 4:"LB", 
@@ -25,36 +25,22 @@ BUTTONS_DICT_REVERSED_R = { "A":0, "B":1, "X":2, "Y":3, "LB":4,
                  "RB":5, "BACK":6, "START":7, "XBOX":8, "LSTICK":9, 
                  "RSTICK":10 }
 
-"""
-RAW HATS READING 
-    (0,1):"UP", (0,-1):"DOWN", 
-    (-1,0):"LEFT", (1,0):"RIGHT", 
-    (0,0):"NOTHING", (1,1):"UP-RIGHT", 
-    (-1,-1):"DOWN-LEFT", (1,-1):"DOWN-RIGHT", 
-    (-1,1):"UP-LEFT"
-"""
-# This maps the values of the raw hat reading to the corresponding indices in the self.hats list
-RAW_HATS_DICT = { (0,1):[0], (0,-1):[1], (-1,0):[2], (1,0):[3],
-                  (1,1):[0,3], (-1,-1):[1,2], (1,-1):[1,3], (-1,1):[0,2], 
-                  (0,0):["hola"] }
+HATS_USED_DICT = { (0,1):"HAT_UP", (0,-1):"HAT_DOWN", (-1,0):"HAT_Left", (1,0):"HAT_RIGHT"}
+HATS_USED_LIST = [(0,1), (0,-1), (-1,0), (1,0)] 
 
-# HATS BUTTONS MAPPING (corresponding indeces in the self.hats list)
-HATS_DICT = {0:"UP", 1:"DOWN", 2:"LEFT", 3:"RIGHT"}
-
-HATS_DICT_INDECES = {"UP":0, "DOWN":1, "LEFT":2, "RIGHT":3}
-
-STOP_LISTEN_WINDOWS = [0, 0, 0, 0, 1, 1, 0, 0, 0, 0] # Bumpers pressed under pygame in Windows
-STOP_LISTEN_RASPBERRY = [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0] # Bumpers pressed under pygame in Raspberry OS
-
-LEFT_BUMPER_INDEX = 4
-RIGHT_BUMPER_INDEX = 5
+AXES_DICT = {(0,-1):"L_STICK_LEFT",(0,1):"L_STICK_RIGHT",(1,1):"L_STICK_DOWN",(1,-1):"L_STICK_UP",
+             (2,-1):"R_STICK_LEFT",(2,1):"R_STICK_RIGHT",(3,1):"R_STICK_DOWN",(3,-1):"R_STICK_UP",
+             (4,-1):"L_TRIGGER",(4,1):"L_TRIGGER",(5,-1):"R_TRIGGER",(5,1):"R_TRIGGER"}
 
 WINDOWS_OS = "w"
 RASPBERRY_OS = "r"
+THRESHOLD = 0.8 # This is the minimum value a joystick axes has to be to be read, otherwise it's considered 0
 
-TRIGGERS_AXIS = 2
-ERRONEOUS_AXES = [0, 1, 3, 4] # These are the indeces of the two axes that correspond to each joystick in the Xbox controller
-THRESHOLD = 0.4 # This is the minimum value a joystick axes has to be to be read, otherwise it's considered 0
+AXES = [0, 0, 0, 0, -1, -1]
+HATS = [(0,0)]
+BUTTONS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+SENSITIVE_AXES = [0, 1, 2, 3]
 
 class XboxJoystick:
     """
@@ -64,242 +50,138 @@ class XboxJoystick:
         # Store the value of the OS string given in the argument
         self.os = operating_system # Either the string "w" for windows or "r" for raspberry pi
 
-        # Initialize the pygame library
-        pygame.init()
+        self.pygame_running = False
+        self.controller_1 = None
+        self.stop_joystick = False
 
-        # Initialize the joystick library
-        pygame.joystick.init()
-        # Detect and initialize the first joystick in the list
-        self.joystick = pygame.joystick.Joystick(0)
-        self.joystick.init()
-        self.name = self.joystick.get_name()
-        print(f"Joystick initialized: {self.name}")
+        self.axes = []
+        self.hats = []
+        self.buttons = []
 
-        self.buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # self.buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # 11 elements. Windows will only use 10 but Raspberry OS requires the 11 elements
-        self.axes = [0, 0, 0, 0, 0, 0] # Each axis state
-        
-        self.hats = [0, 0, 0, 0] # Each hat (arrow) has a state
-        self.keep_listening = False
-        
-        self.axes_direction = [1, 1, 1, 1, 1, 1] # This is a multiplier to the argument of the function that moves the motor associated to the axis. It can be inverted depending on the user preferences
-        self.bumpers_direction = 1
+        self.pressed_button = []
+        self.pressed_hat = []
+        self.pressed_axis = []
 
+    # this function is used to reset the values of pressed inputs lists before adding new ones
     def reset_values(self):
-        self.buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # self.buttons = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] # 11 elements. Windows will only use 10 bu tRaspberry OS requires the 11 elements
-        self.hats = [0, 0, 0, 0] # Each hat state (Arrow buttons)
-        self.axes = [0, 0, 0, 0, 0, 0] # Each axis state
-        self.keep_listening = False
+        self.pressed_button = []
+        self.pressed_hat = []
+        self.pressed_axis = [] 
 
-    """
-    GETTERS
-    """
-    def get_buttons(self):
-        return self.buttons
+    # initializes pygame, pygame.joystick, and an instance of the controller (xbox style controller) 
+    def start_pygame(self):
 
-    def get_hats(self):
-        return self.hats
+        if self.pygame_running == False:
+            print("Controller Initialized")
+            pygame.init()
+            pygame.joystick.init()
+            self.controller_1 = pygame.joystick.Joystick(0)
+        self.pygame_running = True
 
-    def get_axes(self):
-        return self.axes
-
-    # This returns the index in self.hats (self.hats is a list) that corresponds to a given string representing a hat ("UP", "LEFT", "DOWN", etc)
-    def get_hats_dict_index(self, hat):
-        return HATS_DICT_INDECES[hat]
-
-    # This is a list of either 1's or -1's that are a multiplier to the respective axis reading (to invert or revert the reading of a given axis)
-    def get_axis_direction(self, axis_index):
-        return self.axes_direction[axis_index]
-
-    # This converts the corresponding multiplier within self.axes_direction from a 1 into a -1 and viceversa
-    def set_axis_direction(self, axis_index, direction):
-        self.axes_direction[axis_index] = direction
-    
-    # dummy_argument is a placeholder,  when we call a method from motor series it could be called by a button which by itself doesn't always
-        # provide an argument (like letter buttons) but sometimes it does (like bumpers) so to generalize the method call a dummy argument is added
-    def invert_bumpers_direction(self, dummy_argument):
-        self.bumpers_direction = self.bumpers_direction * (-1)
-    
-    # This returns the value of a given button provided the string that represents it
-    def get_button_by_name(self, name):
-        if self.os == WINDOWS_OS:
-            return self.buttons[BUTTONS_DICT_REVERSED_W[name]]
-        elif self.os == RASPBERRY_OS:
-            return self.buttons[BUTTONS_DICT_REVERSED_R[name]]
-
-    """
-    READING SECTION
-    """
-    # Read the state of the axes in the joystick
-    def read_axes(self):
-        self.axes = [round(self.joystick.get_axis(i), 3) for i in range(self.joystick.get_numaxes())] # rounded to 1 decimal point bc the stick axes are never actually 0 (they have an error that starts on the second decimal point of the reading)
-                
-        # The following lines of code implement a fix for uniform operation of the pygame library between windows and raspberry os
-        if (self.os == RASPBERRY_OS):
-            var1 = self.axes[3]
-            self.axes[3] = self.axes[4]
-            self.axes[4] = var1
-            
-            if self.joystick.get_axis(2) == 0:
-                self.axes[2] = -1
-            if self.joystick.get_axis(5) == 0:
-                self.axes[5] = -1
-            
-            if self.axes[2] != -1:
-                trigger_axis = self.axes[2]
-                self.axes[TRIGGERS_AXIS] = (trigger_axis + 1)/2
-            elif self.axes[5] != -1:
-                trigger_axis = self.axes[5]
-                self.axes[TRIGGERS_AXIS] = -1*(trigger_axis + 1)/2
-            else:
-                # both axes are not being pressed or both are being pressed
-                self.axes[TRIGGERS_AXIS] = 0
+    # deinitializes pygame, pygame.joystick, and an instance of the controller (xbox style controller)
+    def end_pygame(self):
         
-        self.axes_error_filter() # Apply the filter to the analog error of the joysticks in the controller
-
-        # Multiply each final value by the direction of the axes defined in self.axes_direction
-        self.axes = [ self.axes[i] * self.axes_direction[i] for i in range(len(self.axes))]
-        
-    # Read the state of the buttons in the joystick
-    def read_buttons(self):
-        # print("Reading buttons")
-        self.buttons = [self.joystick.get_button(i) for i in range(self.joystick.get_numbuttons())]
-        if self.buttons[LEFT_BUMPER_INDEX] == 1:
-            self.buttons[LEFT_BUMPER_INDEX] = 1 * self.bumpers_direction
-        if self.buttons[RIGHT_BUMPER_INDEX] == 1:
-            self.buttons[RIGHT_BUMPER_INDEX] = -1 * self.bumpers_direction
-
-    # Read the state of the hats in the joystick
-    def read_hats(self):
-        raw_hats= self.joystick.get_hat(0) # This is a tuple in the format (x,y),  but we'll convert it to [a, b, c, d] with each letter being the arrow pressed
-        indeces_list = RAW_HATS_DICT[raw_hats]
-        for index in range(len(self.hats)):
-            if index in indeces_list:
-                if ( (HATS_DICT[index] == "DOWN") or (HATS_DICT[index] == "RIGHT") ):                    
-                    self.hats[index] = 1
-                else:
-                    self.hats[index] = -1
-            else:
-                self.hats[index] = 0
-                
-    # Filtering of the axes of the joysticks, who carry an analog error by factory
-    def axes_error_filter(self):
-        for i in ERRONEOUS_AXES:
+        if self.pygame_running == True:
+            pygame.quit()
+            pygame.joystick.quit()
+            self.pygame_running = False
+    
+    # this function prevents light/unintended axis events from calling axis commands
+    def false_axes_event_filter(self):
+        for i in SENSITIVE_AXES:
             if abs(self.axes[i]) < THRESHOLD:
                 self.axes[i] = 0
 
-    # This returns a list of strings that represent all the buttons that are currently being pressed
-        # When this function gets called, it reads the list self.buttons and for every element that is 
-        # set to 1, it will append the corresponding value ("A", "X", "Y", etc.) to the list that it
-        # will return. This will then feed the input for a Profile object which will execute the 
-        # associated function
-    def deliver_buttons(self):
-        pressed_buttons = []
-        # print(f"OS: {self.os}")
-        # print(f"buttons: {len(self.buttons)}")
-        for button in range(len(self.buttons)):
-            #print(f"button: {self.buttons[button]}")
-            if self.buttons[button] != 0:
-                # print(f"buttons[button]: {self.buttons[button]}")
-                # print(f"Is os windows: {self.os == WINDOWS_OS}")
-                if self.os == WINDOWS_OS:
-                    # print("In windows")
-                    pressed_buttons.append(BUTTONS_DICT_W[button])
-                elif self.os == RASPBERRY_OS:
-                    pressed_buttons.append(BUTTONS_DICT_R[button])
-            
-                # print(f"Buttons are: {self.buttons}")
-        return pressed_buttons
-
-    # This returns a list of strings that represent all the hats that are currently being pressed
-        # When this function gets called, it reads the list self.hats and for every element that is 
-        # set to 1, it will append the corresponding value ("A", "X", "Y", etc.) to the list that it
-        # will return. This will then feed the input for a Profile object which will execute the 
-        # associated function
-    def deliver_hats(self):
-        pressed_hats = []
-        for hat in range(len(self.hats)):
-            if ( (self.hats[hat] == 1) or (self.hats[hat] == -1) ):
-                pressed_hats.append(HATS_DICT[hat])
-        
-        return pressed_hats
-
-    # This returns a dictionary that represent all the axes that are currently not in their natural position
-    def deliver_axes(self):
-        axes_to_deliver = {}
-        for axis in range(5): # This ignores the 6th index which is just garbage from the pygame library
-            if self.axes[axis] != 0:
-                # print("deliver_axes")
-                axes_to_deliver[axis] = self.axes[axis]
-        return axes_to_deliver
+    # this function is used to retrieve the pressed inputs lists
+    def deliver_joy(self):
+        return self.pressed_button, self.pressed_hat, self.pressed_axis
 
     """
     LISTEN SECTION
     """
     # Listens to the controller's input
     def listen(self):
-        # print("Listen()")
-        self.reset_values() # reset the values read from the last call for listen_one()
-        self.keep_listening = True
-        while (self.keep_listening):
-            # print("In while loop")
-            # EVENT DETECTION AND PRINT
-            # Possible joystick actions: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN, JOYBUTTONUP, JOYHATMOTION
-            # print(len(pygame.event.get()))
+
+        listening = True
+
+        while listening:
+   
             for event in pygame.event.get(): # User did something.
-                # print(f"Event type: {event.type}")
-                # print(f"Event button up: {pygame.JOYBUTTONDOWN}")
-                # print(f"Event butn dwn: {pygame.JOYBUTTONUP}")
-                # print(f"Event axis: {pygame.JOYAXISMOTION}")
-                # print(f"Event hat: {pygame.JOYHATMOTION}")
-                if event.type == pygame.JOYBUTTONDOWN:
-                    self.read_buttons()
-                    # print(self.get_buttons())
-                    # print(self.deliver_buttons())
+                
+                self.reset_values()  
 
+                if self.stop_joystick == True:
+                    print("Stopping Joystick")
+                    self.end_pygame()
+                    listening = False
+                    return listening
+
+                # Button down events, just like it sounds (when you press a button)
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    previous_buttons = self.buttons
+                    self.buttons = [self.controller_1.get_button(i) for i in range(self.controller_1.get_numbuttons())]
+                    if (self.buttons != BUTTONS and previous_buttons == BUTTONS):
+                        # print(f"buttons: {self.myControler.get_numbuttons()}, {self.buttons}")
+                        # print("")
+                        # count += 1
+                        # print(f" event count: {count}")
+
+                        
+
+                        for button in range(len(self.buttons)):
+                            if self.buttons[button] != 0:
+                                self.pressed_button.append(BUTTONS_DICT_W[button])
+                                # print(f"Pressed button is in pygame_practice: {self.pressed_button}\n")
+
+                        time.sleep(0.5)
+
+                
+                # Releasing buttons are treated as separate events from pressing them down, updates position values
                 elif event.type == pygame.JOYBUTTONUP:
-                    self.read_buttons()
-                    # print(self.deliver_buttons())
+                    self.buttons = [self.controller_1.get_button(i) for i in range(self.controller_1.get_numbuttons())]
+                    # print(f"buttons on release: {self.controller_1.get_numbuttons()}, {self.buttons}")
+                    
 
-                elif event.type == pygame.JOYAXISMOTION:
-                    self.read_axes()
-                    # print(self.deliver_axes())
-                    # print(self.get_axes())
 
+                # Hat motion events (aka D-pad)
                 elif event.type == pygame.JOYHATMOTION:
-                    self.read_hats()
-                    # print(self.deliver_hats())
-                    # print(self.to_string_hats())
+                    previous_hats = self.hats
+                    self.hats = [self.controller_1.get_hat(i) for i in range(self.controller_1.get_numhats())]
+                    if (self.hats != HATS) and (previous_hats == HATS):
+                        # print(f"hats: {self.controller_1.get_numhats()}, {self.hats}")
+                        # print("")
+                        # count += 1
+                        # print(f" event count: {count}")
 
-    # Sets to False the boolean that controls the listen() loop
-    def stop_listening(self, dummy_arg):
-        self.keep_listening = False
-
-    """
-    TO STRING SECTION 
-    
-    def to_string_buttons(self):
-        return f"Buttons: {self.buttons}"
-
-    def to_string_hats(self):
-        return f"Hats: {self.hats}"
-
-    def to_string_axes(self):
-        return f"Axes: {self.axes}"
-
-    def to_string_trigger(self):
-        return f"Trigger: {self.axes[2]}"
+                        for hat in range(len(self.hats)):
+                            if self.hats[hat] in HATS_USED_LIST: # only using left, right, up, and down, ignores diagonals
+                                self.pressed_hat.append(HATS_USED_DICT[self.hats[hat]])
+                        # print(f"Pressed hat is in pygame_practice: {self.pressed_hat}\n")
+                        time.sleep(0.5)
 
 
-def testing():
-    os = WINDOWS_OS
-    print(F"TESTING JOYSTICK -> OS: {os}")
-    controller = XboxJoystick(os)
-    controller.listen()
-    
 
-if __name__ == "__main__":
-    testing()
 
-"""
+                # Axis motion events (aka triggers and thumbsticks)
+                elif event.type == pygame.JOYAXISMOTION:
+                    previous_axes = self.axes
+                    self.axes = [self.controller_1.get_axis(i) for i in range(self.controller_1.get_numaxes())]
+                    self.false_axes_event_filter()
+                    if (self.axes != AXES) and (previous_axes == AXES):
+                        # print(f"axes: {self.controller_1.get_numaxes()}, {self.axes}")
+                        # print("")
+                        # count += 1
+                        # print(f" event count: {count}")
+
+                        for axis in range(len(self.axes)):
+                            if self.axes[axis] != AXES[axis]:
+                                if self.axes[axis] > 0:
+                                    axis_key = (axis,1)
+                                elif self.axes[axis] < 0:
+                                    axis_key = (axis,-1)
+                        self.pressed_axis.append(AXES_DICT[axis_key])
+                        # print(f"Pressed axis is in pygame_practice: {self.pressed_axis}\n")
+                        time.sleep(0.5)
+                        
+                else: 
+                    pass

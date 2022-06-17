@@ -342,14 +342,14 @@ def stop_deliver_coordinates():
 #----------------------------------------------- MANUAL CONTROL PAGE EVENTS SECTION
 @socketio.on("start_manual_control_window")
 def start_manual_control_window():
-    #print("Manual control")
+    #print("Joystick control")
     coordinator.ot_control.set_tc_flag(is_tc_mounted=THERMOCYCLER_CONNECTED)
-    coordinator.manual_control()
+    coordinator.joystick_control()
 
 @socketio.on("stop_manual_control_window")
 def stop_manual_control_window():
-    # print("stop_manual_control")
-    coordinator.stop_manual_control()
+    # print("stop_joystick_control")
+    coordinator.stop_joystick_control()
 
 # @socketio.on("screen_info")
 # def screen_info():
@@ -529,7 +529,7 @@ def start_calibration():
     calibration_points = []
     while not read_done_calibration_flag():
         # Enable manual control
-        coordinator.manual_control()
+        coordinator.joystick_control()
         print("Calibration point added")
         # Once manual control is over (user pressed START button), read the position of the syringe
         position = coordinator.get_current_coordinates()
@@ -556,7 +556,7 @@ def modify_calibration(calibration_points):
     index = calibration_points[FOURTH_CALIBRATION_POINT_POSITION]
     new_list = calibration_points[:(NUMBER_OF_CALIBRATION_POINTS - 1)] # List with the previous calibration points
     # Enable manual control
-    coordinator.manual_control()
+    coordinator.joystick_control()
     # Once manual control is over (user pressed START button), read the position of the syringe
     new_position = coordinator.get_current_coordinates()
     # Store the position in the calibration points list
@@ -587,7 +587,7 @@ def stop_calibration():
     myCamera.stop()
     my_Pippete_Camera.stop()
     activate_done_calibration_flag()
-    coordinator.stop_manual_control()
+    coordinator.stop_joystick_control()
 
 #----------------------------------------------- LABWARE EVENTS SECTION
 

@@ -107,7 +107,7 @@ class OT2_nanotrons_driver(SM):
 
 # Functions that help movements
         
-    def check_for_valid_move(self, pos, axis, size) -> bool:
+    def check_for_valid_move(self, pos, axis) -> bool:
         # print(pos)
         """
         This function checks for limits. If the user tries to go too far, the move 
@@ -155,7 +155,7 @@ class OT2_nanotrons_driver(SM):
         else:
             return HIGH_SPEED
 
-    def double_step_size_XYZ(self, dummyarg):
+    def step_size_up(self):
         """"
         This function first checks for the current step
         size so that it does not go over the limit, and then it doubles it.
@@ -168,7 +168,7 @@ class OT2_nanotrons_driver(SM):
             print("Trying to move morethan allowed predefined steps")
             print(f"The stepping size is currently set to {self.xyz_step_size}")
 
-    def half_step_size_XYZ(self, dummyarg):
+    def step_size_down(self):
         """"
         This function first checks for the current step
         size so that it does not go over the limit, and then it halves it.
@@ -189,7 +189,7 @@ class OT2_nanotrons_driver(SM):
         """
         y_pos = self._position['Y'] # stores the current position
         y_pos += step_size # adds a step size to the current position
-        if(self.check_for_valid_move(y_pos, 'Y', step_size)): # if the future position is a valid move 
+        if(self.check_for_valid_move(y_pos, 'Y')): # if the future position is a valid move 
             self.move({'Y': y_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass # if the move is not valid just dont move 
@@ -197,7 +197,7 @@ class OT2_nanotrons_driver(SM):
     def move_down(self, step_size = STEP_SIZE):
         y_pos = self._position['Y'] # stores the current position
         y_pos -= step_size # adds a step size to the current position
-        if(self.check_for_valid_move(y_pos, 'Y', step_size*(-1))): # if the future position is a valid move 
+        if(self.check_for_valid_move(y_pos, 'Y')): # if the future position is a valid move 
             self.move({'Y': y_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass # if the move is not valid just dont move 
@@ -205,7 +205,7 @@ class OT2_nanotrons_driver(SM):
     def move_left(self, step_size = STEP_SIZE):
         x_pos = self._position['X'] # stores the current position
         x_pos -= step_size # adds a step size to the current position
-        if(self.check_for_valid_move(x_pos, 'X', step_size*(-1))): # if the future position is a valid move 
+        if(self.check_for_valid_move(x_pos, 'X')): # if the future position is a valid move 
             self.move({'X': x_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
@@ -213,7 +213,7 @@ class OT2_nanotrons_driver(SM):
     def move_right(self, step_size = STEP_SIZE):
         x_pos = self._position['X'] # stores the current position
         x_pos += step_size # adds a step size to the current position
-        if(self.check_for_valid_move(x_pos, 'X', step_size)): # if the future position is a valid move 
+        if(self.check_for_valid_move(x_pos, 'X')): # if the future position is a valid move 
             self.move({'X': x_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
@@ -221,7 +221,7 @@ class OT2_nanotrons_driver(SM):
     def pipete_R_Down(self, step_size = STEP_SIZE):
         z_pos = self._position['A'] # stores the current position
         z_pos -= step_size # adds a step size to the current position
-        if(self.check_for_valid_move(z_pos, 'A', step_size*(-1))): # if the future position is a valid move 
+        if(self.check_for_valid_move(z_pos, 'A')): # if the future position is a valid move 
             self.move({'A': z_pos}, speed= self.check_speed(step_size)) # move to the indicated position
         else:
             pass
@@ -229,7 +229,7 @@ class OT2_nanotrons_driver(SM):
     def pipete_R_Up(self, size = STEP_SIZE):
         z_pos = self._position['A'] # stores the current position
         z_pos += size # adds a step size to the current position
-        if(self.check_for_valid_move(z_pos, 'A', size)): # if the future position is a valid move 
+        if(self.check_for_valid_move(z_pos, 'A')): # if the future position is a valid move 
             self.move({'A': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
@@ -237,7 +237,7 @@ class OT2_nanotrons_driver(SM):
     def pipete_L_Down(self, size = STEP_SIZE):
         z_pos = self._position['Z'] # stores the current position
         z_pos -= size # adds a step size to the current position
-        if(self.check_for_valid_move(z_pos, 'Z', size*(-1)) ): # if the future position is a valid move 
+        if(self.check_for_valid_move(z_pos, 'Z') ): # if the future position is a valid move 
             self.move({'Z': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
@@ -245,7 +245,7 @@ class OT2_nanotrons_driver(SM):
     def pipete_L_Up(self, size = STEP_SIZE):
         z_pos = self._position['Z'] # stores the current position
         z_pos += size # adds a step size to the current position
-        if(self.check_for_valid_move(z_pos, 'Z', size) ): # if the future position is a valid move 
+        if(self.check_for_valid_move(z_pos, 'Z') ): # if the future position is a valid move 
             self.move({'Z': z_pos}, speed= self.check_speed(size)) # move to the indicated position
         else:
             pass
@@ -254,11 +254,11 @@ class OT2_nanotrons_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        if syringe_model == labware_class.SYRINGE_MODEL:
+        if syringe_model != labware_class.SYRINGE_MODEL:
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos += size # adds a step size to the current position
-            if(self.check_for_valid_move(b_pos, 'B', size)): # if the future position is a valid move 
+            if(self.check_for_valid_move(b_pos, 'B')): # if the future position is a valid move 
                 # print(f"This is in OTdriver (Plunger L up)")
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
@@ -282,11 +282,11 @@ class OT2_nanotrons_driver(SM):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
-        if syringe_model == labware_class.SYRINGE_MODEL:
+        if syringe_model != labware_class.SYRINGE_MODEL:
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos -= size # adds a step size to the current position
-            if(self.check_for_valid_move(b_pos, 'B', size*(-1))):
+            if(self.check_for_valid_move(b_pos, 'B')):
                 # print(f"This is in OTdriver (Plunger L down")
                 # print(f"current step size is {(size / UNIT_CONVERSION)} mm")
                 # print(f"current plunger speed is: {speed} mm/s")
@@ -313,7 +313,7 @@ class OT2_nanotrons_driver(SM):
             speed = float(speed)
             c_pos: float = self._position['C'] # stores the current position
             c_pos = c_pos + size # adds a step size to the current position
-            if(self.check_for_valid_move(c_pos, 'C', size)): # if the future position is a valid move 
+            if(self.check_for_valid_move(c_pos, 'C')): # if the future position is a valid move 
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
                 # good_speed = input("Is this a good speed (y/n): ")
@@ -339,7 +339,7 @@ class OT2_nanotrons_driver(SM):
             speed = float(speed)
             c_pos: float = self._position['C'] # stores the current position
             c_pos = c_pos - size # adds a step size to the current position
-            if(self.check_for_valid_move(c_pos, 'C', size*(-1))): # if the future position is a valid move 
+            if(self.check_for_valid_move(c_pos, 'C')): # if the future position is a valid move 
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
                 # good_speed = input("Is this a good speed (y/n): ")
@@ -437,52 +437,52 @@ class OT2_nanotrons_driver(SM):
 
 # Joystick functions
 
-    def joystick_step_x_motor(self, direction = 1):
-        if direction > 0:
-            self.move_right(self.xyz_step_size)
-        elif direction < 0:
-            self.move_left(self.xyz_step_size)
-        else:
-            pass
+    # def joystick_step_x_motor(self, direction = 1):
+    #     if direction > 0:
+    #         self.move_right(self.xyz_step_size)
+    #     elif direction < 0:
+    #         self.move_left(self.xyz_step_size)
+    #     else:
+    #         pass
             
-    def joystick_step_y_motor(self, direction = 1):
-        if direction > 0:
-            self.move_down(self.xyz_step_size)
-        elif direction < 0:
-            self.move_up(self.xyz_step_size)
-        else:
-            pass
+    # def joystick_step_y_motor(self, direction = 1):
+    #     if direction > 0:
+    #         self.move_down(self.xyz_step_size)
+    #     elif direction < 0:
+    #         self.move_up(self.xyz_step_size)
+    #     else:
+    #         pass
 
-    def joystick_step_z_motor_up(self, side):
-        if self.side == LEFT:
-            self.pipete_L_Up(self.xyz_step_size)
-        if self.side == RIGHT:    
-            self.pipete_R_Up(self.xyz_step_size)
+    # def joystick_step_z_motor_up(self, side):
+    #     if self.side == LEFT:
+    #         self.pipete_L_Up(self.xyz_step_size)
+    #     if self.side == RIGHT:    
+    #         self.pipete_R_Up(self.xyz_step_size)
     
-    def joystick_step_z_motor_down(self, dummyarg):
-        if self.side == LEFT:
-            self.pipete_L_Down(self.xyz_step_size)
-        if self.side == RIGHT:    
-            self.pipete_R_Down(self.xyz_step_size)
+    # def joystick_step_z_motor_down(self, dummyarg):
+    #     if self.side == LEFT:
+    #         self.pipete_L_Down(self.xyz_step_size)
+    #     if self.side == RIGHT:    
+    #         self.pipete_R_Down(self.xyz_step_size)
 
-    def joystick_step_syringe_motor(self, direction = 1, syringe_model = labware_class.SYRINGE_MODEL):
-        if self.side == LEFT:    
-            if direction > 0:
-                print(f"Syringe model (L-down) {syringe_model}")
-                self.plunger_L_Down(self.syringe_step_size, self.syringe_step_speed, syringe_model)
-            elif direction < 0:
-                print(f"Syringe model (L-up) {syringe_model}")
-                self.plunger_L_Up(self.syringe_step_size, self.syringe_step_speed, syringe_model)
-            else:
-                pass
+    # def joystick_step_syringe_motor(self, direction = 1, syringe_model = labware_class.SYRINGE_MODEL):
+    #     if self.side == LEFT:    
+    #         if direction > 0:
+    #             print(f"Syringe model (L-down) {syringe_model}")
+    #             self.plunger_L_Down(self.syringe_step_size, self.syringe_step_speed, syringe_model)
+    #         elif direction < 0:
+    #             print(f"Syringe model (L-up) {syringe_model}")
+    #             self.plunger_L_Up(self.syringe_step_size, self.syringe_step_speed, syringe_model)
+    #         else:
+    #             pass
 
-        elif self.side == RIGHT:        
-            if direction > 0:
-                self.plunger_R_Down(self.syringe_step_size, self.syringe_step_speed, syringe_model)
-            elif direction < 0:
-                self.plunger_R_Up(self.syringe_step_size, self.syringe_step_speed, syringe_model)
-            else:
-                pass
+    #     elif self.side == RIGHT:        
+    #         if direction > 0:
+    #             self.plunger_R_Down(self.syringe_step_size, self.syringe_step_speed, syringe_model)
+    #         elif direction < 0:
+    #             self.plunger_R_Up(self.syringe_step_size, self.syringe_step_speed, syringe_model)
+    #         else:
+    #             pass
 
 # Stepper functions 
 
@@ -552,15 +552,15 @@ class OT2_nanotrons_driver(SM):
             self.move({'Z': current_z_pos + 30}, speed= MEDIUM_SPEED)
         else:
             self.move({'Z': current_z_pos}, speed= MEDIUM_SPEED)
-        if(self.check_for_valid_move(y, 'Y', None)):
+        if(self.check_for_valid_move(y, 'Y')):
             # First move the Y axis so that it does not collapse with the thermocycler
             self.move({'Y': y}, speed= MEDIUM_SPEED)
-            if(self.check_for_valid_move(x, 'X', None)):
+            if(self.check_for_valid_move(x, 'X')):
                 self.move({'X': x}, speed= MEDIUM_SPEED)
-                if(self.check_for_valid_move(z, 'Z', None)):
+                if(self.check_for_valid_move(z, 'Z')):
                     self.move({'Z': z}, speed= MOVE_TO_SPEED)
 
-    def change_vertical_axis(self, dummyarg):
+    def change_vertical_axis(self):
         # This function allows the controller to have more functionality
         if self.side == LEFT:
             self.side = RIGHT
@@ -571,7 +571,7 @@ class OT2_nanotrons_driver(SM):
         else:
             print("Vertical Axis Error!")
             
-    def report_current_position(self, dummyarg):
+    def report_current_position(self):
         # This function allows the controller to have more functionality
         X_position: float = self._position['X']
         Y_position: float = self._position['Y']
@@ -592,7 +592,7 @@ class OT2_nanotrons_driver(SM):
         z = self._position['Z']
         return x, y, z
     
-    def home_all(self, dummyarg):
+    def home_all(self):
         # print("Example:  'X Y Z A B C' or 'all' ")
         try:
             self.home('X Y Z A')
@@ -605,7 +605,7 @@ class OT2_nanotrons_driver(SM):
     def nothing(self, argument = 1):
         pass
     
-    def screen_info(self, dummyarg):
+    def screen_info(self):
         print("............................................")
         print("")
         print(f"Step size S set to:          {self.syringe_step_size}") 
