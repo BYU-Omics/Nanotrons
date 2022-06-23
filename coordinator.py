@@ -83,6 +83,7 @@ STANDARD_CUSHION_1 = 200
 STANDARD_CUSHION_2 = 300
 AMOUNT_WANTED_DEFAULT = 1000
 
+
 from constants import RUNNING_APP_FOR_REAL, CONTROLLER_CONNECTED
 
 
@@ -107,6 +108,7 @@ class Coordinator:
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
         self.protocol_creator = ProtocolCreator()
+        self.calibration_points = []
         
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
@@ -191,12 +193,16 @@ class Coordinator:
     def joystick_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
         """
-        
-        t1 = threading.Thread(target=self.start_listening)
-        t1.start()
-        while(t1.is_alive()):
-            self.monitor_joystick()
-            time.sleep(0.1)
+        self.mc.stop_joystick = False
+
+        if not self.mc.pygame_running:
+            t1 = threading.Thread(target=self.start_listening)
+            t1.start()
+            while(t1.is_alive()):
+                self.monitor_joystick()
+                time.sleep(0.1)
+        else:
+            pass
 
     def stop_joystick_control(self):
         """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag

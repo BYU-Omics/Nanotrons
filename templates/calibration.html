@@ -12,13 +12,18 @@
     <body>
         <h1>Calibration</h1>
         <br>
-        <button id="back_home" onclick="window.location.href='http://127.0.0.1:5000/';">HOME</button>
-        <button onclick="screen_info()">Screen Info</button>
+        <button id= "home" onclick="window.location.href='http://localhost:5000/';">Home</button>
+
+        <button onclick="window.location.href='http://localhost:5000/manual_control';">Manual Control</button>
+    
+        <button id="labware" onclick="window.location.href='http://localhost:5000/labware';">Labware</button>
+    
+        <button id="protocol" onclick="window.location.href='http://localhost:5000/protocol_execution';">Protocol</button>
+    
+        <button id="about" onclick="window.location.href='http://localhost:5000/about';">About</button>
+
         <br>
-        <button onclick="down_step_size()">Increase step size</button>
-        <button onclick="up_step_size()">Decrease step size</button>
-        <button onclick="stop_manual_control_window()">Add calibration point</button>
-        <br>
+
         <button class="btn-1" onclick="go_to_deck_slot('10')">10</button>
         <button class="btn-1" onclick="go_to_deck_slot('11')">11</button>
         <button class="btn-1" onclick="go_to_deck_slot('12')">12</button>
@@ -40,13 +45,17 @@
         <h3 id='component'>Component: </h3>
 
         <h3 id='coordinates'>Current Coordinates: </h3>
+        
+        <br>
+        <button onclick="add_calibration_point()">Add calibration point</button>
+        <br>
 
         <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
         <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
 
         <button type="button" disabled="disabled" id="test">Test Calibration</button>
 
-        <button type="button" disabled="disabled" id="good_calibration" onclick="location.href='/labware'">Good Calibration - Save Component</button>
+        <button type="button" disabled="disabled" id="good_calibration" onclick="window.location.href='http://localhost:5000/labware';" >Good Calibration - Save Component</button>
 
         <button type="button" disabled="disabled" id="bad_calibration" onclick="location.href='/calibrate_component'">Bad Calibration - Retry</button>
 

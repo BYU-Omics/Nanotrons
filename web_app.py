@@ -508,14 +508,7 @@ def check_tempdeck_status():
 
 @socketio.on("calibration_parameters")
 def calibration_parameters(component_information):
-    # Empty pre-existing components
-    print(componentToCalibrate)
-    print(component_information)
-
     componentToCalibrate.clear()
-    print(componentToCalibrate)
-   # print(component_information)
-
     # component_information comes in the following format: ["c", "SZ002"]
     componentToCalibrate.append(component_information[0]) # Type of component: either "c" or "p" for chip and plate. respectively
     componentToCalibrate.append(component_information[1]) # Component model
@@ -524,27 +517,20 @@ def calibration_parameters(component_information):
 
 @socketio.on("start_calibration")
 def start_calibration():
-    deactivate_done_calibration_flag()
-    socketio.emit("component_being_calibrated", componentToCalibrate) # Send the component being calibrated
-    calibration_points = []
-    while not read_done_calibration_flag():
-        # Enable manual control
-        coordinator.joystick_control()
-        print("Calibration point added")
-        # Once manual control is over (user pressed START button), read the position of the syringe
-        position = coordinator.get_current_coordinates()
-        # Store the position in the calibration points list
-        calibration_points.append(position)
-        # Send feedback to user
-        socketio.emit("feedback_calibration_point", [ position[X], position[Y], position[Z] ] )
-        # Check if all the calibration points have been collected
-        if (len(calibration_points) == NUMBER_OF_CALIBRATION_POINTS):
-            activate_done_calibration_flag()
+    socketio.emit("component_being_calibrated", componentToCalibrate)
+    coordinator.calibration_points = []
+    coordinator.joystick_control()
+
+@socketio.on ("add_calibration_point")
+def add_calibration_point():
+    position = coordinator.get_current_coordinates()
+    coordinator.calibration_points.append(position)
+    socketio.emit("feedback_calibration_point", [ position[X], position[Y], position[Z] ] )
 
     # Checking again, bc the flag could've been deactivated when exiting calibration (pressing home button or other) before finishing the calibration
-    if (len(calibration_points) == NUMBER_OF_CALIBRATION_POINTS):
+    if (len(coordinator.calibration_points) == NUMBER_OF_CALIBRATION_POINTS):
         # Send an event with the calibration points list
-        socketio.emit("stored_calibration_points", calibration_points)
+        socketio.emit("stored_calibration_points", coordinator.calibration_points)
 
 @socketio.on("start_calibration_load")
 def start_calibration_load():
@@ -552,11 +538,11 @@ def start_calibration_load():
 
 @socketio.on("modify_calibration")
 def modify_calibration(calibration_points):
+
     # The 4th element will be the index to modify
     index = calibration_points[FOURTH_CALIBRATION_POINT_POSITION]
     new_list = calibration_points[:(NUMBER_OF_CALIBRATION_POINTS - 1)] # List with the previous calibration points
-    # Enable manual control
-    coordinator.joystick_control()
+
     # Once manual control is over (user pressed START button), read the position of the syringe
     new_position = coordinator.get_current_coordinates()
     # Store the position in the calibration points list
@@ -569,6 +555,7 @@ def modify_calibration(calibration_points):
 def test_calibration(calibration_points):
     # Guess fourth point
     fourth_point = coordinator.guess_fourth_calibration_point(calibration_points)
+    socketio.emit("feedback_calibration_point", [ fourth_point[X], fourth_point[Y], fourth_point[Z] ] )
     # Move syringe to the guessed point
     coordinator.go_to_position(fourth_point)
 
@@ -578,6 +565,9 @@ def calibration_confirmed(calibration_points):
     labware_component = componentToCalibrate[LABWARE_COMPONENT_INDEX]
     component_model = componentToCalibrate[COMPONENT_MODEL_INDEX]
 
+    print(f"labware component: {labware_component}")
+    print(f"component model: {component_model}")
+
     # Call the coordinator method that creates the component and maps out its elements
     coordinator.add_labware_component(labware_component, component_model, calibration_points)
 
@@ -586,7 +576,6 @@ def stop_calibration():
     stop_sending_coordinates()
     myCamera.stop()
     my_Pippete_Camera.stop()
-    activate_done_calibration_flag()
     coordinator.stop_joystick_control()
 
 #----------------------------------------------- LABWARE EVENTS SECTION
@@ -615,63 +604,51 @@ def get_current_labware():
                     slot = 1
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 1
-                    print("FINAL SLOT: 1")
                 elif coordinates[1] < 221.5:
                     slot = 4
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 4
-                    print("FINAL SLOT: 4")
                 elif coordinates[1] < 319.5:
                     slot = 7
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 7
-                    print("FINAL SLOT: 7")
                 else:
                     slot = 10
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 10
-                    print("FINAL SLOT: 10")
             elif coordinates[0] < 228.33:
                 if coordinates[1] < 123.25:
                     slot = 2
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 2
-                    print("FINAL SLOT: 2")
                 elif coordinates[1] < 221.5:
                     slot = 5
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 5
-                    print("FINAL SLOT: 5")
                 elif coordinates[1] < 319.5:
                     slot = 8
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 8
-                    print("FINAL SLOT: 8")
                 else:
                     slot = 11
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 11
-                    print("FINAL SLOT: 11")
             else:
                 if coordinates[1] < 123.25:
                     slot = 3
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 3
-                    print("FINAL SLOT: 3")
                 elif coordinates[1] < 221.5:
                     slot = 6
                     piece_of_labware = second_key[j]
-                    print("FINAL SLOT: 6")
                 elif coordinates[1] < 319.5:
                     slot = 9
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 9
-                    print("FINAL SLOT: 9")
                 else:
                     slot = 12
                     piece_of_labware = second_key[j]
                     labware[new_key[i]][second_key[j]] = 12
-                    print("FINAL SLOT: 12")
             
             labware_slot[new_key[i]]  += [piece_of_labware, slot]
     
@@ -685,8 +662,10 @@ def delete_current_labware():
     coordinator.myLabware.plate_list.clear()
 
 @socketio.on("remove_component_onclick")
-def remove_component_onclick():
-    print(f"hello world")
+def remove_component_onclick(newArray):
+    labware_component = newArray[0]
+    component_index = newArray[1]
+    coordinator.remove_labware_component(labware_component, component_index)
 
 
 @socketio.on("delete_labware")

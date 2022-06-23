@@ -7348,20 +7348,20 @@
                                                     <div id="comp-kz669amb" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
                                                         <div data-testid="linkElement" class="vjMqk"
-                                                            aria-disabled="false"><button class="_2TTZA" id="delete_button" onclick="remove_component_onclick()">Remove File</button></div>
+                                                            aria-disabled="false"><button class="_2TTZA" id="delete_button" onclick="window.location.href='http://localhost:5000/labware';">Remove File</button></div>
                                                     </div>
                                                     <div id="comp-kz6554kr" role="button" tabindex="0"
                                                         aria-disabled="false" class="xxex3">
                                                         <div data-testid="linkElement" class="vjMqk"
-                                                            aria-disabled="false"><button class="_2TTZA" id="load_button" onclick="load_button_listener()">Load</button></div>
+                                                            aria-disabled="false"><button class="_2TTZA" id="load_button" onclick="window.location.href='http://localhost:5000/labware';">Load</button></div>
                                                     </div>
                                                     <div id="comp-kzd59ub3" class="cyPU8 o5QNg _3I1te"><label
                                                             class="_2z549" for="labware_components"></label>
                                                         <div class="_15XQs"><select
                                                                 class="Ch2LG has-custom-focus _1UP8Q"
+                                                                onclick="component_model_onclick()"
                                                                 id="labware_components" required="">
-                                                                <option selected="" value="" disabled=""
-                                                                    class="Vx877 _3pa83" onclick="component_model_onclick()"
+                                                                <option selected="" value="" disabled="" class="Vx877 _3pa83" 
                                                                             >-Select Labware to Remove-
                                                                 </option>
                                                             </select>
@@ -7405,7 +7405,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Remove
+                                                                                style="text-decoration:underline;">Remove Labware
                                                                                 Component</span></span></span></span></span>
                                                         </h2>
                                                     </div>
@@ -7417,7 +7417,7 @@
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
                                                                                 style="text-decoration:underline;">Load
-                                                                                Labware</span></span></span></span></span>
+                                                                                Labware Components</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div id="comp-kzd6p1c4" class="_2Hij5"
@@ -7514,16 +7514,16 @@
                                                     
                                                             </div>
                                                             <div role="button" class="xxex3">
-                                                                <button type="button" class="vjMqk" disabled="disabled" id="upload_model" value="calibrate_model" onclick="location.href='/upload_new_model'">Upload New Model</span>
+                                                                
                                                             </div>
                                                             <div role="button" class="xxex3">
-                                                                <button type="submit" class="vjMqk" disabled="disabled" id="load_empty_button" value="add_empty" onclick="load_stuff()">Load into python</button>
+                                                                
                                                             </div>
                                                             <div role="button" class="xxex3">
-                                                                <button type="submit" class="vjMqk" disabled="disabled" id="calibrate" name="action" value="calibrate_model" onclick="location.href='/calibrate_component'" > Calibrate </button>
+                                                                <button type="button" class="vjMqk" disabled="disabled" id="calibrate" name="action" value="calibrate_model" onclick="location.href='/calibrate_component'" > Calibrate </button>
                                                             </div>
                                                             <div role="button" class="xxex3">
-                                                                <button type="submit" class="vjMqk" disabled="disabled" id="load_calibration" name="action" value="calibrate_model" onclick="location.href='/load_calibration'"> Load Calibration </button>
+                                                                
                                                             </div>
                                                             
                                                         </div>
@@ -7617,8 +7617,7 @@
                                                                     style="letter-spacing:0.03em;"><span
                                                                         style="font-family:futura-lt-w01-book,futura-lt-w05-book,sans-serif;"><span
                                                                             style="color:#292929;"><span
-                                                                                style="text-decoration:underline;">Labware 
-                                                                                Models</span></span></span></span></span>
+                                                                                style="text-decoration:underline;">New Component Calibration</span></span></span></span></span>
                                                         </h2>
                                                     </div>
                                                     <div data-mesh-id="Containerv3utginlineContent-wedge-4"></div>
@@ -7695,7 +7694,6 @@
     <script src="/static/add_labware.js"></script>
     <script src="/static/upload_new_model.js"></script>
     <script src="/static/load_labware_setup.js"></script>
-    <script src="/static/manual_control.js"></script>
 
 </body>
 

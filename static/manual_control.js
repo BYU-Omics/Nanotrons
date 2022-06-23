@@ -1,5 +1,8 @@
 var socket = io.connect('http://127.0.0.1:5000/');
-var home_button = document.getElementById("DrpDwnMn0-5s30label");
+var home_page = document.getElementById("DrpDwnMn0-5s30label");
+var labware_page = document.getElementById("DrpDwnMn0-5s32label");
+var protocol_page = document.getElementById("DrpDwnMn0-5s33label");
+var about_page = document.getElementById("DrpDwnMn0-5s34label");
 var load_labware = document.getElementById("load_labware");
 
 //INSTATANEOUS COMMANDS
@@ -40,13 +43,6 @@ socket.emit("get_labware_summary");
 
 populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
 
-home_button.addEventListener("click", function() {
-    socket.emit("stop_manual_control_window");
-});
-
-home_button.addEventListener("click", function() {
-    socket.emit("stop_manual_control_window");
-});
 
 function displaySettings() {
     console.log("We actually hit this function");
@@ -413,4 +409,18 @@ socket.on("get_syringe_settings", function(givenSetting){
     
     htmlSetting.innerHTML += "  SC_C: "
     htmlSetting.innerHTML += givenSetting['c']  
+
+});
+
+home_page.addEventListener("click", function() {
+    socket.emit("stop_manual_control_window");
+});
+labware_page.addEventListener("click", function() {
+    socket.emit("stop_manual_control_window");
+});
+protocol_page.addEventListener("click", function() {
+    socket.emit("stop_manual_control_window");
+});
+about_page.addEventListener("click", function() {
+    socket.emit("stop_manual_control_window");
 });

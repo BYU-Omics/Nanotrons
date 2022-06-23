@@ -76,7 +76,7 @@ class XboxJoystick:
             pygame.init()
             pygame.joystick.init()
             self.controller_1 = pygame.joystick.Joystick(0)
-        self.pygame_running = True
+            self.pygame_running = True
 
     # deinitializes pygame, pygame.joystick, and an instance of the controller (xbox style controller)
     def end_pygame(self):

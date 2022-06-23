@@ -1,11 +1,16 @@
 var socket = io.connect('http://127.0.0.1:5000');
 
 var stored_calibration_points;
-var home_button = document.getElementById("back_home");
 var test_button = document.getElementById("test");
 var good_calibration_button = document.getElementById("good_calibration");
 var bad_calibration_button = document.getElementById("bad_calibration");
 var calibration_feedback = document.getElementById("feedback_calibration_points");
+
+var home_page = document.getElementById("home");
+var labware_page = document.getElementById("labware");
+var protocol_page = document.getElementById("protocol");
+var about_page = document.getElementById("about");
+
 
 // socket.emit("start_manual_control_window")
 // console.log("start_manual_control_window")
@@ -50,25 +55,8 @@ test_button.addEventListener("click", function() {
     bad_calibration_button.disabled = false; // Enable the bad_calibration button
 });
 
-home_button.addEventListener("click", function() {
-    console.log("home_button.addEventListener")
-    socket.emit("stop_calibration");
-});
-
-function screen_info() {
-    socket.emit("screen_info");
-}
-
-function up_step_size() {
-    socket.emit("up_step_size");
-}
-
-function down_step_size() {
-    socket.emit("down_step_size");
-}
-
-function stop_manual_control_window() {
-    socket.emit("stop_manual_control_window");
+function add_calibration_point() {
+    socket.emit("add_calibration_point");
 }
 
 function go_to_deck_slot(slot) {
@@ -77,6 +65,20 @@ function go_to_deck_slot(slot) {
 
 good_calibration_button.addEventListener("click", function() {
     console.log("good_calibration_button.addEventListener")
-    console.log(stored_calibration_points);
+    console.log(stored_calibration_points)
+    socket.emit("stop_calibration");
     socket.emit("good_calibration", stored_calibration_points);
+});
+
+home_page.addEventListener("click", function() {
+    socket.emit("stop_calibration");
+});
+labware_page.addEventListener("click", function() {
+    socket.emit("stop_calibration");
+});
+protocol_page.addEventListener("click", function() {
+    socket.emit("stop_calibration");
+});
+about_page.addEventListener("click", function() {
+    socket.emit("stop_calibration");
 });

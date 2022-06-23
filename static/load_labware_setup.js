@@ -60,11 +60,11 @@ function files_stored_onclick() {
 
 }
 
-function load_button_listener() {
+load_button.addEventListener("click", function(){
     var file_name = files_select.options[ files_select.selectedIndex ].value;
     console.log("LOAD button pressed :D");
     console.log(file_name);
     socket.emit("load_labware_setup", file_name); // Send the command! :D
     var feedback = document.getElementById("user_feedback");
     feedback.innerHTML = `${file_name} has been loaded to the system`;
-}
+});
