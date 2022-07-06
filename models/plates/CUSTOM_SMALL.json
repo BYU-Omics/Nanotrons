@@ -1,7 +1,6 @@
 {
-    "grid": [2, 10], 
-    "potDistance_r": 15.97, 
-    "potDistance_c": 7.77, 
+    "grid": [10, 2], 
+    "offset": 0,
     "potDepth": 18.0, 
     "nicknames": 
     [

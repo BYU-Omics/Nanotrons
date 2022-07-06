@@ -21,7 +21,7 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('flou_test_7_6_2022.json')
+chips, plates = myProtocol.load_labware_setup('fluo_test_6_30_2022.json')
 
 corning_384 = plates[0]
 custom = plates[1] 
@@ -53,60 +53,57 @@ myProtocol.start_wash(50)
 # ------------START OF PROTOCOL---------------------------------
 
 myProtocol.aspirate_from(600, custom_small('A1'), withdraw_rate)
-myProtocol.dispense_to(50, custom_small('A1'), infusion_rate)
 myProtocol.dispense_to(0, custom('D1'), infusion_rate)
 
-myProtocol.dispense_to(100, corning_384('F6'), infusion_rate)
-myProtocol.dispense_to(100, corning_384('F7'), infusion_rate)
-myProtocol.dispense_to(100, corning_384('F8'), infusion_rate)
-myProtocol.dispense_to(100, corning_384('F9'), infusion_rate)
-myProtocol.dispense_to(100, corning_384('F10'), infusion_rate)
+myProtocol.dispense_to(50, corning_384('G11'), infusion_rate)
+myProtocol.dispense_to(50, corning_384('G12'), infusion_rate)
+myProtocol.dispense_to(50, corning_384('G13'), infusion_rate)
+myProtocol.dispense_to(50, corning_384('G14'), infusion_rate)
+myProtocol.dispense_to(50, corning_384('G15'), infusion_rate)
 
 myProtocol.mid_wash(rate = 50)
 
 myProtocol.aspirate_from(350, custom_small('B1'), withdraw_rate)
-myProtocol.dispense_to(50, custom_small('B1'), infusion_rate)
 myProtocol.dispense_to(0, custom('D1'), infusion_rate)
 
-myProtocol.dispense_to(50, corning_384('G6'), infusion_rate)
-myProtocol.dispense_to(50, corning_384('G7'), infusion_rate)
-myProtocol.dispense_to(50, corning_384('G8'), infusion_rate)
-myProtocol.dispense_to(50, corning_384('G9'), infusion_rate)
-myProtocol.dispense_to(50, corning_384('G10'), infusion_rate)
+myProtocol.dispense_to(20, corning_384('H11'), infusion_rate)
+myProtocol.dispense_to(20, corning_384('H12'), infusion_rate)
+myProtocol.dispense_to(20, corning_384('H13'), infusion_rate)
+myProtocol.dispense_to(20, corning_384('H14'), infusion_rate)
+myProtocol.dispense_to(20, corning_384('H15'), infusion_rate)
 
 myProtocol.mid_wash(rate = 50)
+
 myProtocol.aspirate_from(170, custom_small('C1'), withdraw_rate)
-myProtocol.dispense_to(50, custom_small('C1'), infusion_rate)
 myProtocol.dispense_to(0, custom('D1'), infusion_rate)
 
-myProtocol.dispense_to(20, corning_384('H6'), infusion_rate)
-myProtocol.dispense_to(20, corning_384('H7'), infusion_rate)
-myProtocol.dispense_to(20, corning_384('H8'), infusion_rate)
-myProtocol.dispense_to(20, corning_384('H9'), infusion_rate)
-myProtocol.dispense_to(20, corning_384('H10'), infusion_rate)
+myProtocol.dispense_to(10, corning_384('I11'), infusion_rate)
+myProtocol.dispense_to(10, corning_384('I12'), infusion_rate)
+myProtocol.dispense_to(10, corning_384('I13'), infusion_rate)
+myProtocol.dispense_to(10, corning_384('I14'), infusion_rate)
+myProtocol.dispense_to(10, corning_384('I15'), infusion_rate)
 
 myProtocol.mid_wash(rate = 50)
 
 myProtocol.aspirate_from(110, custom_small('D1'), withdraw_rate)
-myProtocol.dispense_to(50, custom_small('D1'), infusion_rate)
 myProtocol.dispense_to(0, custom('D1'), infusion_rate)
 
-myProtocol.dispense_to(10, corning_384('I6'), infusion_rate)
-myProtocol.dispense_to(10, corning_384('I7'), infusion_rate)
-myProtocol.dispense_to(10, corning_384('I8'), infusion_rate)
-myProtocol.dispense_to(10, corning_384('I9'), infusion_rate)
-myProtocol.dispense_to(10, corning_384('I10'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('J11'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('J12'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('J13'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('J14'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('J15'), infusion_rate)
 
 myProtocol.mid_wash(rate = 50)
+
 myProtocol.aspirate_from(80, custom_small('D1'), withdraw_rate)
-myProtocol.dispense_to(50, custom_small('D1'), infusion_rate)
 myProtocol.dispense_to(0, custom('D1'), infusion_rate)
 
-myProtocol.dispense_to(5, corning_384('J6'), infusion_rate)
-myProtocol.dispense_to(5, corning_384('J7'), infusion_rate)
-myProtocol.dispense_to(5, corning_384('J8'), infusion_rate)
-myProtocol.dispense_to(5, corning_384('J9'), infusion_rate)
-myProtocol.dispense_to(5, corning_384('J10'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('K11'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('K12'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('K13'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('K14'), infusion_rate)
+myProtocol.dispense_to(5, corning_384('K15'), infusion_rate)
 
 myProtocol.mid_wash(rate = 50)
 

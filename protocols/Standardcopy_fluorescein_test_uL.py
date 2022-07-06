@@ -21,7 +21,7 @@ metadata = {
 
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-chips, plates = myProtocol.load_labware_setup('Fluo_Test_03-01.json')
+chips, plates = myProtocol.load_labware_setup('7_5_2022.json')
 
 corning_384 = plates[0]
 custom = plates[1] 
@@ -41,49 +41,83 @@ waste_water = custom('A1')
 wash_water = custom('A2')
 clean_water = custom('A3')
 
-myProtocol.set_syringe_model("HAMILTON_1705")
+infusion_rate = 500  #nL/s
+withdraw_rate = 500  #nL/s
+
+myProtocol.set_syringe_model("HAMILTON_1705.json")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
-myProtocol.start_wash()
+myProtocol.start_wash(500)
 
 # ------------START OF PROTOCOL---------------------------------
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate) # 10 uM Solution
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(20000, corning_384('A11'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('A1')) # 10 uM Solution
-myProtocol.dispense_to(20000, corning_384('A1'))
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(20000, corning_384('A12'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('A1'))
-myProtocol.dispense_to(20000, corning_384('A2'))
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(20000, corning_384('A13'),infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('A1'))
-myProtocol.dispense_to(20000, corning_384('A3'))
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(20000, corning_384('A14'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('A1'))
-myProtocol.dispense_to(20000, corning_384('A4'))
+myProtocol.aspirate_from(20000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(20000, corning_384('A15'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('A1'))
-myProtocol.dispense_to(20000, corning_384('A5'))
+myProtocol.mid_wash(rate = 500)
 
-myProtocol.mid_wash()
+myProtocol.aspirate_from(15000, custom('A5'), withdraw_rate) # 8 uM Solution
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(15000, corning_384('B11'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('B1')) # 8 uM Solution
-myProtocol.dispense_to(20000, corning_384('B1'))
+myProtocol.aspirate_from(15000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(15000, corning_384('B12'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('B1'))
-myProtocol.dispense_to(20000, corning_384('B2'))
+myProtocol.aspirate_from(15000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(15000, corning_384('B13'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('B1'))
-myProtocol.dispense_to(20000, corning_384('B3'))
+myProtocol.aspirate_from(15000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(15000, corning_384('B14'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('B1'))
-myProtocol.dispense_to(20000, corning_384('B4'))
+myProtocol.aspirate_from(15000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(15000, corning_384('B15'), infusion_rate)
 
-myProtocol.aspirate_from(20000, custom_small('B1'))
-myProtocol.dispense_to(20000, corning_384('B5'))
+myProtocol.mid_wash(rate = 500)
 
-myProtocol.mid_wash()
+myProtocol.aspirate_from(10000, custom('A5'), withdraw_rate) # 6 uM Solution
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(10000, corning_384('C11'), infusion_rate)
+
+myProtocol.aspirate_from(10000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(10000, corning_384('C12'), infusion_rate)
+
+myProtocol.aspirate_from(10000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(10000, corning_384('C13'), infusion_rate)
+
+myProtocol.aspirate_from(10000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'),infusion_rate)
+myProtocol.dispense_to(10000, corning_384('C14'), infusion_rate)
+
+myProtocol.aspirate_from(10000, custom('A5'), withdraw_rate)
+myProtocol.dispense_to(0, custom('D1'), infusion_rate)
+myProtocol.dispense_to(10000, corning_384('C15'), infusion_rate)
+
+myProtocol.mid_wash(rate = 500)
 
 #--------------END OF PROTOCOL--------------
 
-myProtocol.fill_syringe_with_water()
-myProtocol.end_of_protocol()
+myProtocol.fill_syringe_with_water(500)
+myProtocol.end_of_protocol(1)

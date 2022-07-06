@@ -7,22 +7,31 @@ import numpy as np
 from chip import Chip
 from plate import Plate
 
-CALIBRATION_POINTS = 3
-SMALL_WELL = "S"
-BIG_WELL = "B"
 
 """
 SHARED CALIBRATION METHODS
 """
-# Calculate the unit vector of a vector
-def unit_vector(vector):
-    magnitude = np.linalg.norm(vector)
-    return vector/magnitude
 
 # This method receives three calibration points and guesses the fourth (fourth corner of the Chip/Plate component)
 def guess_fourth_calibration_point(calibration_points):
+    
     ordered_calibration_points = reorder_calibration_points(calibration_points) # The three calibration points need to be in the right order or the contructor vectors won't be set properly
 
+    bl = ordered_calibration_points[0]
+    br = ordered_calibration_points[1] 
+    fl = ordered_calibration_points[0]
+
+    # back_left to back_right
+    accross_vector = []
+    accross_vector.append(br[0] - bl[0])
+    accross_vector.append(br[1] - bl[1])
+    accross_vector.append(br[2] - bl[2])
+
+    # back_left to front_left
+    down_vector = []
+    down_vector.append(fl[0] - bl[0])
+    down_vector.append(fl[1] - bl[1])
+    down_vector.append(fl[2] - bl[2])
     # Constructor vectors
     vector_a = np.array(ordered_calibration_points[1]) - np.array(ordered_calibration_points[0])
     vector_b = np.array(ordered_calibration_points[2]) - np.array(ordered_calibration_points[0])
@@ -40,42 +49,58 @@ def guess_fourth_calibration_point(calibration_points):
     # ii. Top right callibration point
     # iii. Bottom left callibration point
     # NOTE: the order of the points matters both for guessing the 4th calibration point right and for creating the plane for mapping out the wells/pots in a grid
+
 def reorder_calibration_points(calibration_points):
-    magnitudes = []
-    ordered_points = []
-    # Create points
+
+    # Make arrays from calibration points
     a = np.array(calibration_points[0])
     b = np.array(calibration_points[1])
     c = np.array(calibration_points[2])
     # Create vectors. Formatted in tuples: (point1, point2, vector_numpy_array)
-    v0 = (a,b,b - a)
-    v1 = (b,c,c - b)
-    v2 = (a,c,c - a)
+    v0 = (b,c,c - b)
+    v1 = (a,c,c - a)
+    v2 = (a,b,b - a)
     vectors = [v0,v1,v2]
-    # Vertex point: index corresponds to the vector number, the value at that index is the point that is not part of the vector
-    vertices = [c, a, b]
+    magnitudes = []
 
-    for vector in range(CALIBRATION_POINTS):
+    # get magnitude of each vector, compiled to list
+    for vector in range(len(calibration_points)):
         magnitude = np.linalg.norm(vectors[vector][2])
         magnitudes.append(magnitude)
     
-    index_max = magnitudes.index(max(magnitudes)) # Finds the index of the vector that connects the diagonal (it will have the max magnitude)
-    vectors.pop(index_max) # We get rid of the vector that makes the diagonal
-    magnitudes.pop(index_max)
-    reference_point = vertices[index_max] # This is the point that is not included in the diagonal vector (numpy array)
-    vertices.pop(index_max)
+    index_of_back_left = magnitudes.index(max(magnitudes)) # Finds the index of the vector that connects the diagonal (it will have the max magnitude).
+    back_left_point = calibration_points[index_of_back_left] # index_of_back_left corresponds to index of back left point in calibration_points
 
-    index_max = magnitudes.index(max(magnitudes)) # Find the index of the vector that makes the long side of the rectangle
-    vector_points = [ vectors[index_max][0], vectors[index_max][1] ] # Points that make the long side of the rectangle
-    ordered_points.append(list(reference_point)) # Append to the return value the first element (vertice of the three points)
-    # Append to the return value the second element (second point in the long side vector)
-    if list(vector_points[0]) != list(reference_point):
-        ordered_points.append(list(vector_points[0]))
-    else:
-        ordered_points.append(list(vector_points[1]))
+    # get "back-right" calibration point, aka closest calibration point to robot home position
+    ref_point = [418.0, 350.0, 170.15] # Robot home position
+    r = np.array(ref_point)
+    r1 = (r, a, a-r)
+    r2 = (r, b, b-r)
+    r3 = (r, c, c-r)
+    ref_vectors = [r1, r2, r3]
+    ref_magnitudes = []
+    # get magnitude of each vector, compiled to list
+    for vector in range(len(calibration_points)):
+        magnitude = np.linalg.norm(ref_vectors[vector][2])
+        ref_magnitudes.append(magnitude)
 
-    # Append to the return value the third element (point not involved in the long side vector)
-    ordered_points.append(list(vertices[index_max]))
+    index_of_back_right = ref_magnitudes.index(min(ref_magnitudes))
+    back_right_point = calibration_points[index_of_back_right]
+
+    calibration_point_list = [] # copy of calibration_points list to be manipulated
+    for point in calibration_points:
+        calibration_point_list.append(point)
+
+    ordered_points = [] # list to be returned
+    
+    calibration_point_list.pop(calibration_point_list.index(back_left_point))
+    calibration_point_list.pop(calibration_point_list.index(back_right_point))
+
+    front_left_point = calibration_point_list[0]
+
+    ordered_points.append(back_left_point)
+    ordered_points.append(back_right_point)
+    ordered_points.append(front_left_point)
 
     return ordered_points
 
@@ -87,134 +112,60 @@ def get_nicknames(nicknames_list):
 
     return single_list
 
-"""
-CHIP CALIBRATION METHODS
-"""
-# This method takes the parameters of the chip plus its calibration points and returns a list of the locations of all the wells in that chip
-def map_out_wells(chip_parameters, calibration_points):
-    ordered_calibration_points = reorder_calibration_points(calibration_points) # The three calibration points need to be in the right order or the contructor vectors won't be set properly
-    # Extract useful information from chip_parameters
-    grid = chip_parameters["grid"]
-    point_distance = chip_parameters["pointDistance"]
-    well_distance = chip_parameters["wellDistance"]
-
-    locations = [] # This is the list of tuples with the locations of all the wells in a chip, that will be returned: [ (x,y,z), ...]
-    
-    # Define points
-    point_a = np.array(ordered_calibration_points[0]) # This point will be the reference for all vectors and displacements
-    point_b = np.array(ordered_calibration_points[1])
-    point_c = np.array(ordered_calibration_points[2])
-
-    # Define vectors 
-    v1 = point_b - point_a
-    v2 = point_c - point_a
-
-    # Define unit vectors
-    u1 = unit_vector(v1) # Horizontal unit vector
-    u2 = unit_vector(v2) # Vertical unit vector
-
-    # Initial horizontal offset
-    d = point_distance
-
-    # Go through each row and column, create locations, and append them to the locations list
-        # NOTE: the order in which they are stored is row by row from left to right, using an imaginary
-        # rectangular table laying down on its long side
-    for row in range(grid[0]):
-        for column in range(grid[1]):
-            displacement = u1 * (d + column * well_distance) + u2 * (row * well_distance) # Formula for spanning a plane with two vectors and an initial displacement
-            new_location = point_a + displacement # Calculated location of the new well
-            x,y,z = new_location # Unpack locations from the numpy array
-            array_location = [x, y, z]
-            new_tuple = (x,y,z) # Pack locations in appropriate format
-            # locations.append(new_tuple)
-            locations.append(array_location)
-    return locations#locations
-
-# This method is provided a grid and row_types and returns a list with the type of well that corresponds to each index
-def get_well_types(grid, row_types):
-    # Calculate the amount of wells that will be considered
-    amount_of_wells = grid[0] * grid[1]
-    list_of_well_types = [ None for _ in range(amount_of_wells)]
-    well_index = 0
-
-    for row in range(grid[0]):
-        row_type = row_types[row]
-        for column in range(grid[1]):
-            if row_type == "BS":
-                if column % 2 == 0:
-                    list_of_well_types[well_index] = BIG_WELL
-                else:
-                    list_of_well_types[well_index] = SMALL_WELL
-            elif row_type == "B":
-                list_of_well_types[well_index] = BIG_WELL
-            elif row_type == "S":
-                list_of_well_types[well_index] = SMALL_WELL
-            well_index = well_index + 1 
-
-    return list_of_well_types
-
-# This method creates a Chip object and sets all the pertinent parameters to it from the provided chip_parameters data and well_locations
-def create_chip(model_name, chip_parameters, well_locations):
-
-    # Unpack parameters to be used
-    grid = chip_parameters["grid"]
-    well_types = get_well_types(grid, chip_parameters["rowTypes"])
-    nicknames = get_nicknames(chip_parameters["nicknames"])
-
-    # Calculate the amount of wells that will be considered
-    amount_of_wells = grid[0] * grid[1]
-
-    # Create Chip object
-    new_chip = Chip(model_name=model_name, grid=grid)
-
-    # Store the locations, nicknames, and well types of the wells in the chip
-    for index in range(amount_of_wells):
-        new_chip.set_location(index, well_locations[index])
-        new_chip.set_nickname(index, nicknames[index])
-        new_chip.set_well_type(index, well_types[index])
-
-    return new_chip
 
 """
-PLATE CALIBRATION METHODS
+CALIBRATION METHODS
 """
 # This method takes the parameters of the plate plus its calibration points and returns a list of the locations of all the pots in that plate
-def map_out_pots(plate_parameters, calibration_points):
-    ordered_calibration_points = reorder_calibration_points(calibration_points) # The three calibration points need to be in the right order or the contructor vectors won't be set properly
+def calibrate_model(chip_parameters, calibration_points):
+    ordered_calibration_points = reorder_calibration_points(calibration_points)   
     
-    # Extract useful information from chip_parameters
-    grid = plate_parameters["grid"]
-    pot_distance_r = plate_parameters["potDistance_r"]
-    pot_distance_c = plate_parameters["potDistance_c"]
+    grid = chip_parameters["grid"]
+    plate_rows = grid[0] # change to take value from model parameters
+    plate_columns = grid[1] # change to take value from model parameters
+    calibration_offset = chip_parameters["offset"] # change to take value from model parameters
 
-    locations = [] # This is the list of tuples with the locations of all the wells in a chip, that will be returned: [ (x,y,z), ...]
+    bl = ordered_calibration_points[0]
+    br = ordered_calibration_points[1] 
+    fl = ordered_calibration_points[2]
     
-    # Define points
-    point_a = np.array(ordered_calibration_points[0]) # This point will be the reference for all vectors and displacements
-    point_b = np.array(ordered_calibration_points[1])
-    point_c = np.array(ordered_calibration_points[2])
 
-    # Define vectors 
-    v1 = point_b - point_a
-    v2 = point_c - point_a
+    # back_left to back_right
+    accross_vector = []
+    accross_vector.append((br[0] - bl[0]) / (2*calibration_offset + plate_columns -1))
+    accross_vector.append((br[1] - bl[1]) / (2*calibration_offset + plate_columns -1))
+    accross_vector.append((br[2] - bl[2]) / (2*calibration_offset + plate_columns -1))
 
-    # Define unit vectors
-    u1 = unit_vector(v1)
-    u2 = unit_vector(v2)
+    # back_left to front_left
+    down_vector = []
+    down_vector.append((fl[0] - bl[0]) / (plate_rows -1))
+    down_vector.append((fl[1] - bl[1]) / (plate_rows -1))
+    down_vector.append((fl[2] - bl[2]) / (plate_rows -1))
 
-    # Go through each row and column, create locations, and append them to the locations list
-        # NOTE: the order in which they are stored is row by row from left to right, using an imaginary
-        # rectangular table laying down on its long side
-    for row in range(grid[0]):
-        for column in range(grid[1]):
-            displacement = u1 * (column * pot_distance_c) + u2 * (row * pot_distance_r) # Formula for spanning a plane with two vectors and an initial displacement
-            new_location = point_a + displacement # Calculated location of the new well
-            x,y,z = new_location # Unpack locations from the numpy array
-            new_tuple = (x,y,z) # Pack locations in appropriate format
-            locations.append(new_tuple)
-    return locations
+    # so well coordinate start reference can change without changing back_left
+    ref_point = bl
 
-def create_plate(model_name, plate_parameters, pot_locations):
+    # populate the matrix with well coordinates
+    plate_index = 0
+    well_coordinate_list = []
+    for i in range(0, plate_rows):
+        for j in range(0, plate_columns):
+            point_to_add = []
+            point_to_add.append(ref_point[0] + (calibration_offset + j) * accross_vector[0])
+            point_to_add.append(ref_point[1] + (calibration_offset + j) * accross_vector[1])
+            point_to_add.append(ref_point[2] + (calibration_offset + j) * accross_vector[2])
+            well_coordinate_list.append(point_to_add)
+            plate_index += 1
+ 
+        ref_point[0] = ref_point[0] + down_vector[0]
+        ref_point[1] = ref_point[1] + down_vector[1]
+        ref_point[2] = ref_point[2] + down_vector[2]
+        
+    
+        
+    return well_coordinate_list
+
+def create_component(model_name, plate_parameters, pot_locations):
 
     # Unpack parameters to be used
     grid = plate_parameters["grid"]
@@ -230,13 +181,13 @@ def create_plate(model_name, plate_parameters, pot_locations):
     nicknames = get_nicknames(plate_parameters["nicknames"])
 
     # Create Chip object
-    new_plate = Plate(model_name=model_name, grid=grid)
+    new_component = Plate(model_name=model_name, grid=grid)
 
     # Store the locations, nicknames, and well types of the wells in the chip
     for index in range(amount_of_pots):
-        new_plate.set_location(index, pot_locations[index])
-        new_plate.set_nickname(index, nicknames[index])
-        new_plate.set_pot_depth(index, pot_depth[index])
+        new_component.set_location(index, pot_locations[index])
+        new_component.set_nickname(index, nicknames[index])
+        new_component.set_pot_depth(index, pot_depth[index])
 
-    return new_plate
+    return new_component
 

@@ -51,7 +51,7 @@ class ModelsManager:
     def get_component_models(self, component_type):
         component_models = list() # Create an empty list to store the names of each file
         path_of_interest = self.get_path(component_type) # This command gets the path to the chips folder
-        component_models = [f.split(".")[0] for f in os.listdir(path_of_interest) if os.path.isfile(os.path.join(path_of_interest, f))] # This returns a list of all the files in the path_of_interest
+        component_models = [f.split("#")[0] for f in os.listdir(path_of_interest) if os.path.isfile(os.path.join(path_of_interest, f))] # This returns a list of all the files in the path_of_interest
             
         return component_models
 
@@ -70,10 +70,10 @@ class ModelsManager:
 
         if (self.operating_system == "w"):
             #print(f"Component model: {component_model}")
-            file_path = open(path_to_models_folder + "\\" + str(component_model).strip("[]'") + ".json")
+            file_path = open(path_to_models_folder + "\\" + str(component_model).strip("[]'"))
 
         elif (self.operating_system == "r"):
-            file_path = open(path_to_models_folder + "/" + str(component_model).strip("[]'") + ".json")
+            file_path = open(path_to_models_folder + "/" + str(component_model).strip("[]'"))
         
         parameters = json.load(file_path)
 

@@ -60,7 +60,7 @@ DISTANCE = 10 #mm
 LINUX_OS = 'posix'
 WINDOWS_OS = "nt"
 MACBOOK_OS = 'Darwin'
-UNIT_CONVERSION  = 4.23 #3.8896 4.16
+UNIT_CONVERSION  = 4 #3.8896 4.16
 INBETWEEN_LIFT_DISTANCE = -10 # Default distance the syringe will be lifted/lowered when going from one nanopots well\reagent pot to another
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -615,14 +615,14 @@ class Coordinator:
         component_parameters = self.myModelsManager.get_model_parameters(labware_component, component_model)
 
         if (labware_component == LABWARE_CHIP):
-            mapped_well_locations = map_out_wells(component_parameters, calibration_points) # Map out components within the chip
-            new_chip = create_chip(component_model, component_parameters, mapped_well_locations) # Create Chip object with all the internal information it needs
-            self.myLabware.add_chip(new_chip) # Add chip to Chamber
+            mapped_well_locations = calibrate_model(component_parameters, calibration_points) # Map out components within the chip
+            new_component = create_component(component_model, component_parameters, mapped_well_locations) # Create Chip object with all the internal information it needs
+            self.myLabware.add_chip(new_component) # Add chip to Chamber
 
         elif (labware_component == LABWARE_PLATE):
-            mapped_pot_locations = map_out_pots(component_parameters, calibration_points) # Map out components within the plate
-            new_plate = create_plate(component_model, component_parameters, mapped_pot_locations) # Create Plate object with all the internal information it needs
-            self.myLabware.add_plate(new_plate) # Add plate to Chamber
+            mapped_pot_locations = calibrate_model(component_parameters, calibration_points) # Map out components within the plate
+            new_component = create_component(component_model, component_parameters, mapped_pot_locations) # Create Plate object with all the internal information it needs
+            self.myLabware.add_plate(new_component) # Add plate to Chamber
 
     def remove_labware_component(self, labware_component, component_index):
         """ Delete a calibrated labware component from the list of current labware components
