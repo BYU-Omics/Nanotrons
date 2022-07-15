@@ -66,6 +66,42 @@ socket.on('models_available', function(received_models) {
 
 });
 
+//------------------------ Alphabet dictionary
+function num_to_alpha(num_to_convert){
+    num_to_alpha_dict = {
+        1  : "A",
+        2  : "B",
+        3  : "C",
+        4  : "D",
+        5  : "E",
+        6  : "F",
+        7  : "G",
+        8  : "H",
+        9  : "I",
+        10 : "J",
+        11 : "K",
+        12 : "L",
+        13 : "M",
+        14 : "N",
+        15 : "O",
+        16 : "P",
+        17 : "Q",
+        18 : "R",
+        19 : "S",
+        20 : "T",
+        21 : "U",
+        22 : "V",
+        23 : "W",
+        24 : "X",
+        25 : "Y",
+        26 : "Z"
+    }
+
+    alpha_to_return = num_to_alpha_dict[num_to_convert]
+    return alpha_to_return
+}
+
+
 // ----------------------- CAPTURE INPUT METHODS
 
 function extract_all_inputs() {
@@ -127,19 +163,11 @@ function extract_chip_fields() {
         console.log("CHIP ROWS OR COLUMNS INPUT ERROR");
     }
 
-    var well_number = 0;
     for (var row = 0; row<rows; row++) {
         var row_nicknames = [];
         for (var col=0; col<columns; col++) {
-            var input_component = document.getElementById(`well_${well_number}`);
-            if (input_component.value == "") {
-                console.log(`Well #${well_number} has no input value`);
-                return false;
-            }
-            else {
-                row_nicknames.push(input_component.value);
-            }
-            well_number++;
+            well_nickname = num_to_alpha(row+1) + String(col+1)
+            row_nicknames.push(well_nickname);
         }
         provided_nicknames.push(row_nicknames)
     }
@@ -186,19 +214,13 @@ function extract_plate_fields() {
         console.log("PLATE ROWS OR COLUMNS INPUT ERROR");
     }
     
-    var pot_number = 0;
+  
     for (var row = 0; row<rows; row++) {
         var row_nicknames = [];
         for (var col=0; col<columns; col++) {
-            var input_component = document.getElementById(`pot_${pot_number}`);
-            if (input_component.value == "") {
-                console.log(`Pot #${pot_number} has no input value`);
-                return false;
-            }
-            else {
-                row_nicknames.push(input_component.value);
-            }
-            pot_number++;
+            well_nickname = num_to_alpha(row+1) + String(col+1)
+            row_nicknames.push(well_nickname);
+
         }
         provided_nicknames.push(row_nicknames)
     }
@@ -240,7 +262,6 @@ function write_user_summary(model_properties) {
     `;
 
     if (component_type == "Chip") {
-        var well_nicknames = model_properties.nicknames;
         var rows = model_properties.chip_grid_rows;
         var columns = model_properties.chip_grid_columns;
         additional_div_text += `
@@ -248,27 +269,12 @@ function write_user_summary(model_properties) {
         <label class="field_label"><u><b>Grid: </b></u></label> <label>${rows} x ${columns}</label><br>
         <label class="field_label"><u><b>Offset: </b></u></label> <label>${model_properties.chip_offset}</label> mm<br>
         <label class="field_label"><u><b>Well Depth: </b></u></label> <label>${model_properties.chip_well_depth}</label> mm<br>
-        <label class="field_label"><u><b>Well Names: </b></u></label><br>
         `
-        additional_div_text += `<table>`; // Open the table
-        for (var row=0; row < rows; row++) {
-            // Open row
-            additional_div_text += `<tr>`;
-            for (var col=0; col < columns; col++) {
-                if (col == 0) {
-                    additional_div_text += `<th>Row #${row+1}</th>`
-                }
-                // Add column data
-                additional_div_text += `<td>${well_nicknames[row][col]}</td>`;
-            }
-            // Close row
-            additional_div_text += `</tr>`;
-        }
-        additional_div_text += `</table>`; // Close the table
+        
     }
 
     if (component_type == "Plate") {
-        var pot_nicknames = model_properties.nicknames;
+        
         var rows = model_properties.plate_grid_rows;
         var columns = model_properties.plate_grid_columns;
         additional_div_text += `
@@ -276,23 +282,9 @@ function write_user_summary(model_properties) {
         <label class="field_label"><u><b>Grid: </b></u></label> <label>${rows} x ${columns}</label><br>
         <label class="field_label"><u><b>Offset: </b></u></label> <label>${model_properties.plate_offset}</label> mm<br>
         <label class="field_label"><u><b>Well Depth: </b></u></label> <label>${model_properties.plate_well_depth}</label> mm<br>
-        <label class="field_label"><u><b>Well Names: </b></u></label><br>
+       
         `
-        additional_div_text += `<table>`; // Open the table
-        for (var row=0; row < rows; row++) {
-            // Open row
-            additional_div_text += `<tr>`;
-            for (var col=0; col < columns; col++) {
-                if (col == 0) {
-                    additional_div_text += `<th>Row #${row+1}</th>`
-                }
-                // Add column data
-                additional_div_text += `<td>${pot_nicknames[row][col]}</td>`;
-            }
-            // Close row
-            additional_div_text += `</tr>`;
-        }
-        additional_div_text += `</table>`; // Close the table
+        
     }
 
     if (component_type == "Syringe") {
@@ -320,110 +312,6 @@ function check_if_empty(id) {
     }
 }
 
-// ----------------------- DYNAMIC INPUT FIELDS METHODS - CHIPS
-
-function check_chip_grid_inputs() {
-    var row_input = chip_grid_rows.value;
-    var col_input = chip_grid_columns.value;
-    var row_input_number = parseInt(row_input); // The only way this will not be an integer is if the field was left blank or the user entered something other than a number
-    var col_input_number = parseInt(col_input);
-    var chip_grid_feedback = document.getElementById("chip_grid_feedback");
-    chip_grid_feedback.innerHTML = "";
-
-    if ( (!isNaN(row_input_number)) && (!isNaN(col_input_number)) ){
-        // This means both row and col inputs are numbers
-        // Call method that creates the dynamic html code
-        create_chip_fields(row_input_number, col_input_number);
-    }
-
-    else {
-        // Inputs were wrong (they're either empty or user entered something other than a number in at least one of the fields)
-        if ((row_input != "") && (col_input != "")) {
-            // Both inputs have content, but at least one of them is in the wrong format, so write a feedback line
-            chip_grid_feedback.innerHTML = " ERROR! Only numbers (integers) allowed for grid size"
-        }
-    }
-}
-
-function create_chip_fields(rows, columns) {
-    // Create table for the user to provide the nickname of each well
-    create_chip_nicknames_table(rows, columns);
-}
-
-function create_chip_nicknames_table(rows, columns) {
-    var nicknames_div = document.getElementById("chip_nicknames_div");
-    nicknames_div.innerHTML = ``; // Empty the content with every call so that the previous table (in case the user specifies it many times) is deleted
-    var nicknames_table = `<table>`; // Open the table
-    var well_number = -1;
-
-    for (var row=0; row < rows; row++) {
-        // Open row
-        nicknames_table += `<tr>`;
-        for (var col=0; col < columns; col++) {
-            if (col == 0) {
-                nicknames_table += `<th>Row #${row+1}</th>`
-            }
-            well_number += 1;
-            // console.log("well_number", well_number);
-            // Add column data
-            nicknames_table += `<td><input size="2" id="well_${well_number}"></td>`;
-        }
-        // Close row
-        nicknames_table += `</tr>`;
-    }
-    nicknames_table += `</table>`; // Close the table
-    nicknames_div.insertAdjacentHTML("afterbegin", nicknames_table);
-}
-
-// ----------------------- DYNAMIC INPUT FIELDS METHODS - PLATES
-
-function check_plate_grid_inputs() {
-    var row_input = plate_grid_rows.value;
-    var col_input = plate_grid_columns.value;
-    var row_input_number = parseInt(row_input); // The only way this will not be an integer is if the field was left blank or the user entered something other than a number
-    var col_input_number = parseInt(col_input);
-    var plate_grid_feedback = document.getElementById("plate_grid_feedback");
-    plate_grid_feedback.innerHTML = "";
-
-    if ( (!isNaN(row_input_number)) && (!isNaN(col_input_number)) ){
-        // This means both row and col inputs are numbers
-        // Call method that creates the dynamic html code
-        create_plate_nicknames_table(row_input_number, col_input_number);
-    }
-
-    else {
-        // Inputs were wrong (they're either empty or user entered something other than a number in at least one of the fields)
-        if ((row_input != "") && (col_input != "")) {
-            // Both inputs have content, but at least one of them is in the wrong format, so write a feedback line
-            plate_grid_feedback.innerHTML = " ERROR! Only numbers (integers) allowed for grid size"
-        }
-    }
-}
-
-function create_plate_nicknames_table(rows, columns) {
-    var nicknames_div = document.getElementById("plate_nicknames_div");
-    nicknames_div.innerHTML = ``; // Empty the content with every call so that the previous table (in case the user specifies it many times) is deleted
-    var nicknames_table = `<table>`; // Open the table
-    var pot_number = -1;
-
-    for (var row=0; row < rows; row++) {
-        // Open row
-        nicknames_table += `<tr>`;
-        for (var col=0; col < columns; col++) {
-            if (col == 0) {
-                nicknames_table += `<th>Row #${row+1}</th>`
-            }
-            pot_number += 1;
-            // console.log("well_number", well_number);
-            // Add column data
-            nicknames_table += `<td><input size="2" id="pot_${pot_number}"></td>`;
-        }
-        // Close row
-        nicknames_table += `</tr>`;
-    }
-    nicknames_table += `</table>`; // Close the table
-    nicknames_div.insertAdjacentHTML("afterbegin", nicknames_table);
-}
 
 // ----------------------- EXISTING FILES DISPLAY METHODS
 
@@ -526,21 +414,7 @@ syringe_radio_input.onclick = function() {
     toggle_visibility("syringes");
 }
 
-chip_grid_rows.oninput = function() {
-    check_chip_grid_inputs();
-}
 
-chip_grid_columns.oninput = function() {
-    check_chip_grid_inputs();
-}
-
-plate_grid_rows.oninput = function() {
-    check_plate_grid_inputs();
-}
-
-plate_grid_columns.oninput = function() {
-    check_plate_grid_inputs();
-}
 
 confirm_parameters_btn.onclick = function() {
     final_new_model_properties = extract_all_inputs();
