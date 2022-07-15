@@ -7,7 +7,7 @@
 from typing import List
 
 from opentrons_shared_data.deck.dev_types import Metadata
-from plate import Plate
+from model import Model
 import sys
 import os
 from pathlib import Path
@@ -309,7 +309,7 @@ class ProtocolCreator:
                                  location = None, 
                                  temp = None, 
                                  holding_time = None, 
-                                 plate: Plate = None, 
+                                 model: Model = None, 
                                  void: bool = None, 
                                  plate_index: int = None,
                                  clean_water = None, 
@@ -327,9 +327,9 @@ class ProtocolCreator:
             location ([type], optional): [description]. Defaults to None.
             temp ([type], optional): [description]. Defaults to None.
             holding_time ([type], optional): [description]. Defaults to None.
-            plate (Plate, optional): [description]. Defaults to None.
+            model (Model, optional): [description]. Defaults to None.
             void (bool, optional): [description]. Defaults to None.
-            plate_index (int, optional): [description]. Defaults to None.
+            model_index (int, optional): [description]. Defaults to None.
             clean_water ([type], optional): [description]. Defaults to None.
             wash_water ([type], optional): [description]. Defaults to None.
             waste_water ([type], optional): [description]. Defaults to None.
@@ -366,7 +366,7 @@ class ProtocolCreator:
         elif cmd == TAKE_PICTURE:
             cmd_text += f"{cmd}()" 
         elif cmd == VOID_PLATE_DEPTH_CMD:
-            cmd_text += f"{cmd}(plate = {plate}, void = {void})"
+            cmd_text += f"{cmd}(model = {model}, void = {void})"
         elif cmd == SET_WASHING_POSITIONS_CMD:
             cmd_text += f"{cmd}({clean_water}, {wash_water}, {waste_water})"
         elif cmd == START_WASH_CMD:

@@ -83,8 +83,8 @@ class Api:
     def end_of_protocol(self):
         self.coordinator.end_of_protocol()
 
-    def void_plate_depth(self, plate: Plate, void: bool = False):
-        self.coordinator.void_plate_depth(plate, void)
+    def void_plate_depth(self, model: Model, void: bool = False):
+        self.coordinator.void_plate_depth(model, void)
 
     def take_picture(self, source = None):
         if source != None:

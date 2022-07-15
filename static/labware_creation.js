@@ -26,21 +26,23 @@ var syringe_properties_div = document.getElementById("syringe_properties");
 var chip_new_model_name = document.getElementById("chip_new_model_name");
 var chip_grid_rows = document.getElementById("chip_grid_rows");
 var chip_grid_columns = document.getElementById("chip_grid_columns");
-var chip_point_distance = document.getElementById("chip_point_distance");
-var chip_well_distance = document.getElementById("chip_well_distance");
+var chip_offset = document.getElementById("chip_offset");
+var chip_well_depth = document.getElementById("chip_well_depth");
 
 //Input fields for a Plate element
 var plate_new_model_name = document.getElementById("plate_new_model_name");
 var plate_grid_rows = document.getElementById("plate_grid_rows");
 var plate_grid_columns = document.getElementById("plate_grid_columns");
-var plate_pot_distance_r = document.getElementById("plate_pot_distance_r");
-var plate_pot_distance_c = document.getElementById("plate_pot_distance_c");
-var plate_pot_depth = document.getElementById("plate_pot_depth");
+var plate_offset = document.getElementById("plate_offset");
+var plate_well_depth = document.getElementById("plate_pwell_depth");
 
 //Input fields for a Syringe element
 var syringe_new_model_name = document.getElementById("syringe_new_model_name");
 var syringe_volume = document.getElementById("syringe_volume");
 var syringe_inner_diameter = document.getElementById("syringe_inner_diameter");
+var syringe_upper_limit = document.getElementById("syringe_upper_limit");
+var syringe_lower_limit = document.getElementById("syringe_lower_limit");
+var syringe_sweetspot = document.getElementById("syringe_sweetspot");
 
 // Submission buttons
 var back_to_edit_mode_btn = document.getElementById("back_to_edit");
@@ -92,7 +94,7 @@ function extract_all_inputs() {
 }
 
 function extract_chip_fields() {
-    var chip_elements_ids = ["chip_new_model_name", "chip_grid_rows", "chip_grid_columns", "chip_point_distance", "chip_well_distance"];
+    var chip_elements_ids = ["chip_new_model_name", "chip_grid_rows", "chip_grid_columns", "chip_offset", "chip_well_depth"];
     var chip_properties = {};
     chip_properties.component_type = "Chip";
     // Get the info from the static fields
@@ -113,22 +115,6 @@ function extract_chip_fields() {
 
     var rows = parseInt(chip_grid_rows.value)
     var columns = parseInt(chip_grid_columns.value);
-
-    // Get info from the row types dropdown lists
-    var row_types = [];
-    for (var i=0; i<rows; i++) {
-        var select_component = document.getElementById(`row_type_${i}`);
-        var row_type_selected = select_component.value;
-        if (row_type_selected == "default") {
-            console.log("CHIP ROW TYPE ERROR, DEFAULT SELECTED");
-            return false;
-        }
-        else {
-            row_types.push(row_type_selected);
-        }
-    }
-    // console.log("row_types", row_types);
-    chip_properties.row_types = row_types;
 
     // Get info from the nicknames table
     var provided_nicknames = [];
@@ -167,7 +153,7 @@ function extract_chip_fields() {
 }
 
 function extract_plate_fields() {
-    var plate_elements_ids = ["plate_new_model_name", "plate_grid_rows", "plate_grid_columns", "plate_pot_distance_r", "plate_pot_distance_c",  "plate_pot_depth"];
+    var plate_elements_ids = ["plate_new_model_name", "plate_grid_rows", "plate_grid_columns", "plate_offset", "plate_well_depth"];
     var plate_properties = {};
     plate_properties.component_type = "Plate";
     // Get the info from the static fields
@@ -226,7 +212,7 @@ function extract_plate_fields() {
 }
 
 function extract_syringe_fields() {
-    var syringe_elements_ids = ["syringe_new_model_name", "syringe_volume", "syringe_inner_diameter"];
+    var syringe_elements_ids = ["syringe_new_model_name", "syringe_volume", "syringe_inner_diameter","syringe_upper_limit","syringe_lower_limit","syringe_sweetspot"];
     var syringe_properties = {};
     syringe_properties.component_type = "Syringe";
     // Get the info from the static fields
@@ -260,9 +246,8 @@ function write_user_summary(model_properties) {
         additional_div_text += `
         <label class="field_label"><u><b>Model: </b></u></label> <label>${model_properties.chip_new_model_name}</label><br>
         <label class="field_label"><u><b>Grid: </b></u></label> <label>${rows} x ${columns}</label><br>
-        <label class="field_label"><u><b>Point Distance: </b></u></label> <label>${model_properties.chip_point_distance}</label><br>
-        <label class="field_label"><u><b>Well Distance: </b></u></label> <label>${model_properties.chip_well_distance}</label><br>
-        <label class="field_label"><u><b>Row Types: </b></u></label> <label>${model_properties.row_types}</label><br>
+        <label class="field_label"><u><b>Offset: </b></u></label> <label>${model_properties.chip_offset}</label> mm<br>
+        <label class="field_label"><u><b>Well Depth: </b></u></label> <label>${model_properties.chip_well_depth}</label> mm<br>
         <label class="field_label"><u><b>Well Names: </b></u></label><br>
         `
         additional_div_text += `<table>`; // Open the table
@@ -289,10 +274,9 @@ function write_user_summary(model_properties) {
         additional_div_text += `
         <label class="field_label"><u><b>Model: </b></u></label> <label>${model_properties.plate_new_model_name}</label><br>
         <label class="field_label"><u><b>Grid: </b></u></label> <label>${rows} x ${columns}</label><br>
-        <label class="field_label"><u><b>Pot Distance: </b></u></label> <label>${model_properties.plate_pot_distance_r}</label><br>
-        <label class="field_label"><u><b>Pot Distance: </b></u></label> <label>${model_properties.plate_pot_distance_c}</label><br>
-        <label class="field_label"><u><b>Pot Depth: </b></u></label> <label>${model_properties.plate_pot_depth}</label><br>
-        <label class="field_label"><u><b>Pot Names: </b></u></label><br>
+        <label class="field_label"><u><b>Offset: </b></u></label> <label>${model_properties.plate_offset}</label> mm<br>
+        <label class="field_label"><u><b>Well Depth: </b></u></label> <label>${model_properties.plate_well_depth}</label> mm<br>
+        <label class="field_label"><u><b>Well Names: </b></u></label><br>
         `
         additional_div_text += `<table>`; // Open the table
         for (var row=0; row < rows; row++) {
@@ -316,6 +300,9 @@ function write_user_summary(model_properties) {
         <label class="field_label"><u><b>Model: </b></u></label> <label>${model_properties.syringe_new_model_name}</label><br>
         <label class="field_label"><u><b>Volume: </b></u></label> <label>${model_properties.syringe_volume} cc</label><br>
         <label class="field_label"><u><b>Inner Diameter: </b></u></label> <label>${model_properties.syringe_inner_diameter} mm</label><br>
+        <label class="field_label"><u><b>Upper Syringe Limit: </b></u></label> <label>${model_properties.syringe_upper_limit}</label><br>
+        <label class="field_label"><u><b>Lower Syringe Limit: </b></u></label> <label>${model_properties.syringe_lower_limit}</label><br>
+        <label class="field_label"><u><b>Syringe Sweetspot: </b></u></label> <label>${model_properties.syringe_sweetspot}</label><br>
         `
     }
 
@@ -359,9 +346,6 @@ function check_chip_grid_inputs() {
 }
 
 function create_chip_fields(rows, columns) {
-    // Create the options for the row types (all big, all small, intercalated)
-    create_row_type_options(rows);
-
     // Create table for the user to provide the nickname of each well
     create_chip_nicknames_table(rows, columns);
 }
@@ -389,26 +373,6 @@ function create_chip_nicknames_table(rows, columns) {
     }
     nicknames_table += `</table>`; // Close the table
     nicknames_div.insertAdjacentHTML("afterbegin", nicknames_table);
-}
-
-function create_row_type_options(rows) {
-    var row_types_div = document.getElementById("chip_row_types_div");
-    row_types_div.innerHTML = ``;
-    var row_types_text = ``;
-
-    for (var row=0; row < rows; row++) {
-        row_types_text+= `
-            &emsp;<label>- Row #${row+1}: </label>
-            <select id="row_type_${row}">
-                <option value="default"> - Select a type for row #${row+1} - </option>
-                <option value="B">B (all wells are big)</option>
-                <option value="S">S (all wells are small)</option>
-                <option value="BS">BS (intercalated well size)</option>
-            </select><br>
-        `
-    }
-    row_types_text+= `<br>`;
-    row_types_div.insertAdjacentHTML("afterbegin", row_types_text);
 }
 
 // ----------------------- DYNAMIC INPUT FIELDS METHODS - PLATES

@@ -347,18 +347,7 @@ class Coordinator:
         else:   
             self.go_to_position(location)        
 
-    def go_to_well(self, chip, well_nickname):
-        """ This method moves the system to the location assigned to a specific well in a chip by retrieving the location from myLabware and then calling go_to_position()
-
-        Args:
-            chip ([int]): this is the index of the Chip object contained in Labware
-            well_nickname ([str]): this is a string representing the nickname of the well i.e. 'C4' or 'D11'
-        """
-        # Get the location of the well by its nickname
-        location = self.myLabware.get_well_location(chip, well_nickname) # [x, y, z]
-        self.go_to_position(location)
-
-    def go_to_pot(self, plate, pot_nickname):
+    def go_to_well(self, model, well_nickname):
         """ This method moves the system to the location assigned to a specific pot in a plate by retrieving the location from myLabware and then calling go_to_position()
 
         Args:
@@ -366,7 +355,7 @@ class Coordinator:
             pot_nickname ([str]): this is a string representing the nickname of the well i.e. 'C4' or 'D9'
         """
         # Get the location of the well by its nickname
-        location = self.myLabware.get_pot_location(plate, pot_nickname) # [x, y, z]
+        location = self.myLabware.get_well_location(model, well_nickname) # [x, y, z]
         self.go_to_position(location)
     
     def pick_up_liquid(self, volume, rate = DEFAULT_RATE): 
@@ -499,11 +488,10 @@ class Coordinator:
         """
         new_model_name = properties["chip_new_model_name"]
         grid = [int(properties["chip_grid_rows"]), int(properties["chip_grid_columns"])]
-        point_distance = float(properties["chip_point_distance"])
-        well_distance = float(properties["chip_well_distance"])
-        row_types = properties["row_types"]
+        offset = float(properties["chip_offset"])
+        well_depth = float(properties["chip_well_depth"])
         nicknames = properties["nicknames"]
-        self.myModelsManager.create_chip_model(new_model_name, grid, point_distance, well_distance, row_types, nicknames)
+        self.myModelsManager.create_chip_model(new_model_name, grid, offset, well_depth, nicknames)
     
     def create_new_plate_model(self, properties):
         """This method creates a new plate model (in a json file) using the provided dictionary of parameters and calling the corresponding
@@ -514,11 +502,10 @@ class Coordinator:
         """
         new_model_name = properties["plate_new_model_name"]
         grid = [int(properties["plate_grid_rows"]), int(properties["plate_grid_columns"])]
-        pot_distance_r = float(properties["plate_pot_distance_r"])
-        pot_distance_c = float(properties["plate_pot_distance_c"])
-        pot_depth = float(properties["plate_pot_depth"])
+        offset = float(properties["plate_offset"])
+        well_depth = float(properties["plate_well_depth"])
         nicknames = properties["nicknames"]
-        self.myModelsManager.create_plate_model(new_model_name, grid, pot_distance_r, pot_distance_c, pot_depth, nicknames)
+        self.myModelsManager.create_plate_model(new_model_name, grid, offset, well_depth, nicknames)
     
     def create_new_syringe_model(self, properties):
         """This method creates a new syringe model (in a json file) using the provided dictionary of parameters and calling the corresponding
@@ -530,7 +517,10 @@ class Coordinator:
         new_model_name = properties["syringe_new_model_name"]
         volume = float(properties["syringe_volume"])
         inner_diameter = float(properties["syringe_inner_diameter"])
-        self.myModelsManager.create_syringe_model(new_model_name, volume, inner_diameter)
+        upper_limit = float(properties["syringe_upper_limit"])
+        lower_limit = float(properties["syringe_lower_limit"])
+        sweetspot = float(properties["syringe_sweetspot"])
+        self.myModelsManager.create_syringe_model(new_model_name, volume, inner_diameter, upper_limit, lower_limit, sweetspot)
 
     def get_current_labware(self):
         """ Obtains a disctionary with the components currently calibrated and loaded onto the system and ready to be used
@@ -562,11 +552,11 @@ class Coordinator:
         Args:
             input_file_name ([str]): name of desired input file
         """
+        
         print(f"Coordinator: Loading labware from {input_file_name}")
         self.myLabware.load_labware_from_file(input_file_name)
-        chip_list = self.myLabware.chip_list
-        plate_list = self.myLabware.plate_list
-        labware = [chip_list, plate_list]
+        model_list = self.myLabware.model_list
+        labware = model_list
         return labware
 
     def load_syringe_setup(self, loaded_syringe):
@@ -617,12 +607,12 @@ class Coordinator:
         if (labware_component == LABWARE_CHIP):
             mapped_well_locations = calibrate_model(component_parameters, calibration_points) # Map out components within the chip
             new_component = create_component(component_model, component_parameters, mapped_well_locations) # Create Chip object with all the internal information it needs
-            self.myLabware.add_chip(new_component) # Add chip to Chamber
+            self.myLabware.add_model(new_component) # Add chip to Chamber
 
         elif (labware_component == LABWARE_PLATE):
             mapped_pot_locations = calibrate_model(component_parameters, calibration_points) # Map out components within the plate
             new_component = create_component(component_model, component_parameters, mapped_pot_locations) # Create Plate object with all the internal information it needs
-            self.myLabware.add_plate(new_component) # Add plate to Chamber
+            self.myLabware.add_model(new_component) # Add plate to Chamber
 
     def remove_labware_component(self, labware_component, component_index):
         """ Delete a calibrated labware component from the list of current labware components
@@ -632,10 +622,10 @@ class Coordinator:
             component_index ([int]): index of the component in the list of chips or plates
         """
         if (labware_component == LABWARE_CHIP):
-            self.myLabware.remove_chip(component_index)
+            self.myLabware.remove_model(component_index)
             
         elif (labware_component == LABWARE_PLATE):
-            self.myLabware.remove_plate(component_index)
+            self.myLabware.remove_model(component_index)
 
     def set_syringe_model(self, syringe_model):
         """ Set the model of the syringe currenly being operated
@@ -728,22 +718,20 @@ class Coordinator:
         """
         self.coordinates_refresh_rate = new_rate
 
-    def get_type_of_labware_by_slot(self, slot: int, plate: Plate = None, chip: Chip = None):
-        if plate != None:
-            plate_pot_properties = plate.export_plate_properties()
-            locations = plate_pot_properties["pot_locations"]
-        elif chip != None:
-            dummy = 0
-            # print(chip.well_locations)
+    def get_type_of_labware_by_slot(self, slot: int, model: Model = None):
+        if model != None:
+            model_well_properties = model.export_model_properties()
 
-    def get_depth_of_labware(self, labware: Plate):
-        plate_pot_properties = labware.export_plate_properties()
-        depth = plate_pot_properties["pot_depths"]
+        return model_well_properties
+
+    def get_depth_of_labware(self, labware: Model):
+        model_well_properties = labware.export_model_properties()
+        depth = model_well_properties["well_depths"]
         return depth
 
-    def set_plate_depth(self, plate, depth):
+    def set_plate_depth(self, model, depth):
         # .get_depth_of_labware return a list, so we get the first elements since all of the deoths are the same [0]
-        plate_default_depth = self.get_depth_of_labware(plate)[0]
+        plate_default_depth = self.get_depth_of_labware(model)[0]
         if depth == PLATE_DEPTH:
             # we set the depth here to the distance of the pot minus 1 milimiter so that it has some room. 
             return plate_default_depth - 1
@@ -757,8 +745,8 @@ class Coordinator:
         else: 
             return None
 
-    def void_plate_depth(self, plate: Plate, void: bool = False):
-        plate.void_plate_depth(void)
+    def void_plate_depth(self, model: Model, void: bool = False):
+        model.void_plate_depth(void)
 
     '''
     PROTOCOL METHODS SECTION FOR OT2
@@ -988,7 +976,7 @@ class Coordinator:
         Args:
             container_description ([str]): string that describes what container needs to be verified
         """
-        return self.myLabware.check_well_pot_existence(container_description)
+        return self.myLabware.check_well_existence(container_description)
 
     def connect_all(self):
         """This method connects the modules connected to the computer"""

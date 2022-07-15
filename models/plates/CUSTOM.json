@@ -1,7 +1,7 @@
 {
     "grid":[4,5],
     "offset": 0,
-    "potDepth":20,
+    "wellDepth":20,
     "nicknames":
     [
         ["A1","A2","A3","A4","A5"],

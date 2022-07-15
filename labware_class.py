@@ -6,8 +6,8 @@ LABWARE CLASS
 
 from numpy import False_
 from models_manager import LABWARE_CHIP, LABWARE_PLATE
-from chip import Chip
-from plate import Plate
+# from model import Model
+from model import Model
 import sys
 
 import os
@@ -26,38 +26,24 @@ SYRINGE_MODEL = "HAMILTON_FAKE.json"
 
 class Labware_class:
     def __init__(self):
-        self.chip_list = []
-        self.plate_list = []
+        self.model_list = []
         self.syringe_model = SYRINGE_MODEL
         self.syringe_model_is_default = True
 
     """
     SETTERS SECTION
     """
-    def add_chip(self, new_chip):
-        # add new_chip to the list of chips
-        self.chip_list.append(new_chip)
-
-    def remove_chip(self, chip_index):
-        # print(f"Chips: {self.chip_list}")
-        self.chip_list.pop(chip_index)
-
-
-    def add_plate(self, new_plate):
+    def add_model(self, new_model):
         # add new_plate to the list of chips
-        self.plate_list.append(new_plate)
+        self.model_list.append(new_model)
 
-    def remove_plate(self, plate_index):
+    def remove_model(self, model_index):
         # print(f"Plates: {self.plate_list}")
-        self.plate_list.pop(plate_index)
-
-    def reset_chip_list(self):
-        # print(f"Reseting the chips\n Chips: {self.chip_list}")
-        self.chip_list.clear()
+        self.model_list.pop(model_index)
     
-    def reset_plate_list(self):
+    def reset_model_list(self):
         # print(f"Reseting the plates\n Plates: {self.plate_list}")
-        self.plate_list.clear()
+        self.model_list.clear()
 
     def set_syringe_model(self, model_name):
         self.syringe_model = model_name
@@ -69,130 +55,52 @@ class Labware_class:
     def get_syringe_model(self):
         return self.syringe_model
     
-    def get_chip_models(self):
+    def get_models(self):
         models = dict()
-        for chip in self.chip_list:
-            models[chip.get_model_name()] = chip.get_location_by_index(0)        
-        return models
-    
-    def get_plate_models(self):
-        # models = []
-        # for plate in self.plate_list:
-        #         models.append(plate.get_model_name())
-        
-        models = dict()
-        for plate in self.plate_list:
-            models[plate.get_model_name()] = plate.get_location_by_index(0)
-        
-        # print(f"Models: {models}")#A TEST, DELETE
+        for model in self.model_list:
+            models[model.get_model_name()] = model.get_location_by_index(0)
         return models
 
     def get_current_labware(self):
         labware = dict()
-        labware["chips"] = self.get_chip_models()
-        labware["plates"] = self.get_plate_models()
+        labware["models"] = self.get_models()
         labware["syringe"] = self.get_syringe_model()
         return labware
 
-    def get_well_location(self, chip, well_nickname):
-        location = self.chip_list[chip].get_location_by_nickname(well_nickname)
-        return location
-
-    def get_pot_location(self, plate, pot_nickname):
-        location = self.plate_list[plate].get_location_by_nickname(pot_nickname)
+    def get_well_location(self, model, well_nickname):
+        location = self.model_list[model].get_location_by_nickname(well_nickname)
         return location
 
     # String input looks like: "p 1E3" or "c 1B3" : "[component] [component_index][well/pot nickname]"
-    def check_well_pot_existence(self, container):
+    def check_well_existence(self, container):
         # Unpack variables from the input string
         component = container.split()[0]
         index = int(container.split()[1][0])
         nickname = container.split()[1][1:]
 
         # Verify existence of the container specified
-        if component == LABWARE_CHIP:
-            return self.chip_list[index].verify_nickname_existence(nickname)
+        if component == (LABWARE_CHIP or LABWARE_PLATE):
+            return self.model_list[index].verify_nickname_existence(nickname)
 
-        elif component == LABWARE_PLATE:
-            return self.plate_list[index].verify_nickname_existence(nickname)
-
-    """
-    SAVE/LOAD LABWARE 
-        This section either saves/loads Chip and Plate objects to/from a dictionary
-        The format of the dictionary is the following:
-
-        labware_dictionary = {
-            "chips": [
-                {
-                    # Properties of Chip #1
-                },
-                {
-                    # Properties of Chip #2
-                },
-                ...
-                {
-                    # Properties of Chip #n
-                }
-            ],
-            "plates: [
-                {
-                    # Properties of Plate #1
-                },
-                {
-                    # Properties of Plate #2
-                },
-                ...
-                {
-                    # Properties of Plate #n
-                }
-            ]
-        }
-
-        chip_properties = {
-            "model": "model_name", 
-            "grid": [row, col],
-            "well_locations": [ (X1, Y1, Z1), (X2, Y2, Z2), ... , (Xn, Yn, Zn)],
-            "well_types": [type_1, type_2, ..., type_n],
-            "well_nicknames": ["#1", "#2", ... , "#n"],
-        }
-
-        plate_properties = {
-            "model": "model_name", 
-            "grid": [row, col],
-            "pot_locations": [ (X1, Y1, Z1), (X2, Y2, Z2), ... , (Xn, Yn, Zn)],
-            "pot_depths": [type_1, type_2, ..., type_n],
-            "pot_nicknames": ["#1", "#2", ... , "#n"],
-        }
-    """
     # This method parses the list of chips and plates and outputs a dictionary with all the parameters of all the labware components
     def labware_to_dictionary(self):
         labware_dictionary = dict()
-        labware_dictionary["chips"] = list()
-        labware_dictionary["plates"] = list()
-
-        # Iterate through chips list, extract properties of each chip, and store in labware_dictionary
-        for chip in self.chip_list:
-            chip_properties = chip.export_chip_properties()
-            labware_dictionary["chips"].append(chip_properties)
+        labware_dictionary["models"] = list()
 
         # Iterate through plates list, extract properties of each plate, and store in labware_dictionary
-        for plate in self.plate_list:
-            plate_properties = plate.export_plate_properties()
-            labware_dictionary["plates"].append(plate_properties)
+        if len(self.model_list) >0:
+            for model in self.model_list:
+                model_properties = model.export_model_properties()
+                labware_dictionary["models"].append(model_properties)
         return labware_dictionary
 
     def dictionary_to_labware(self, labware_dictionary):        
-        chips_list = labware_dictionary["chips"] # This is a list of dictionaries, each of which containes prooperties for a given chip
-        plates_list = labware_dictionary["plates"] # This is a list of dictionaries, each of which containes prooperties for a given plate
-        # Iterate through chips_list and create a Chip object out of each dictionary
-        for chip_properties in chips_list:
-            new_chip = Chip(chip_properties=chip_properties)
-            self.chip_list.append(new_chip)
+        model_list = labware_dictionary["models"] # This is a list of dictionaries, each of which containes properties for a given model
 
-        # Iterate through plates_list and create a Plate object out of each dictionary
-        for plate_properties in plates_list:
-            new_plate = Plate(plate_properties=plate_properties)
-            self.plate_list.append(new_plate)
+        # Iterate through model_list and create a model object out of each dictionary
+        for model_properties in model_list:
+            new_model = Model(model_properties=model_properties)
+            self.model_list.append(new_model)
             
     def get_path_to_saved_labware_folder(self):
         current_path = os.getcwd() # Returns a string representing the location of this file
@@ -233,18 +141,14 @@ class Labware_class:
 
         # Create a dictionary out of the data in the specified json file
         labware_dictionary = json.load(input_file)
-
         # Create labware out of the dictionary
         self.dictionary_to_labware(labware_dictionary)
 
-        chip_number = 0
-        plate_number = 0
+        model_number = 0
 
         for key in labware_dictionary:
-            if key == 'chip':
-                chip_number += 1
-            elif key == 'plate':
-                plate_number += 1
+            if key == 'models':
+                model_number += 1
         
     def available_saved_labware_files(self):
         path = os.listdir(self.get_path_to_saved_labware_folder())

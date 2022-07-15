@@ -91,30 +91,31 @@ class ModelsManager:
         
         json.dump(properties, output_file)
 
-    def create_chip_model(self, new_model_name, grid, point_distance, well_distance, row_types, nicknames):
+    def create_chip_model(self, new_model_name, grid, offset, well_depth, nicknames):
         properties = { 
             "grid": grid, # This is a list: [rows,columns]
-            "pointDistance": point_distance, # float number
-            "wellDistance": well_distance, # float number
-            "rowTypes": row_types, # list of strings: ["BS","B", "BS"]
+            "offset": offset, # float number
+            "wellDepth": well_depth, # float number
             "nicknames": nicknames # List of lists with strings in them, each sublist holds the nicknames of a row
         }
         self.save_new_model_file(LABWARE_CHIP, new_model_name, properties)
 
-    def create_plate_model(self, new_model_name, grid, pot_distance_r, pot_distance_c, pot_depth, nicknames):
+    def create_plate_model(self, new_model_name, grid, offset, well_depth, nicknames):
         properties = {
             "grid": grid, # This is a list: [rows,columns]
-            "potDistance_r": pot_distance_r, # float number
-            "potDistance_c": pot_distance_c, # float number
-            "potDepth": pot_depth, # float number or list, to specify a common or specific depth accorss all pots respectively
+            "offset": offset, # float number
+            "wellDepth": well_depth, # float number or list, to specify a common or specific depth accorss all pots respectively
             "nicknames": nicknames # List of lists with strings in them, each sublist holds the nicknames of a row
         }
         self.save_new_model_file(LABWARE_PLATE, new_model_name, properties)
 
-    def create_syringe_model(self, new_model_name, volume, inner_diameter):
+    def create_syringe_model(self, new_model_name, volume, inner_diameter, upper_limit, lower_limit, sweetspot):
         properties = {
             "volume": volume, # float number
             "inner_diameter": inner_diameter, # float number
+            "upper_syringe_limit": upper_limit,
+            "lower_syringe_limit": lower_limit,
+            "sweetspot_on_syringe": sweetspot 
         }
         self.save_new_model_file(LABWARE_SYRINGE, new_model_name, properties)     
         

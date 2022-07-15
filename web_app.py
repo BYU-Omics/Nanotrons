@@ -21,6 +21,11 @@ from python_execute import Py_Execute
 import platform
 import datetime
 from constants import RUNNING_APP_FOR_REAL, THERMOCYCLER_CONNECTED
+import sys, asyncio
+
+if sys.platform == "win32" and (3, 8, 0) <= sys.version_info < (3, 9, 0):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 ALLOWED_EXTENSIONS = ['json']
 LABWARE_CHIP = "c"
 LABWARE_PLATE = "p"
@@ -589,7 +594,7 @@ def get_labware_models():
 def get_current_labware():
     labware = coordinator.get_current_labware()
     new_key = list(labware) #to iterate thorugh the keys chips, plates, and syringes
-    labware_slot = {"chips":[], "plates":[]}
+    labware_slot = {"models":[]}
     for i in range (len(new_key)-1): #length minus one so that we do not run syringes. It throws an error when making the syring into a list and we don't need it anyways
         second_key = list(labware[new_key[i]]) #to iterate through any labware under chips or plates. This labware name is key to the coordinates
         #print(second_key)
@@ -658,8 +663,7 @@ def get_current_labware():
 
 @socketio.on("delete_current_labware")
 def delete_current_labware():
-    coordinator.myLabware.chip_list.clear()
-    coordinator.myLabware.plate_list.clear()
+    coordinator.myLabware.model_list.clear()
 
 @socketio.on("remove_component_onclick")
 def remove_component_onclick(newArray):
@@ -744,28 +748,22 @@ def get_syringe_models():
 @socketio.on("instant_command")
 def execute_instant_command(command_description):
     # Here goes the App.whatever that sends an instantaneous command to the OT_CONTROL object -> "INSTANTANEOUS COMMANDS" section of Application class
-    if(command_description[0] == "c"):
-        chip = int(command_description[1])
-        well_nickname = command_description[2]
-        coordinator.go_to_well(chip, well_nickname)
 
-    else:
-        plate = int(command_description[1])
-        pot_nickname = command_description[2]
-        coordinator.go_to_pot(plate, pot_nickname)
+    model = int(command_description[1])
+    well_nickname = command_description[2]
+    coordinator.go_to_well(model, well_nickname)
 
 @socketio.on("get_labware_summary")
 def get_labware_summary():
     full_labware_dict =  coordinator.get_full_current_labware()
     labware_summary = dict()
-    labware_summary["chips"] = list()
-    labware_summary["plates"] = list()
+    labware_summary["models"] = list()
     """
     labware_summary format
         labware_summary = {
-            "chips": [
-                chip_summary#1, 
-                chip_summary#2
+            "models": [
+                model_summary#1, 
+                model_summary#2
             ],
             "plates": [
                 plate_summary#1,
@@ -773,7 +771,7 @@ def get_labware_summary():
             ]
         }
 
-        chip_summary = {
+        model_summary = {
             "model": [str],
             "nicknames": [nickname_1, nickname_2, ... , nickname_n] # Like A3, B5, C11, etc.
         }
@@ -783,17 +781,13 @@ def get_labware_summary():
             "nicknames": [nickname_1, nickname_2, ... , nickname_n] # Like A3, B5, C11, etc.
         }
     """
-    for chip_properties in full_labware_dict["chips"]:
-        summary = dict()
-        summary["model"] = chip_properties["model"]
-        summary["nicknames"] = chip_properties["well_nicknames"]
-        labware_summary["chips"].append(summary)
+    
 
-    for plate_properties in full_labware_dict["plates"]:
+    for model_properties in full_labware_dict["models"]:
         summary = dict()
-        summary["model"] = plate_properties["model"]
-        summary["nicknames"] = plate_properties["pot_nicknames"]
-        labware_summary["plates"].append(summary)
+        summary["model"] = model_properties["model"]
+        summary["nicknames"] = model_properties["well_nicknames"]
+        labware_summary["models"].append(summary)
     socketio.emit("labware_summary", labware_summary)
 
 @socketio.on("go_to_deck_slot")
@@ -899,10 +893,9 @@ def set_protocol_filename(protocol_name):
     if name_of_calibration_file == None or name_of_calibration_file == 'None set':
         pass
     else:
-        coordinator.myLabware.chip_list.clear()
-        coordinator.myLabware.plate_list.clear()
-        print(f"Loading labware")
+        coordinator.myLabware.model_list.clear()
         coordinator.load_labware_setup(name_of_calibration_file)
+
     socketio.emit("protocol_python_labware", name_of_calibration_file)
     socketio.emit("protocol_python_author", author)
     socketio.emit("protocol_python_description", description)

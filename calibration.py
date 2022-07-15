@@ -4,8 +4,8 @@ CALIBRATION MODULE
 """
 
 import numpy as np
-from chip import Chip
-from plate import Plate
+from model import Model
+
 
 
 """
@@ -48,7 +48,7 @@ def guess_fourth_calibration_point(calibration_points):
     # i. Top left callibration point
     # ii. Top right callibration point
     # iii. Bottom left callibration point
-    # NOTE: the order of the points matters both for guessing the 4th calibration point right and for creating the plane for mapping out the wells/pots in a grid
+    # NOTE: the order of the points matters both for guessing the 4th calibration point right and for creating the plane for mapping out the wells/wells in a grid
 
 def reorder_calibration_points(calibration_points):
 
@@ -116,13 +116,13 @@ def get_nicknames(nicknames_list):
 """
 CALIBRATION METHODS
 """
-# This method takes the parameters of the plate plus its calibration points and returns a list of the locations of all the pots in that plate
+# This method takes the parameters of the model plus its calibration points and returns a list of the locations of all the wells in that model
 def calibrate_model(chip_parameters, calibration_points):
     ordered_calibration_points = reorder_calibration_points(calibration_points)   
     
     grid = chip_parameters["grid"]
-    plate_rows = grid[0] # change to take value from model parameters
-    plate_columns = grid[1] # change to take value from model parameters
+    model_rows = grid[0] # change to take value from model parameters
+    model_columns = grid[1] # change to take value from model parameters
     calibration_offset = chip_parameters["offset"] # change to take value from model parameters
 
     bl = ordered_calibration_points[0]
@@ -132,30 +132,30 @@ def calibrate_model(chip_parameters, calibration_points):
 
     # back_left to back_right
     accross_vector = []
-    accross_vector.append((br[0] - bl[0]) / (2*calibration_offset + plate_columns -1))
-    accross_vector.append((br[1] - bl[1]) / (2*calibration_offset + plate_columns -1))
-    accross_vector.append((br[2] - bl[2]) / (2*calibration_offset + plate_columns -1))
+    accross_vector.append((br[0] - bl[0]) / (2*calibration_offset + model_columns -1))
+    accross_vector.append((br[1] - bl[1]) / (2*calibration_offset + model_columns -1))
+    accross_vector.append((br[2] - bl[2]) / (2*calibration_offset + model_columns -1))
 
     # back_left to front_left
     down_vector = []
-    down_vector.append((fl[0] - bl[0]) / (plate_rows -1))
-    down_vector.append((fl[1] - bl[1]) / (plate_rows -1))
-    down_vector.append((fl[2] - bl[2]) / (plate_rows -1))
+    down_vector.append((fl[0] - bl[0]) / (model_rows -1))
+    down_vector.append((fl[1] - bl[1]) / (model_rows -1))
+    down_vector.append((fl[2] - bl[2]) / (model_rows -1))
 
     # so well coordinate start reference can change without changing back_left
     ref_point = bl
 
     # populate the matrix with well coordinates
-    plate_index = 0
+    model_index = 0
     well_coordinate_list = []
-    for i in range(0, plate_rows):
-        for j in range(0, plate_columns):
+    for i in range(0, model_rows):
+        for j in range(0, model_columns):
             point_to_add = []
             point_to_add.append(ref_point[0] + (calibration_offset + j) * accross_vector[0])
             point_to_add.append(ref_point[1] + (calibration_offset + j) * accross_vector[1])
             point_to_add.append(ref_point[2] + (calibration_offset + j) * accross_vector[2])
             well_coordinate_list.append(point_to_add)
-            plate_index += 1
+            model_index += 1
  
         ref_point[0] = ref_point[0] + down_vector[0]
         ref_point[1] = ref_point[1] + down_vector[1]
@@ -165,29 +165,29 @@ def calibrate_model(chip_parameters, calibration_points):
         
     return well_coordinate_list
 
-def create_component(model_name, plate_parameters, pot_locations):
+def create_component(model_name, model_parameters, well_locations):
 
     # Unpack parameters to be used
-    grid = plate_parameters["grid"]
-    # Calculate the amount of pots that will be considered
-    amount_of_pots = grid[0] * grid[1]
-    pot_depth = 0
+    grid = model_parameters["grid"]
+    # Calculate the amount of wells that will be considered
+    amount_of_wells = grid[0] * grid[1]
+    well_depth = 0
 
-    # The depths of the pots can be either all the same or different for each
-    if type(plate_parameters["potDepth"]) == list:
-        pot_depth = plate_parameters["potDepth"]
+    # The depths of the wells can be either all the same or different for each
+    if type(model_parameters["wellDepth"]) == list:
+        well_depth = model_parameters["wellDepth"]
     else:
-        pot_depth = [plate_parameters["potDepth"] for _ in range(amount_of_pots)]
-    nicknames = get_nicknames(plate_parameters["nicknames"])
+        well_depth = [model_parameters["wellDepth"] for _ in range(amount_of_wells)]
+    nicknames = get_nicknames(model_parameters["nicknames"])
 
     # Create Chip object
-    new_component = Plate(model_name=model_name, grid=grid)
+    new_component = Model(model_name=model_name, grid=grid)
 
     # Store the locations, nicknames, and well types of the wells in the chip
-    for index in range(amount_of_pots):
-        new_component.set_location(index, pot_locations[index])
+    for index in range(amount_of_wells):
+        new_component.set_location(index, well_locations[index])
         new_component.set_nickname(index, nicknames[index])
-        new_component.set_pot_depth(index, pot_depth[index])
+        new_component.set_well_depth(index, well_depth[index])
 
     return new_component
 

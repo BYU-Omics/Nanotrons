@@ -2,7 +2,7 @@ var form = document.querySelector("form");
 
 var socket = io.connect('http://127.0.0.1:5000');
 
-var chip_plate_select = document.getElementById("labware_components");
+var model_select = document.getElementById("labware_components");
 var component_locations_select = document.getElementById("container_nickname");
 var calibrated_chips = document.getElementById("calibrated_chips");
 var calibrated_plates = document.getElementById("calibrated_plates");
@@ -22,25 +22,18 @@ delete_button.addEventListener("click", function(){
 socket.on("here_current_labware", function(labware_dict) {
     console.log(labware_dict);
 
-    // Update the list of chips
-    for (var i = 0; i < labware_dict["chips"].length; i++){
+    // Update the list of models
+    for (var i = 0; i < labware_dict["models"].length; i++){
         var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["chips"][i])); // Append a text node to the list element node
-        calibrated_chips.appendChild(node); // Add the node to the labware list
-    }
-
-    // Update the list of plates
-    for (var i = 0; i < labware_dict["plates"].length; i++){
-        var node = document.createElement('li'); // Create a list element
-        node.appendChild(document.createTextNode(labware_dict["plates"][i])); // Append a text node to the list element node
-        calibrated_plates.appendChild(node); // Add the node to the labware list
+        node.appendChild(document.createTextNode(labware_dict["models"][i])); // Append a text node to the list element node
+        calibrated_models.appendChild(node); // Add the node to the labware list
     }
 });
 
 socket.on("labware_summary", function(labware_summary_received) {
     labware_summary = labware_summary_received;
     // Empty test options added
-    reset_chip_plate_options();
+    reset_model_options();
     // Populate options for the labware components dropdown list here
     populate_component_models();
 });
@@ -64,49 +57,50 @@ form.addEventListener("submit", function(event) {
     event.preventDefault();
   }, false);
 
-  function reset_chip_plate_options() {
+  function reset_model_options() {
     // Erase all the options inside the dropdown list (select object)
-    var length = chip_plate_select.options.length;
+    var length = model_select.options.length;
     // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
     for (var i = length - 1; i >= 0; i--) {
-        chip_plate_select.remove(i);
+        model_select.remove(i);
     };
     // Add the default option
     var new_option = document.createElement("option");
     new_option.text = "- Select a Labware Component -";
-    chip_plate_select.add(new_option);
+    model_select.add(new_option);
 }
 
 function populate_component_models() {
-    var index = 1;
-    for (let chip_summary of labware_summary.chips) {
-        var new_option = document.createElement("option");
-        new_option.text = `Chip #${index} - ` + chip_summary["model"];
-        chip_plate_select.add(new_option);
-        index++;
+    if (newArray[0] == 'c'){
+        var index = 1;
+        for (let model_summary of labware_summary.models) {
+            var new_option = document.createElement("option");
+            new_option.text = `Model #${index} - ` + model_summary["model"];
+            model_select.add(new_option);
+            index++;
+        }
     }
-    index = 1;
-    for (let plate_summary of labware_summary.plates) {
-        var new_option = document.createElement("option");
-        new_option.text = `Plate #${index} - ` + plate_summary["model"];
-        chip_plate_select.add(new_option);
-        index++;
+    
+    else {
+        index = 1;
+        for (let model_summary of labware_summary.models) {
+            var new_option = document.createElement("option");
+            new_option.text = `Model #${index} - ` + model_summary["model"];
+            model_select.add(new_option);
+            index++;
+        }
     }
 }
 
 var labware_summary = {
-    "chips": [
-        chip_summary_1, 
-        chip_summary_2
-    ],
-    "plates": [
-        plate_summary_1
+    "models": [
+        model_summary_1
     ]
 };
 
 function component_model_onclick() {
     console.log("component_model_onclick called!");
-    var option_selected = chip_plate_select.options[ chip_plate_select.selectedIndex ].value;
+    var option_selected = model_select.options[ model_select.selectedIndex ].value;
     console.log(option_selected);
     var current_labware_selected = option_selected;
     var labware_selected_changed = current_labware_selected != previous_labware_selected; // Boolean to see if with the click event on the select component the option selected was changed or not
