@@ -105,6 +105,7 @@ class Coordinator:
         self.mc = joystick.XboxJoystick(operating_system)
         self.myLabware = Labware_class()
         self.joystick_profile = DEFAULT_PROFILE
+        self.allow_homing = False
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
         self.protocol_creator = ProtocolCreator()
@@ -255,7 +256,20 @@ class Coordinator:
 
         if len(hat) != 0:
             if hat[0] == "HAT_LEFT":
-                self.ot_control.home('Y')
+                if self.allow_homing == True:
+                    self.ot_control.home('B')
+                    self.allow_homing = False
+            elif hat[0] == "HAT_RIGHT":
+                if self.allow_homing == True:
+                    self.ot_control.home('C')
+                    self.allow_homing = False
+            elif hat[0] == "HAT_UP":
+                self.allow_homing = True
+            elif hat[0] == "HAT_DOWN":
+                if self.allow_homing == True:
+                    self.ot_control.home('XYZA')
+                    self.allow_homing = False
+                
 
         if len(axis) != 0:
             if axis[0] == "L_STICK_LEFT":
