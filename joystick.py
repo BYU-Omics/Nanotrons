@@ -25,7 +25,7 @@ BUTTONS_DICT_REVERSED_R = { "A":0, "B":1, "X":2, "Y":3, "LB":4,
                  "RB":5, "BACK":6, "START":7, "XBOX":8, "LSTICK":9, 
                  "RSTICK":10 }
 
-HATS_USED_DICT = { (0,1):"HAT_UP", (0,-1):"HAT_DOWN", (-1,0):"HAT_Left", (1,0):"HAT_RIGHT"}
+HATS_USED_DICT = { (0,1):"HAT_UP", (0,-1):"HAT_DOWN", (-1,0):"HAT_LEFT", (1,0):"HAT_RIGHT"}
 HATS_USED_LIST = [(0,1), (0,-1), (-1,0), (1,0)] 
 
 AXES_DICT = {(0,-1):"L_STICK_LEFT",(0,1):"L_STICK_RIGHT",(1,1):"L_STICK_DOWN",(1,-1):"L_STICK_UP",

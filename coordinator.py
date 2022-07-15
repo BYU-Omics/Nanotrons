@@ -254,7 +254,8 @@ class Coordinator:
                 self.mc.stop_joystick = True
 
         if len(hat) != 0:
-            pass
+            if hat[0] == "HAT_LEFT":
+                self.ot_control.home('Y')
 
         if len(axis) != 0:
             if axis[0] == "L_STICK_LEFT":
