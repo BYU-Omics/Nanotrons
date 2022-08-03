@@ -30,10 +30,10 @@ Z_MAX= 170.15
 Z_MIN= 10 
 A_MAX= 170.15
 A_MIN= 10 
-B_MAX= 105 # (16) is the new limit if B axis is homed after a protocol without hard resetting. 
-B_MIN= -1*105 # (-187) is the new limit if B axis is homed after a protocol without hard resetting. 
-C_MAX= 105
-C_MIN= -1*105
+B_MAX= 0
+B_MIN= -50
+C_MAX= 0
+C_MIN= -50
 TC_X = 211
 TC_Y = 155
 TC_Z_OPEN_LID = 170
@@ -41,6 +41,8 @@ TC_Z_CLOSED_LID = 170
 BC_AXIS_UNIT_CONVERTION = 4.16
 STEP_SIZE = 10
 S_STEP_SIZE = 10
+
+SYRINGE_LIMITS_DICT = {"upper_syringe_limit": B_MAX, "lower_syringe_limit": B_MIN}
 
 SHORT_MEDIUM_STEP_LIMIT = 10
 MEDIUM_LONG_STEP_LIMIT = 50
@@ -107,7 +109,7 @@ class OT2_nanotrons_driver(SM):
 
 # Functions that help movements
         
-    def check_for_valid_move(self, pos, axis) -> bool:
+    def check_for_valid_move(self, pos, axis, syringe_parameters = SYRINGE_LIMITS_DICT) -> bool:
         # print(pos)
         """
         This function checks for limits. If the user tries to go too far, the move 
@@ -128,6 +130,8 @@ class OT2_nanotrons_driver(SM):
         # if self.tc_flag == True and ((self._position['X'] + size) < TC_X) and ((self._position['Y'] + size) > TC_Y) and ((self._position['Z'] + size) < TC_Z_OPEN_LID):
         #     return False
 
+
+
         if axis == 'X' and (pos > X_MAX or pos < X_MIN):
             return False
         elif axis == 'Y' and (pos > Y_MAX or pos < Y_MIN):
@@ -136,9 +140,9 @@ class OT2_nanotrons_driver(SM):
             return False
         elif axis == 'A' and (pos > A_MAX or pos < A_MIN):
             return False
-        elif axis == 'B' and (pos > B_MAX or pos < B_MIN):
+        elif axis == 'B' and (pos > syringe_parameters["upper_syringe_limit"] or pos < syringe_parameters["lower_syringe_limit"]):
             return False
-        elif axis == 'C' and (pos > C_MAX or pos < C_MIN):
+        elif axis == 'C' and (pos > syringe_parameters["upper_syringe_limit"] or pos < syringe_parameters["lower_syringe_limit"]):
             return False
         else:
             return True
@@ -250,7 +254,7 @@ class OT2_nanotrons_driver(SM):
         else:
             pass
 
-    def plunger_L_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL):
+    def plunger_L_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL, syringe_parameters = SYRINGE_LIMITS_DICT):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
@@ -258,7 +262,7 @@ class OT2_nanotrons_driver(SM):
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos += size # adds a step size to the current position
-            if(self.check_for_valid_move(b_pos, 'B')): # if the future position is a valid move 
+            if(self.check_for_valid_move(b_pos, 'B', syringe_parameters)): # if the future position is a valid move 
                 # print(f"This is in OTdriver (Plunger L up)")
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
@@ -273,12 +277,13 @@ class OT2_nanotrons_driver(SM):
                 print(f"Cannot move to {b_pos}")
                 print(f"Current position is: {self._position['B']}")
                 print(f"Requested distance is: {size}")
+                print(f'Upper limit for left syringe: {syringe_parameters["upper_syringe_limit"]}')
                     # Add print for boundary position
 
         else:
             print("Please select a syringe model (L-up)")
 
-    def plunger_L_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL):
+    def plunger_L_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL, syringe_parameters = SYRINGE_LIMITS_DICT):
         # print(f"Size aspirating:{size}")
         # if self.flag == True:
         #     size = S_STEP_SIZE
@@ -286,7 +291,7 @@ class OT2_nanotrons_driver(SM):
             speed = float(speed)
             b_pos: float = self._position['B'] # stores the current position
             b_pos -= size # adds a step size to the current position
-            if(self.check_for_valid_move(b_pos, 'B')):
+            if(self.check_for_valid_move(b_pos, 'B', syringe_parameters)):
                 # print(f"This is in OTdriver (Plunger L down")
                 # print(f"current step size is {(size / UNIT_CONVERSION)} mm")
                 # print(f"current plunger speed is: {speed} mm/s")
@@ -301,19 +306,20 @@ class OT2_nanotrons_driver(SM):
                 print(f"Cannot move to {b_pos}")
                 print(f"Current position is: {self._position['B']}")
                 print(f"Requested step size is: {size}")
+                print(f'Lower limit for left syringe: {syringe_parameters["lower_syringe_limit"]}')
                     # Add print for boundary position
 
         else:
             print("Please select a syringe model (L-down)")
 
-    def plunger_R_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL):
+    def plunger_R_Up(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL, syringe_parameters = SYRINGE_LIMITS_DICT):
         #if self.flag == True:
            # size = S_STEP_SIZE
         if syringe_model != labware_class.SYRINGE_MODEL:
             speed = float(speed)
             c_pos: float = self._position['C'] # stores the current position
             c_pos = c_pos + size # adds a step size to the current position
-            if(self.check_for_valid_move(c_pos, 'C')): # if the future position is a valid move 
+            if(self.check_for_valid_move(c_pos, 'C', syringe_parameters)): # if the future position is a valid move 
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
                 # good_speed = input("Is this a good speed (y/n): ")
@@ -332,14 +338,14 @@ class OT2_nanotrons_driver(SM):
         else:
             print("Please select a syringe model")
 
-    def plunger_R_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL):
+    def plunger_R_Down(self, size: float = SYRINGE_DEFAULT_STEP, speed = SYRINGE_SLOW_SPEED, syringe_model = labware_class.SYRINGE_MODEL, syringe_parameters = SYRINGE_LIMITS_DICT):
        # if self.flag == True:
            # size = S_STEP_SIZE
         if syringe_model != labware_class.SYRINGE_MODEL:
             speed = float(speed)
             c_pos: float = self._position['C'] # stores the current position
             c_pos = c_pos - size # adds a step size to the current position
-            if(self.check_for_valid_move(c_pos, 'C')): # if the future position is a valid move 
+            if(self.check_for_valid_move(c_pos, 'C', syringe_parameters)): # if the future position is a valid move 
                 # print(f"step size is {(size / UNIT_CONVERSION)}")
                 # print(f"current plunger speed is: {speed} mm/s")
                 # good_speed = input("Is this a good speed (y/n): ")

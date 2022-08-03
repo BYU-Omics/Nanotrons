@@ -52,8 +52,6 @@ myProtocol.set_syringe_model("HAMILTON_175.json")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
-myProtocol.start_wash(50)
-
 # ------------START OF PROTOCOL---------------------------------
 myProtocol.close_lid()
 myProtocol.set_block_temp(4, 2)

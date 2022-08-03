@@ -29,6 +29,7 @@ class Labware_class:
         self.model_list = []
         self.syringe_model = SYRINGE_MODEL
         self.syringe_model_is_default = True
+        
 
     """
     SETTERS SECTION

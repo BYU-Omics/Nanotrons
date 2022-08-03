@@ -697,8 +697,9 @@ def load_syringe_setup(syringe_file_name):
     if syringe_file_name == None or syringe_file_name == "None set":
         print(f"WARNING: Filename set to: {syringe_file_name} ")
     else:
-        syringe = coordinator.load_syringe_setup(syringe_file_name)
-        print(f"Success. Labware loaded: {syringe}")
+        coordinator.load_syringe_setup(syringe_file_name)
+        syringe = coordinator.myLabware.syringe_model
+        print(f"Syringe loaded: {syringe}")
 
 @socketio.on("available_saved_labware_files")
 def available_saved_labware():
@@ -758,36 +759,13 @@ def get_labware_summary():
     full_labware_dict =  coordinator.get_full_current_labware()
     labware_summary = dict()
     labware_summary["models"] = list()
-    """
-    labware_summary format
-        labware_summary = {
-            "models": [
-                model_summary#1, 
-                model_summary#2
-            ],
-            "plates": [
-                plate_summary#1,
-                plate_summary#2,
-            ]
-        }
-
-        model_summary = {
-            "model": [str],
-            "nicknames": [nickname_1, nickname_2, ... , nickname_n] # Like A3, B5, C11, etc.
-        }
-
-        plate_summary = {
-            "model": [str],
-            "nicknames": [nickname_1, nickname_2, ... , nickname_n] # Like A3, B5, C11, etc.
-        }
-    """
-    
 
     for model_properties in full_labware_dict["models"]:
         summary = dict()
         summary["model"] = model_properties["model"]
         summary["nicknames"] = model_properties["well_nicknames"]
         labware_summary["models"].append(summary)
+        
     socketio.emit("labware_summary", labware_summary)
 
 @socketio.on("go_to_deck_slot")

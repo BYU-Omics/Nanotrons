@@ -220,6 +220,7 @@ class Coordinator:
         button, hat, axis,  = self.mc.deliver_joy()
         self.mc.reset_values()
         syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         
         if len(button) != 0:
             if button[0] == "START":
@@ -227,7 +228,7 @@ class Coordinator:
                     print("Please select a syringe model (start) ")
                 
                 else :
-                    print(f"Current syringe model is: {syringe_model}")
+                    # print(f"Current syringe model is: {syringe_model}")
                     self.user_input = input("Enter volume in nanoliters: ")
                     self.ot_control.set_nL(self.user_input)
                     self.user_input2 = input("Enter flow-rate in nanoliters per second: ")
@@ -265,6 +266,7 @@ class Coordinator:
                     self.allow_homing = False
             elif hat[0] == "HAT_UP":
                 self.allow_homing = True
+                print("Controller homing enabled.")
             elif hat[0] == "HAT_DOWN":
                 if self.allow_homing == True:
                     self.ot_control.home('XYZA')
@@ -285,9 +287,9 @@ class Coordinator:
             elif axis[0] == "R_STICK_RIGHT":
                 pass
             elif axis[0] == "R_STICK_UP":
-                self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model)
+                self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
             elif axis[0] == "R_STICK_DOWN":
-                self.ot_control.plunger_L_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model)
+                self.ot_control.plunger_L_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
             elif axis[0] == "L_TRIGGER":
                 pass
             elif axis[0] == "R_TRIGGER":
@@ -383,7 +385,9 @@ class Coordinator:
 
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume) 
-        self.ot_control.plunger_L_Up(step_displacement, speed, syringe_model = self.myLabware.get_syringe_model())
+        syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        self.ot_control.plunger_L_Up(step_displacement, speed, syringe_model, syringe_parameters)
 
     def drop_off_liquid(self, volume, rate = DEFAULT_RATE):
         """ Sends a command to the syringe motor to displace a distance that is equivalent to dispensing a given volume of liquid
@@ -394,7 +398,9 @@ class Coordinator:
         """
         speed = self.flowrate_to_speed_converter(rate)
         step_displacement = self.volume_to_distance_converter(volume)
-        self.ot_control.plunger_L_Down(step_displacement, speed, syringe_model = self.myLabware.get_syringe_model())
+        syringe_model = self.myLabware.get_syringe_model()
+        syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
+        self.ot_control.plunger_L_Down(step_displacement, speed, syringe_model, syringe_parameters)
     
     def volume_to_distance_converter(self, volume):
         """ This method converts a certain amount of volume into displacement needed to move that amount 

@@ -1,0 +1,7 @@
+{
+    "volume": 0, 
+    "inner_diameter": 0,
+    "upper_syringe_limit": 18,
+    "lower_syringe_limit": -300,
+    "sweetspot_on_syringe": 0
+    }

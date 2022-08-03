@@ -92,12 +92,6 @@ function populate_component_models() {
     }
 }
 
-var labware_summary = {
-    "models": [
-        model_summary_1
-    ]
-};
-
 function component_model_onclick() {
     console.log("component_model_onclick called!");
     var option_selected = model_select.options[ model_select.selectedIndex ].value;

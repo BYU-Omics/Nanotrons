@@ -7,41 +7,30 @@ var load_labware = document.getElementById("load_labware");
 
 //INSTATANEOUS COMMANDS
 // Get select components by id
-var chip_plate_select = document.getElementById("labware_components");
+var model_select = document.getElementById("labware_components");
 var component_locations_select = document.getElementById("container_nickname");
 var slot_select = document.getElementById("slot_nickname");
 var go_button = document.getElementById("go_button");
 var show_component_button = document.getElementById("show_component_button");
 var previous_labware_selected = "";
-var chip_summary_1 = {
-    "model": "SZ001",
-    "nicknames": ["A0","A1","A2","A3","A4","B0","B1","B2","B3","B4","C0","C1","C2","C3","C4"]
-};
-var chip_summary_2 = {
-    "model": "SZ003",
-    "nicknames": ["A0","A1","A2","B0","B1","B2","C0","C1","C2"]
-};
-var plate_summary_1 = {
-    "model": "KW001",
-    "nicknames": ["A0","A1","A2","A3","A4","A5","A6","A7","A8","A9","B0","B1","B2","B3","B4","B5","B6","B7","B8","B9","C0","C1","C2","C3","C4","C5","C6","C7","C8","C9","D0","D1","D2","D3","D4","D5","D6","D7","D8","D9","E0","E1","E2","E3","E4","E5","E6","E7","E8","E9"]
-};
+var newArray = []; 
 
-// This is the initialization value but will change as soon as the socket.on method is triggered to receive the actual values of the labware_summary. This assignment is just for testing and documentation purposes
-var labware_summary = {
-    "chips": [
-        chip_summary_1, 
-        chip_summary_2
-    ],
-    "plates": [
-        plate_summary_1
-    ]
-};
+
+//The socket.on event is placed after the testing call for populate_component_models() to make sure the testing happens before actual data is received and processed (otherwise test data would overwrite actual data)
+socket.on("labware_summary", function(labware_summary_received) {
+    console.log("here is the labware summary" + labware_summary_received)
+    labware_summary = labware_summary_received;
+    // Empty test options added
+    reset_model_options();
+    // Populate options for the labware components dropdown list here
+    populate_component_models();
+});
 
 socket.emit("start_manual_control_window");
 socket.emit("give_me_coordinates");
-socket.emit("get_labware_summary");
 
-populate_component_models(); // This is only needed for testing, when the system is connected to the server this is redundant since it's already done when the socket receives the labware_summary
+socket.emit("give_me_current_labware");
+socket.emit("get_labware_summary");
 
 
 function displaySettings() {
@@ -89,12 +78,6 @@ function set_temperature() {
     let btemp = document.getElementById("btemp");
     let htime = document.getElementById("htime");
     socket.emit("set_temperature", [btemp.value, htime.value]);
-}
-
-function rate_to_distance_converter() {
-    let infusion_rate = document.getElementById("infusion_rate");
-    let withdraw_rate = document.getElementById("withdraw_rate");
-    socket.emit("rate_to_distance_converter", [infusion_rate.value, withdraw_rate.value]);
 }
 
 function set_lid_temperature() {
@@ -223,48 +206,32 @@ socket.on("get_lid_temp", function(temp) {
     temp1.innerHTML = temp;
 });
 
-//The socket.on event is placed after the testing call for populate_component_models() to make sure the testing happens before actual data is received and processed (otherwise test data would overwrite actual data)
-socket.on("labware_summary", function(labware_summary_received) {
-    labware_summary = labware_summary_received;
-    // Empty test options added
-    reset_chip_plate_options();
-    // Populate options for the labware components dropdown list here
-    populate_component_models();
-});
-
-function reset_chip_plate_options() {
+function reset_model_options() {
     // Erase all the options inside the dropdown list (select object)
-    var length = chip_plate_select.options.length;
+    var length = model_select.options.length;
     // The following for loop itertes from largest index to smalles since as items are removed, the length of the array decreases
     for (var i = length - 1; i >= 0; i--) {
-        chip_plate_select.remove(i);
+        model_select.remove(i);
     };
     // Add the default option
     var new_option = document.createElement("option");
     new_option.text = "- Select a Labware Component -";
-    chip_plate_select.add(new_option);
+    model_select.add(new_option);
 }
 
 function populate_component_models() {
-    var index = 1;
-    for (let chip_summary of labware_summary.chips) {
-        var new_option = document.createElement("option");
-        new_option.text = `Chip #${index} - ` + chip_summary["model"];
-        chip_plate_select.add(new_option);
-        index++;
-    }
     index = 1;
-    for (let plate_summary of labware_summary.plates) {
+    for (let model_summary of labware_summary.models) {
         var new_option = document.createElement("option");
-        new_option.text = `Plate #${index} - ` + plate_summary["model"];
-        chip_plate_select.add(new_option);
+        new_option.text = `Model #${index} - ` + model_summary["model"];
+        model_select.add(new_option);
         index++;
     }
 }
 
 function component_model_onclick() {
     console.log("component_model_onclick called!");
-    var option_selected = chip_plate_select.options[ chip_plate_select.selectedIndex ].value;
+    var option_selected = model_select.options[ model_select.selectedIndex ].value;
     console.log(option_selected);
     var current_labware_selected = option_selected;
     var labware_selected_changed = current_labware_selected != previous_labware_selected; // Boolean to see if with the click event on the select component the option selected was changed or not
@@ -297,18 +264,12 @@ function component_model_onclick() {
         // If the labware selected changed, fill in the options in the locations dropdown list
         if (labware_selected_changed) {
             // Find the labware component with the model equal to option_selected
-            var component_type_selected = option_selected.split("#")[0]
             var index_selected = parseInt(option_selected.split("#")[1][0]) - 1;
             // Extract its locations ("nicknames")
             var locations;
-            if (component_type_selected == "Chip ") {
-                console.log(labware_summary.chips);
-                locations = labware_summary.chips[index_selected].nicknames;
-            }
-            else {
-                console.log(labware_summary.plates);
-                locations = labware_summary.plates[index_selected].nicknames;
-            }
+                locations = labware_summary.models[index_selected].nicknames;
+                console.log("these are the locations " + locations)
+
             // Iterate through that list and add each element in it as an option to component_locations_select
             for (let location of locations) {
                 var new_option = document.createElement("option");
@@ -361,8 +322,8 @@ function show_component_button_listener(slot){
 }
 
 function go_button_listener() {
-    var component = chip_plate_select.value.split("#")[0][0].toLowerCase(); // extracts the lowercase initial of the component type
-    var component_index = parseInt(chip_plate_select.value.split("#")[1][0]) - 1; // extracts the index of the labware component
+    var component = model_select.value.split("#")[0][0].toLowerCase(); // extracts the lowercase initial of the component type
+    var component_index = parseInt(model_select.value.split("#")[1][0]) - 1; // extracts the index of the labware component
     var component_location = component_locations_select.value; // extracts the location selected within the labware component
     var command = [component, component_index, component_location]; // packs the command in the expected format in web_app.py
     console.log("GO! button pressed :D");
@@ -370,7 +331,7 @@ function go_button_listener() {
     socket.emit("instant_command", command); // Send the command! :D
 
     var feedback = document.getElementById("user_feedback");
-    feedback.innerHTML = `Syringe sent to ${component_location} in ${chip_plate_select.value}`;
+    feedback.innerHTML = `Syringe sent to ${component_location} in ${model_select.value}`;
 }
 
 socket.on("get_syringe_settings", function(givenSetting){
@@ -419,8 +380,5 @@ labware_page.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
 });
 protocol_page.addEventListener("click", function() {
-    socket.emit("stop_manual_control_window");
-});
-about_page.addEventListener("click", function() {
     socket.emit("stop_manual_control_window");
 });
