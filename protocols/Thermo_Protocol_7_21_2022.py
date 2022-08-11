@@ -28,7 +28,7 @@ metadata = {
 }
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-models = myProtocol.load_labware_setup('TC_7_20.json')
+models = myProtocol.load_labware_setup('TC_08_10_2022.json')
 
 custom = models[0]
 microPots_chip = models[1]
@@ -52,10 +52,12 @@ myProtocol.set_syringe_model("HAMILTON_175.json")
 
 myProtocol.set_washing_positions(custom('A3'), custom('A2'), custom('A1'))
 
+myProtocol.start_wash(50)
+
 # ------------START OF PROTOCOL---------------------------------
 myProtocol.close_lid()
+myProtocol.set_block_temp(4)
 myProtocol.set_block_temp(4, 2)
-myProtocol.deactivate_block()
 myProtocol.open_lid()
 
 myProtocol.aspirate_from(1050, custom('A5'), withdraw_rate)
@@ -69,13 +71,14 @@ myProtocol.dispense_to(200, chip_1('A9'), infusion_rate)
 
 myProtocol.dispense_to(0, custom('A1'), infusion_rate)
 
+myProtocol.deactivate_block()
 myProtocol.close_lid()
 myProtocol.set_lid_temp(37)
-myProtocol.set_block_temp(37, 15)
+myProtocol.set_block_temp(37, 30)
 myProtocol.deactivate_lid()
-myProtocol.set_block_temp(4, 7)
-myProtocol.deactivate_block()
+myProtocol.set_block_temp(4, 15)
 myProtocol.open_lid()
+myProtocol.deactivate_block()
 
 myProtocol.mid_wash(rate = 50)
 myProtocol.fill_syringe_with_water(50)

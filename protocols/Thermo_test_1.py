@@ -30,13 +30,13 @@ metadata = {
 # ----------IMPORT THE CALIBRATION FOR THIS PROTOCOL: this is done from the executer, it is specified on the GUI
 
 myProtocol.close_lid()
-myProtocol.set_block_temp(4, 2)
+myProtocol.set_block_temp(4, 1)
 myProtocol.deactivate_block()
 myProtocol.open_lid()
 myProtocol.close_lid()
 myProtocol.set_lid_temp(37)
-myProtocol.set_block_temp(37, 15)
+myProtocol.set_block_temp(37, 1)
 myProtocol.deactivate_lid()
-myProtocol.set_block_temp(4, 7)
+myProtocol.set_block_temp(4, 1)
 myProtocol.deactivate_block()
 myProtocol.open_lid()
