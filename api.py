@@ -42,7 +42,7 @@ class Api:
     def load_labware_setup(self, file_name):
         return self.coordinator.load_labware_setup(file_name)
 
-    def aspirate_from(self, volume, position, rate):
+    def aspirate_from(self, volume, position, rate = DEFAULT_RATE):
         self.coordinator.aspirate_from(volume, position, rate)
         self.amount_wanted = volume
 

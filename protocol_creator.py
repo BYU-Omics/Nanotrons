@@ -922,14 +922,9 @@ def tets_creation_of_file():
     # CREATE A PROTOCOL WITH ALL PARAMETERS SPECIFIED 
     if True:
         name_of_file = creator.create_protocol_file(labware_name=labware, 
-                                                    list_of_commands=list_of_commands, 
-                                                    voided_plates=plates_to_void_depth,
-                                                    author=author,
-                                                    description=description,
-                                                    waste_water_well=waste,
-                                                    wash_water_well=wash,
-                                                    clean_water_well=clean,
-                                                    filename=name_of_file)
+        list_of_commands=list_of_commands, voided_plates=plates_to_void_depth,
+        author=author, description=description,waste_water_well=waste,
+        wash_water_well=wash, clean_water_well= clean,filename= name_of_file)
 
     # CREATE A PROTOCOL WITHOUT WASHING SETUP
     if False:

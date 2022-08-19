@@ -237,13 +237,19 @@ class Coordinator:
                     self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
             
             elif button[0] == "A":
-                self.ot_control.pipete_L_Down(self.ot_control.xyz_step_size)
+                if (self.ot_control.side == LEFT):
+                    self.ot_control.pipete_L_Down(self.ot_control.xyz_step_size)
+                else:
+                    self.ot_control.pipete_R_Down(self.ot_control.xyz_step_size)
             elif button[0] == "B":
                 self.ot_control.report_current_position()
             elif button[0] == "X":
                 self.ot_control.change_vertical_axis()
             elif button[0] == "Y":
-                self.ot_control.pipete_L_Up(self.ot_control.xyz_step_size)
+                if (self.ot_control.side == LEFT):
+                    self.ot_control.pipete_L_Up(self.ot_control.xyz_step_size)
+                else: 
+                    self.ot_control.pipete_R_Up(self.ot_control.xyz_step_size)
             elif button[0] == "RB":
                 self.ot_control.step_size_up()
             elif button[0] == "LB":
@@ -287,9 +293,15 @@ class Coordinator:
             elif axis[0] == "R_STICK_RIGHT":
                 pass
             elif axis[0] == "R_STICK_UP":
-                self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
+                if(self.ot_control.side == LEFT):
+                    self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
+                else:
+                    self.ot_control.plunger_R_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
             elif axis[0] == "R_STICK_DOWN":
-                self.ot_control.plunger_L_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
+                if(self.ot_control.side == LEFT):
+                    self.ot_control.plunger_L_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
+                else:
+                    self.ot_control.plunger_R_Down(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
             elif axis[0] == "L_TRIGGER":
                 pass
             elif axis[0] == "R_TRIGGER":

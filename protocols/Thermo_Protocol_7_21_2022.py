@@ -28,7 +28,7 @@ metadata = {
 }
 # ----------CHIPS AND PLATES ARE LOADED IN THE ORDER THEY WERE CALIBRATED, this determines the index-----------
 
-models = myProtocol.load_labware_setup('TC_08_10_2022.json')
+models = myProtocol.load_labware_setup('TC2_08_16_2022.json')
 
 custom = models[0]
 microPots_chip = models[1]
