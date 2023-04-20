@@ -22,21 +22,21 @@ class Keyboard:
             for event in pygame.event.get(): # User did something.
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        self.otdriver.move_up(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.move_forward(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_DOWN:
-                        self.otdriver.move_down(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.move_back(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_LEFT:
                         self.otdriver.move_left(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_RIGHT:
                         self.otdriver.move_right(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_q:
-                        self.otdriver.pipete_L_Up(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.Z_axis_Up(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_a:
-                        self.otdriver.pipete_L_Down(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.Z_axis_Down(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_w:
-                        self.otdriver.pipete_R_Up(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.A_axis_Up(step_size= self.otdriver.xyz_step_size)
                     elif event.key == pygame.K_s:
-                        self.otdriver.pipete_R_Down(step_size= self.otdriver.xyz_step_size)
+                        self.otdriver.A_axis_Down(step_size= self.otdriver.xyz_step_size)
 
     # Sets to False the boolean that controls the listen() loop
     def stop_listening(self, dummy_arg):

@@ -65,9 +65,10 @@ SMALL_SQR_LINE_THICKNESS = 1
 
 app = Flask(__name__) # __name__ return the name of the file when called by another function. If called within the file it will return "__main__"
 
-print("Running web_app.py (web_app line 63)")
+print("\nRunning web_app.py\n")
 if RUNNING_APP_FOR_REAL:
-    print("Make sure the computer is connected to the modules and controller.")
+    pass
+    # print("Make sure the computer is connected to the modules and controller.")
 else: 
     print("Running app as a test. This means the server is not connected to the modules or the controller.")
 
@@ -83,6 +84,16 @@ logging.getLogger("engineio").setLevel(logging.ERROR)
 # -----------------------------------
 
 coordinator = Coordinator()
+print("\nHoming XYZA axes.\n")
+
+# Syringe homing will fail if initial position is too far from limit switch. Dont Know Why...
+# Move syringe position within range (approx 25 mm) before initiating manual homing of syringe.
+print("************ Remember This ************")
+print("WARNING: Syringe axes must be homed manually before use!")
+print("************ Remember This ************\n")
+coordinator.allow_homing = True
+coordinator.ot_control.home('XYZA')
+coordinator.allow_homing = False
 
 socketio = SocketIO(app, cors_allowed_origins='*') # the second parameter allows to disable some extra security implemented by newer versions of Flask that create an error if this parameter is not added
 
@@ -356,11 +367,6 @@ def stop_manual_control_window():
     # print("stop_joystick_control")
     coordinator.stop_joystick_control()
 
-# @socketio.on("screen_info")
-# def screen_info():
-#     print("screen_info")
-#     coordinator.ot_control.screen_info(True)
-
 @socketio.on("up_step_size")
 def up_step_size():
     # print("up_step_size")
@@ -517,50 +523,86 @@ def calibration_parameters(component_information):
     # component_information comes in the following format: ["c", "SZ002"]
     componentToCalibrate.append(component_information[0]) # Type of component: either "c" or "p" for chip and plate. respectively
     componentToCalibrate.append(component_information[1]) # Component model
-    print(componentToCalibrate)
+    # print(componentToCalibrate)
 
 
 @socketio.on("start_calibration")
 def start_calibration():
     socketio.emit("component_being_calibrated", componentToCalibrate)
-    coordinator.calibration_points = []
+    coordinator.calibration_points = [[0,0,0],[0,0,0],[0,0,0]] # reset values for calibration
+    coordinator.front_left_updated = False
+    coordinator.back_left_updated = False
+    coordinator.back_right_updated = False
+    positions = coordinator.calibration_points
+    str_position_1 = f"({positions[0][X]}, {positions[0][Y]}, {positions[0][Z]})"
+    str_position_2 = f"({positions[1][X]}, {positions[1][Y]}, {positions[1][Z]})"
+    str_position_3 = f"({positions[2][X]}, {positions[2][Y]}, {positions[2][Z]})"
+    socketio.emit("update_front_left",str_position_1)
+    socketio.emit("update_back_left",str_position_2)
+    socketio.emit("update_back_right",str_position_3)
     coordinator.joystick_control()
 
-@socketio.on ("add_calibration_point")
-def add_calibration_point():
+
+@socketio.on("Save Front Left")
+def save_front_left(): # currently this only works for the left pipette
     position = coordinator.get_current_coordinates()
-    coordinator.calibration_points.append(position)
-    socketio.emit("feedback_calibration_point", [ position[X], position[Y], position[Z] ] )
+    coordinator.calibration_points[0] = [ position[X], position[Y], position[Z] ]
+    print(coordinator.calibration_points)
+    str_position = f"({position[X]}, {position[Y]}, {position[Z]})"
+    socketio.emit("update_front_left", str_position )
+    socketio.emit("enable_move_to_front_left")
+    coordinator.front_left_updated = True
+    if (coordinator.front_left_updated == True) and (coordinator.back_left_updated == True) and (coordinator.back_right_updated == True):
+        socketio.emit("enable_test_calibration", coordinator.calibration_points)
+    
 
-    # Checking again, bc the flag could've been deactivated when exiting calibration (pressing home button or other) before finishing the calibration
-    if (len(coordinator.calibration_points) == NUMBER_OF_CALIBRATION_POINTS):
-        # Send an event with the calibration points list
-        socketio.emit("stored_calibration_points", coordinator.calibration_points)
+@socketio.on("Save Back Left")
+def save_back_left():
+    position = coordinator.get_current_coordinates()
+    coordinator.calibration_points[1] = [ position[X], position[Y], position[Z] ]
+    print(coordinator.calibration_points)
+    str_position = f"({position[X]}, {position[Y]}, {position[Z]})"
+    socketio.emit("update_back_left", str_position )
+    socketio.emit("enable_move_to_back_left")
+    coordinator.back_left_updated = True
+    if (coordinator.front_left_updated == True) and (coordinator.back_left_updated == True) and (coordinator.back_right_updated == True):
+        socketio.emit("enable_test_calibration", coordinator.calibration_points)
+    
 
-@socketio.on("start_calibration_load")
-def start_calibration_load():
-    socketio.emit("component_being_calibrated", componentToCalibrate) # Send the component being calibrated
+@socketio.on("Save Back Right")
+def save_back_right():
+    position = coordinator.get_current_coordinates()
+    coordinator.calibration_points[2] = [ position[X], position[Y], position[Z] ]
+    print(coordinator.calibration_points)
+    str_position = f"({position[X]}, {position[Y]}, {position[Z]})"
+    socketio.emit("update_back_right", str_position )
+    socketio.emit("enable_move_to_back_right")
+    coordinator.back_right_updated = True
+    if (coordinator.front_left_updated == True) and (coordinator.back_left_updated == True) and (coordinator.back_right_updated == True):
+        socketio.emit("enable_test_calibration", coordinator.calibration_points)
 
-@socketio.on("modify_calibration")
-def modify_calibration(calibration_points):
+@socketio.on("move_to_front_left")
+def move_to_front_left():
+    print(f"\nmoving to {coordinator.calibration_points[0]}")
+    # Move to front left calibration point
+    coordinator.go_to_position(coordinator.calibration_points[0])
 
-    # The 4th element will be the index to modify
-    index = calibration_points[FOURTH_CALIBRATION_POINT_POSITION]
-    new_list = calibration_points[:(NUMBER_OF_CALIBRATION_POINTS - 1)] # List with the previous calibration points
+@socketio.on("move_to_back_left")
+def move_to_back_left():
+    print(f"\nmoving to {coordinator.calibration_points[1]}")
+    # Move to back left calibration point
+    coordinator.go_to_position(coordinator.calibration_points[1])
 
-    # Once manual control is over (user pressed START button), read the position of the syringe
-    new_position = coordinator.get_current_coordinates()
-    # Store the position in the calibration points list
-    new_list[index] = new_position
-
-    # Send an event with the new calibration points
-    socketio.emit("calibration_points", new_list)
+@socketio.on("move_to_back_right")
+def move_to_back_right():
+    print(f"\nmoving to {coordinator.calibration_points[2]}")
+    # Move to back right calibration point
+    coordinator.go_to_position(coordinator.calibration_points[2])
 
 @socketio.on("test_calibration")
 def test_calibration(calibration_points):
     # Guess fourth point
     fourth_point = coordinator.guess_fourth_calibration_point(calibration_points)
-    socketio.emit("feedback_calibration_point", [ fourth_point[X], fourth_point[Y], fourth_point[Z] ] )
     # Move syringe to the guessed point
     coordinator.go_to_position(fourth_point)
 
@@ -835,14 +877,24 @@ def run_protocol(protocol_name):
         coordinator.disconnect_all() # First we disconnect all the modules
     
     if protocol_name == "- Select a Protocol -":
-        print(protocol_name)
+        print("Select a Protocol to Run!")
     elif ' ' in protocol_name:
-        print(protocol_name)
+        print(f'Selected Protocol: "{protocol_name}"')
         print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
     else:
+        print("\n***********************************")
         print("Running protocol")
+        print("Protocol Start Time: ", time.strftime("%H:%M:%S", time.gmtime()))
+        print("***********************************\n")
+
         executer.set_file_name(protocol_name) # Then we add the calibration to use
         executer.execute_python_protocol() # Then we execute an external file: the protocol.py
+
+        print("\n***********************************")
+        print("Protocol Finished Running!")
+        print("Protocol End Time: ", time.strftime("%H:%M:%S", time.gmtime()))
+        print("***********************************\n")
+
         coordinator.disconnect_all()
         coordinator.connect_all()
 
@@ -857,22 +909,27 @@ def get_available_protocols():
 
 @socketio.on("set_protocol_filename")
 def set_protocol_filename(protocol_name):
-    # print(f"Filename set to: {protocol_name}")
-    if ' ' in protocol_name:
-        print(protocol_name)
-        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.")
+    
+    if protocol_name == "- Select a Protocol -":
+        pass
+    elif ' ' in protocol_name:
+        print(f"\nFilename set to: {protocol_name}")
+        print("WARNING: There is a space on the name. Please replace it with an '_' before running the protocol.\n")
     elif '.py' not in protocol_name:
-        print("WARNING: Trying to set the filename to a not allowed extension. ")
+        print(f"\nFilename set to: {protocol_name}")
+        print("WARNING: File must have a .py extension!\n")
     else:
         executer.set_file_name(protocol_name) # Then we add the calibration to use
+        print(f"\nFilename set to: {protocol_name}")
     name_of_calibration_file = executer.info_from_protocol()[1]
     author = executer.info_from_protocol()[2]
     description = executer.info_from_protocol()[3]
-    if name_of_calibration_file == None or name_of_calibration_file == 'None set':
+    if name_of_calibration_file == None or name_of_calibration_file == '':
         pass
     else:
         coordinator.myLabware.model_list.clear()
-        coordinator.load_labware_setup(name_of_calibration_file)
+        
+        # coordinator.load_labware_setup(name_of_calibration_file)
 
     socketio.emit("protocol_python_labware", name_of_calibration_file)
     socketio.emit("protocol_python_author", author)
@@ -965,6 +1022,7 @@ def get_available_scripts():
 
 if __name__ == "__main__":
     socketio.emit("go_to_deck_slot", 10)
-    print("BUTTON CONNECTED************************")
+    print("\n************ Ignore This Next Bit ************")
     socketio.run(app)
+    
     

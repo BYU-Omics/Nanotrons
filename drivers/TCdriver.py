@@ -20,7 +20,7 @@ import os
 
 if TYPE_CHECKING:
     # avoid an issue where Queue doesn't support generics at runtime
-    CommandQueue = Queue[Tuple[str, Callable[[str], None]]]
+    CommandQueue = Queue(Tuple[str, Callable[[str], None]])
 else:
     CommandQueue = Queue
 
@@ -101,10 +101,11 @@ class Thermocycler:
         self._port = None
         self._connection = None
         if RUNNING_APP_FOR_REAL and THERMOCYCLER_CONNECTED:
-            print("Attempting to connect to TC")
+            print("Attempting connection to Thermocycler")
             self._connection = self._connect_to_port()
+            print("Thermocycler Connected!")
         else:
-            print("Not connected to the TC port")
+            pass
         self._update_thread = None
         self._current_temp = None
         self._target_temp = None

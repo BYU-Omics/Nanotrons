@@ -67,14 +67,11 @@ class Model:
         x = location[0]
         y = location[1]
         z = location[2]
+        
+            
         depth = self.get_well_depth(0)
         location_with_depth = [x, y, z - depth]
-        if self.void_depth:
-            # print("Depth has been voided. Returning calibration point level.")
-            return location
-        else:
-            # print(f"Depth for {self.get_model_name()} has not been voided. Going to the bottom of plate. ")
-            return location_with_depth
+        return location_with_depth
 
     # Returns the location of a given pot specified by its index
     def get_location_by_index(self, well_index):

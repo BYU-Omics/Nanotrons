@@ -6,7 +6,24 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         
+        
         <link rel="stylesheet" href="/static/styles/style2.css">
+        
+        <style>
+            body {
+                margin: 50px;
+            }
+            #container{
+                width: 500px;
+                height: 375px;
+                border: 10px #333 solid;
+            }
+            #needle_cam{
+                width: 490px;
+                height: 365px;
+                background-color: #666;
+            }
+        </style>
     </head>
 
     <body>
@@ -24,44 +41,39 @@
 
         <br>
 
-        <button class="btn-1" onclick="go_to_deck_slot('10')">10</button>
-        <button class="btn-1" onclick="go_to_deck_slot('11')">11</button>
-        <button class="btn-1" onclick="go_to_deck_slot('12')">12</button>
         
-        <br>
-        <button class="btn-1" onclick="go_to_deck_slot('7')"> 7 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('8')"> 8 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('9')"> 9 </button>
-        <br>
-        <button class="btn-1" onclick="go_to_deck_slot('4')"> 4 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('5')"> 5 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('6')"> 6 </button>
-        <br>
-        <button class="btn-1" onclick="go_to_deck_slot('1')"> 1 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('2')"> 2 </button>
-        <button class="btn-1" onclick="go_to_deck_slot('3')"> 3 </button>
-        <br>
-        
-        <h3 id='component'>Component: </h3>
+        <h3 id="component">Component: </h3>
 
-        <h3 id='coordinates'>Current Coordinates: </h3>
-        
-        <br>
-        <button onclick="add_calibration_point()">Add calibration point</button>
-        <br>
+        <h3 id="coordinates">Current Coordinates: </h3>
 
-        <img id="bg" src="{{ url_for('video_1_feed') }}"> <br><br>
-        <img id="bg" src="{{ url_for('video_2_feed') }}"> <br><br>
+        <h3 id="front left">Current Front Left: </h3>
+        <h3 id="back left">Current Back Left: </h3>
+        <h3 id="back right">Current Back Right: </h3>
+        
+        <button onclick="save_front_left()">Save Front Left</button>
+        <button onclick="save_back_left()">Save Back Left</button>
+        <button onclick="save_back_right()">Save Back Right</button>
+        <br>
+        <button type="button" disabled="disabled" id="Move_To_Front_Left">Move To Front Left</button>
+        <button type="button" disabled="disabled" id="Move_To_Back_Left">Move To Back Left</button>
+        <button type="button" disabled="disabled" id="Move_To_Back_Right">Move To Back Right</button>
+        <br><br>
 
         <button type="button" disabled="disabled" id="test">Test Calibration</button>
-
         <button type="button" disabled="disabled" id="good_calibration" onclick="window.location.href='http://localhost:5000/labware';" >Good Calibration - Save Component</button>
+        <br><br>
+          
+        
 
-        <button type="button" disabled="disabled" id="bad_calibration" onclick="location.href='/calibrate_component'">Bad Calibration - Retry</button>
+        <div>
+            <img id="needle_cam" src="{{ url_for('video_2_feed') }}"></img> 
+        </div>
+        
+        <br><br>
+        
+        
 
-        <ol id="feedback_calibration_points"></ol>
-
-        <script src="static/calibration.js"></script>
+        
     </body>
-
+    <script src="static/calibration.js"></script>
 </html>

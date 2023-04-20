@@ -54,7 +54,7 @@ import logging
 import os
 import sys
 import platform
-from collections import deque 
+from constants import THERMOCYCLER_CONNECTED, TEMPDECK_CONNECTED 
 
 DISTANCE = 10 #mm
 LINUX_OS = 'posix'
@@ -100,24 +100,30 @@ class Coordinator:
         """
         operating_system = ""
         os_recognized = os.name
-        print(f"OS recognized in init: {os_recognized}")
+        # print(f"OS recognized in init: {os_recognized}")
         self.ot_control = OT2_nanotrons_driver()
         self.mc = joystick.XboxJoystick(operating_system)
         self.myLabware = Labware_class()
-        self.joystick_profile = DEFAULT_PROFILE
         self.allow_homing = False
+        self.syringe_homing_warned = False
         self.tc_control = Thermocycler(interrupt_callback=interrupt_callback)
         self.td_control = TempDeck()
         self.protocol_creator = ProtocolCreator()
-        self.calibration_points = []
-        
+        self.calibration_points = [[0,0,0],[0,0,0],[0,0,0]]
+        self.front_left_updated = False
+        self.back_left_updated = False
+        self.back_right_updated = False
         if os_recognized == WINDOWS_OS:
             logging.info("Operating system: Windows")
-            print("Init function Windows")
+            # print("Init function Windows")
             operating_system = "w"
             if RUNNING_APP_FOR_REAL and CONTROLLER_CONNECTED:
-                self.myController = XboxJoystick("w")
-        elif os_recognized == LINUX_OS:
+                self.mc = joystick.XboxJoystick(operating_system)
+            else:
+                self.mc = Keyboard(self.ot_control)
+
+        # really not sure if setup was ever completed/tested for other OS
+        elif os_recognized == LINUX_OS: 
             logging.info("Operating system: Linux")
             operating_system = "r"
             if RUNNING_APP_FOR_REAL:
@@ -125,8 +131,10 @@ class Coordinator:
                     self.myController = Keyboard(self.ot_control)
                 else:
                     self.myController = XboxJoystick(operating_system)
-        if RUNNING_APP_FOR_REAL:
-            self.myProfile = Profile(self.joystick_profile)
+        else:
+            print("Operating system: ", os_recognized)
+
+        
         self.myModelsManager = ModelsManager(operating_system)
         self.coordinates_refresh_rate = REFRESH_COORDINATE_INTERVAL
         self.deck = Deck()
@@ -190,6 +198,14 @@ class Coordinator:
     def start_listening(self):
         self.mc.start_pygame()
         self.mc.listen()
+
+    def stop_joystick_control(self):
+        """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
+        """
+        try:
+            self.mc.stop_joystick = True
+        except AttributeError:
+            print("Trying to stop listening controller inputs but no controller connected")
     
     def joystick_control(self):
         """ This method opens a secondary thread to listen to the input of the joystick (have a real time update of the triggered inputs) and calls monitor_joystick on the main thread on a loop
@@ -202,16 +218,9 @@ class Coordinator:
             while(t1.is_alive()):
                 self.monitor_joystick()
                 time.sleep(0.1)
+            self.stop_joystick_control()
         else:
             pass
-
-    def stop_joystick_control(self):
-        """ This method turns off the flag that enables listening to the joystick, which triggers killing manual control given that the loop depends on that flag
-        """
-        try:
-            self.mc.stop_joystick = True
-        except AttributeError:
-            print("Trying to stop listening controller inputs but no controller connected")
 
     
     def monitor_joystick(self):
@@ -235,21 +244,22 @@ class Coordinator:
                     #self.ot_control.set_nL(self.user_input2) (Not being used currently)
                     self.ot_control.set_step_speed_syringe_motor(self.flowrate_to_speed_converter(float(self.user_input2)))
                     self.ot_control.set_step_size_syringe_motor(self.volume_to_distance_converter(int(self.user_input)))
+                    print('')
             
             elif button[0] == "A":
                 if (self.ot_control.side == LEFT):
-                    self.ot_control.pipete_L_Down(self.ot_control.xyz_step_size)
+                    self.ot_control.Z_axis_Down(self.ot_control.xyz_step_size)
                 else:
-                    self.ot_control.pipete_R_Down(self.ot_control.xyz_step_size)
+                    self.ot_control.A_axis_Down(self.ot_control.xyz_step_size)
             elif button[0] == "B":
                 self.ot_control.report_current_position()
             elif button[0] == "X":
                 self.ot_control.change_vertical_axis()
             elif button[0] == "Y":
-                if (self.ot_control.side == LEFT):
-                    self.ot_control.pipete_L_Up(self.ot_control.xyz_step_size)
+                if self.ot_control.side == LEFT:
+                    self.ot_control.Z_axis_Up(self.ot_control.xyz_step_size)
                 else: 
-                    self.ot_control.pipete_R_Up(self.ot_control.xyz_step_size)
+                    self.ot_control.A_axis_Up(self.ot_control.xyz_step_size)
             elif button[0] == "RB":
                 self.ot_control.step_size_up()
             elif button[0] == "LB":
@@ -257,37 +267,73 @@ class Coordinator:
             elif button[0] == "LSTICK":
                 pass
             elif button[0] == "RSTICK":
-                pass
+                print("Right stick button pressed")
+                self.ot_control.update_pipette_attachment_status() # Toggles pipette attachment, default is attached
+                print("Pipette status updated")
             elif button[0] == "BACK":
                 self.mc.stop_joystick = True
 
         if len(hat) != 0:
-            if hat[0] == "HAT_LEFT":
+            if hat[0] == "HAT_UP":
+                self.allow_homing = True
+                print("\nController homing enabled.\n")
+
+            elif hat[0] == "HAT_LEFT":
                 if self.allow_homing == True:
-                    self.ot_control.home('B')
-                    self.allow_homing = False
+                    if self.syringe_homing_warned:
+                        print("Homing left syringe\n")
+                        self.ot_control.home('B')
+                        self.allow_homing = False
+                    else:
+                        print("\n****************************************************************************")
+                        print("Syringe homing will fail if initial position is too far from limit switch.")
+                        print("Dont Know Why...")
+                        print("Move syringe position within range (approx 25 mm)\nbefore initiating manual homing of syringe.")
+                        print("Press button again to proceed with syringe homing (if you dare...)!")
+                        print("****************************************************************************\n")
+                        self.syringe_homing_warned = True
+                else:
+                    print("Homing not enabled")
+
             elif hat[0] == "HAT_RIGHT":
                 if self.allow_homing == True:
-                    self.ot_control.home('C')
-                    self.allow_homing = False
-            elif hat[0] == "HAT_UP":
-                self.allow_homing = True
-                print("Controller homing enabled.")
+                    if self.syringe_homing_warned:
+                        print("Homing right syringe")
+                        self.ot_control.home('C')
+                        self.allow_homing = False
+                    else:
+                        print("\n****************************************************************************")
+                        print("Syringe homing will fail if initial position is too far from limit switch.")
+                        print("Dont Know Why...")
+                        print("Move syringe position within range (approx 25 mm)\nbefore initiating manual homing of syringe.")
+                        print("Press button again to proceed with syringe homing (if you dare...)!")
+                        print("****************************************************************************\n")
+                        self.syringe_homing_warned = True
+                else:
+                    print("Homing not enabled")
+
             elif hat[0] == "HAT_DOWN":
                 if self.allow_homing == True:
                     self.ot_control.home('XYZA')
                     self.allow_homing = False
+                else:
+                    print("Homing not enabled")
                 
 
         if len(axis) != 0:
             if axis[0] == "L_STICK_LEFT":
+                # print("left")
                 self.ot_control.move_left(self.ot_control.xyz_step_size)
             elif axis[0] == "L_STICK_RIGHT":
+                # print("right")
                 self.ot_control.move_right(self.ot_control.xyz_step_size)
             elif axis[0] == "L_STICK_UP":
-                self.ot_control.move_up(self.ot_control.xyz_step_size)
+                # print("back")
+                self.ot_control.move_forward(self.ot_control.xyz_step_size)
             elif axis[0] == "L_STICK_DOWN":
-                self.ot_control.move_down(self.ot_control.xyz_step_size)
+                # print("front")
+                self.ot_control.move_back(self.ot_control.xyz_step_size)
+
             elif axis[0] == "R_STICK_LEFT":
                 pass
             elif axis[0] == "R_STICK_RIGHT":
@@ -295,6 +341,7 @@ class Coordinator:
             elif axis[0] == "R_STICK_UP":
                 if(self.ot_control.side == LEFT):
                     self.ot_control.plunger_L_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
+                    print('')
                 else:
                     self.ot_control.plunger_R_Up(self.ot_control.syringe_step_size, self.ot_control.syringe_step_speed, syringe_model, syringe_parameters)
             elif axis[0] == "R_STICK_DOWN":
@@ -354,7 +401,8 @@ class Coordinator:
         Args:
             location ([tuple]): contains three float numbers indicating a target 3D coordinate
         """
-        self.open_lid() # Prevents the pipette to crash with the thermocycler
+        if THERMOCYCLER_CONNECTED:
+            self.open_lid() # Prevents the pipette to crash with the thermocycler
         x = location[0]
         y = location[1]
         z = location[2] + 3
@@ -437,7 +485,7 @@ class Coordinator:
         distance_in_mm = volume * FROM_NANOLITERS / area # Volume is assumed to come in nanoLiters to it's converted to microliters to perform accurate calculations
         distance_to_feed_to_stepper_motor = distance_in_mm * UNIT_CONVERSION # something is off with the syringe motors, so distances have to be adjusted
 
-        print(f"Distance: {distance_in_mm} mm")
+        # print(f"Distance: {distance_in_mm} mm")
         # Return the distance needed to displace that amount of volume
         return distance_to_feed_to_stepper_motor
 
@@ -466,7 +514,7 @@ class Coordinator:
         speed_in_mm_s = rate * FROM_NANOLITERS / area * UNIT_CONVERSION # rate is assumed to come in nanoLiters/s, it's converted to microliters/s, then to mm/s 
         # print(f"speed: {speed_in_mm_s / UNIT_CONVERSION} mm/s")
 
-        print(f"Speed: {speed_in_mm_s} mm/s")
+        # print(f"Speed: {speed_in_mm_s} mm/s")
         # Return the speed to be used 
         return speed_in_mm_s
         
@@ -586,10 +634,9 @@ class Coordinator:
             input_file_name ([str]): name of desired input file
         """
         
-        print(f"Coordinator: Loading labware from {input_file_name}")
+        print(f"\nLoading labware from {input_file_name}\n")
         self.myLabware.load_labware_from_file(input_file_name)
-        model_list = self.myLabware.model_list
-        labware = model_list
+        labware = self.myLabware.model_list
         return labware
 
     def load_syringe_setup(self, loaded_syringe):
@@ -778,25 +825,23 @@ class Coordinator:
         else: 
             return None
 
-    def void_plate_depth(self, model: Model, void: bool = False):
-        model.void_plate_depth(void)
 
     '''
     PROTOCOL METHODS SECTION FOR OT2
         This section defines methods that get called to facilitate reading a script of instructions 
     '''
-    def aspirate_from(self, volume, position, W_rate = DEFAULT_RATE):
+    def aspirate_from(self, volume, position, rate = DEFAULT_RATE):
         """ This will go to the position of the source and aspirate an amount in nL"""
         self.go_to_position(position)
-        self.pick_up_liquid(int(100), W_rate) # Pick up an extra 100 for backlash
-        self.aspirate(volume, W_rate)
-        self.drop_off_liquid(int(100), W_rate) # Drop off liquid to account for backlash
+        self.pick_up_liquid(int(100), rate) # Pick up an extra 100 for backlash, doesn't log action
+        self.aspirate(volume, rate) # Pick up target volume
+        self.drop_off_liquid(int(100), rate) # Drop off liquid to account for backlash, doesn't log action
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to aspirate
 
-    def dispense_to(self, volume, position, I_rate = DEFAULT_RATE):
+    def dispense_to(self, volume, position, rate = DEFAULT_RATE):
         """ This will go to the position of the destination and dispense an amount in nL"""
         self.go_to_position(position)
-        self.dispense(volume, I_rate)
+        self.dispense(volume, rate)
         time.sleep(TIME_TO_SETTLE) # Allow some time to the syringe to dispense
         
     def move_plunger(self, position, speed = SYRINGE_SLOW_SPEED):
@@ -822,7 +867,7 @@ class Coordinator:
             and end in a postition that allows the protocol to aspirate and dispense without hitting limmmits"""
         # Go to waste and SYRINGE_BOTTOM
         syringe_model = self.myLabware.get_syringe_model()
-        print (f" start wash syringe: {syringe_model}")
+        # print (f" start wash syringe: {syringe_model}")
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         syringe_bottom_coordinate = syringe_parameters["lower_syringe_limit"] # This parameter is a coordinate on the B axis
         syringe_top_coordinate = syringe_parameters["upper_syringe_limit"] # This parameter is a coordinate on the B axis
@@ -830,9 +875,9 @@ class Coordinator:
 
         speed = self.flowrate_to_speed_converter(rate)
 
-        print(f"Syringe position is {self.ot_control._position['B']}")
+        # print(f"Syringe position is {self.ot_control._position['B']}")
         self.go_to_position(self.waste_water)
-        print (f"syringe_bottom_coordinate: {syringe_bottom_coordinate}")
+        # print (f"syringe_bottom_coordinate: {syringe_bottom_coordinate}")
         self.move_plunger(syringe_bottom_coordinate, speed)
         # Go to wash, SYRINGE_TOP, SYRINGE_BOTTOM
         self.go_to_position(self.wash_water)
@@ -850,8 +895,8 @@ class Coordinator:
         syringe_model = self.myLabware.get_syringe_model()
         syringe_parameters = self.myModelsManager.get_model_parameters(LABWARE_SYRINGE, syringe_model)
         syringe_sweet_spot_coordinate = syringe_parameters["sweetspot_on_syringe"] # This parameter is a coordinate on the B axis
-
         speed = self.flowrate_to_speed_converter(rate)
+        
         self.go_to_position(self.waste_water)
         self.dispense(left_over,rate)
         # Go to wash, aspirate amount wanted + Cushion 1, dipense amount wanted + Cushion 2
@@ -1015,9 +1060,11 @@ class Coordinator:
         """This method connects the modules connected to the computer"""
         try:
             self.disconnect_all()
-            self.tc_control._connection = self.tc_control._connect_to_port()
+            if THERMOCYCLER_CONNECTED:
+                self.tc_control._connection = self.tc_control._connect_to_port()
             self.ot_control.connect_driver()
-            self.td_control.connect(self.ot_control._port)
+            if TEMPDECK_CONNECTED:
+                self.td_control.connect(self.ot_control._port)
         except TypeError:
             print("Not able to disconnect and connect back to the modules")
 

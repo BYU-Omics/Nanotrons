@@ -4,7 +4,8 @@ JOYSTICK CLASS
     handles operational discrepancies of pygame 1.9.6 between Windows and Raspberry OS (any linux
     OS really )
 """
-
+from os import environ 
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # this line keeps pygame from printing a message when initiated 
 import pygame
 import time
 

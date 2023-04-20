@@ -99,8 +99,8 @@ class Labware_class:
         model_list = labware_dictionary["models"] # This is a list of dictionaries, each of which containes properties for a given model
 
         # Iterate through model_list and create a model object out of each dictionary
-        for model_properties in model_list:
-            new_model = Model(model_properties=model_properties)
+        for model in model_list:
+            new_model = Model(model_properties=model)
             self.model_list.append(new_model)
             
     def get_path_to_saved_labware_folder(self):
@@ -145,11 +145,11 @@ class Labware_class:
         # Create labware out of the dictionary
         self.dictionary_to_labware(labware_dictionary)
 
-        model_number = 0
+        # model_number = 0
 
-        for key in labware_dictionary:
-            if key == 'models':
-                model_number += 1
+        # for key in labware_dictionary:
+        #     if key == 'models':
+        #         model_number += 1
         
     def available_saved_labware_files(self):
         path = os.listdir(self.get_path_to_saved_labware_folder())

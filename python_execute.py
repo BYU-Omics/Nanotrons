@@ -56,7 +56,7 @@ class Py_Execute:
         self.p = subprocess.Popen(cmd, shell=True)
         out, err= self.p.communicate()
         if err == None:
-            print("Protocol ended without errors")
+            pass
         else:
             print(err)
             if out != None:
@@ -100,23 +100,23 @@ class Py_Execute:
             pass
             
     def info_from_protocol(self) -> list:
-        labware_calibration_file_name = "None set"
-        author = "None set"
-        description = "None set"
+        labware_calibration_file_name = ""
+        author = ""
+        description = ""
         try:
             if self.filename == 'no_name.py' or self.filename == "- Select a Protocol -":
-                print("No file has been selected")
-                contents = "None set"
-                labware_calibration_file_name = "None set"
-                author = "None set"
-                description = "None set"
+                # print("No file has been selected")
+                contents = ""
+                labware_calibration_file_name = ""
+                author = ""
+                description = ""
                 return [contents, labware_calibration_file_name, author, description]
             else:
                 with open(self.set_get_path(), 'r') as f:
                     contents = f.readlines()
                     for line in contents:
                         if "load_labware_setup" in line:
-                            labware_calibration: str = line[40:]
+                            labware_calibration: str = line[38:]
                             labware_calibration_file_name = labware_calibration.replace('(','').replace(')','').replace("'", "").replace("\n", "") # To get only the name as a string
                         if "author" in line:
                             author: str = line[12:]

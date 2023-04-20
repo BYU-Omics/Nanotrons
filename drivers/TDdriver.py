@@ -75,9 +75,11 @@ class TempDeck:
         self._port = None
         self.find_port()
         if RUNNING_APP_FOR_REAL and TEMPDECK_CONNECTED:
+            print("Attempting connection to Tempdeck")
             self.connect(self._port)
+            print("Tempdeck Connected!")
         else:
-            print("Not connected to the TD port")
+            pass
 
     def connect(self, port=None) -> Optional[str]:
         try:
