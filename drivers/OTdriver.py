@@ -31,13 +31,13 @@ LEFT_PIPETTE_ATTACHED = True
 Z_MAX_NO_PIPETTE = 218
 Z_MIN_NO_PIPETTE = 78
 Z_MAX_WITH_PIPETTE = 170.15 # values for when pipette is attached
-Z_MIN_WITH_PIPETTE = 20 # values for when pipette is attached
+Z_MIN_WITH_PIPETTE = 35 # values for when pipette is attached
 
 RIGHT_PIPETTE_ATTACHED = False
 A_MAX_NO_PIPETTE = 218
 A_MIN_NO_PIPETTE = 78
 A_MAX_WITH_PIPETTE = 170.15 # values for when pipette is attached
-A_MIN_WITH_PIPETTE = 20 # values for when pipette is attached
+A_MIN_WITH_PIPETTE = 35 # values for when pipette is attached
 
 B_MAX = 0
 B_MIN = -50
@@ -168,10 +168,10 @@ class OT2_nanotrons_driver(SM):
         if self.xyz_step_size_index < (len(list_of_sizes) -1):
             self.xyz_step_size_index += 1
             self.xyz_step_size = list_of_sizes[self.xyz_step_size_index]
-            print(f"\nManual Movement set to {self.xyz_step_size} mm\n")
+            print(f"\nXYZ Manual Movement set to {self.xyz_step_size} mm\n")
         else:
-            print("\nCannot further increase or decrease the Manual Control movement size")
-            print(f"Manual Movement set to {self.xyz_step_size} mm\n")
+            print("\nCannot further increase the Manual Control movement size")
+            print(f"XYZ Manual Movement set to {self.xyz_step_size} mm\n")
 
     def step_size_down(self):
         """"
@@ -182,9 +182,10 @@ class OT2_nanotrons_driver(SM):
         if self.xyz_step_size_index > 0:
             self.xyz_step_size_index -= 1
             self.xyz_step_size = list_of_sizes[self.xyz_step_size_index]
-            print(f"Stepping {self.xyz_step_size}[mm]")
+            print(f"\nXYZ Manual Movement set to {self.xyz_step_size} mm\n")
         else:
-            print(f"{str(self.xyz_step_size)} is the lowest step size allowed")
+            print("\nCannot further increase the Manual Control movement size")
+            print(f"XYZ Manual Movement set to {self.xyz_step_size} mm\n")
 
 # Functions to move the different axis, X, Y, Z and syringe: 
 

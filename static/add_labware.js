@@ -1,7 +1,7 @@
 $(document).ready( function(){
 
     // Set up the socket connection 
-    var socket = io.connect('http://127.0.0.1:5000');
+    var socket = io.connect('http://127.0.0.1:5000'); 
 
     // This is supposed to be received through a socket event, but this is for testing purposes
     var models = {};
@@ -79,26 +79,4 @@ $(document).ready( function(){
 
         }
     }
-
-
-
-    // // Event listener for the form object. Gets activated when the submit button is pressed and captures the values entered
-    // form.addEventListener("submit", function(event) {
-    //     console.log(form)
-    //     var data = new FormData(form); // This stores all the values captured in the form entered by the user
-    //     console.log("Form data: ", data)
-    //     var command = []; // This array will hold the values to be sent to the python code
-    //     var index = 0;
-    //     for (const entry of data) {
-    //         command[index] = entry[1]; // extract the useful information in each entry (only in index 1, index 0 containes the "name" identifier of each HTML input component)
-    //         index++;
-    //     };
-
-    //     console.log(command); // example output: ["c", "SZ002"]
-    //     // Send the data captured from the form to the Python code through the socket
-    //     socket.emit("calibration_parameters", command);
-    //     document.getElementById("myForm").reset(); // This resets the values of the form after it has been submitted
-    //     event.preventDefault(); // don't know if this is needed
-    // });
-
 })
